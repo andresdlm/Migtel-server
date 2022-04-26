@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Client } from 'pg';
 import { CreateClientDto, UpdateClientDto } from './../dtos/clients.dtos';
 
 @Injectable()
 export class ClientsService {
+  constructor(@Inject('PG') private dbClient: Client) {}
+
   findAll() {
     return null;
   }
