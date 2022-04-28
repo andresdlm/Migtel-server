@@ -14,14 +14,14 @@ import { ClientsService } from './../services/clients.service';
 export class ClientsController {
   constructor(private clientsService: ClientsService) {}
 
-  @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.clientsService.findOne(id);
-  }
-
   @Get()
   getAll() {
     return this.clientsService.findAll();
+  }
+
+  @Get(':id')
+  getOne(@Param('id', ParseIntPipe) id: number) {
+    return this.clientsService.findOne(id);
   }
 
   @Post('')
@@ -36,6 +36,6 @@ export class ClientsController {
 
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
-    return this.clientsService.remove(id);
+    return this.clientsService.delete(id);
   }
 }
