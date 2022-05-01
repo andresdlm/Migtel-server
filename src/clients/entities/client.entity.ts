@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PrimaryColumn, Column, Entity } from "typeorm";
+import { PrimaryColumn, Column, Entity, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Clients {
@@ -21,6 +21,9 @@ export class Clients {
   @Column({type: 'int'})
   retention: number;
 
-  @Column({type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
-  created_at: Date;
+  @CreateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
+  create_at: Date;
+
+  @UpdateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
+  update_at: Date;
 }

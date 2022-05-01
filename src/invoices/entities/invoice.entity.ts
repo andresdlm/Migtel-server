@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PrimaryColumn, Column, Entity } from "typeorm";
+import { PrimaryColumn, Column, Entity, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Invoices {
@@ -9,7 +9,7 @@ export class Invoices {
   @Column({type: 'int'})
   client_id: number;
 
-  @Column({type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
+  @CreateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
   register_date: Date;
 
   @Column({type: 'int'})
@@ -47,4 +47,7 @@ export class Invoices {
 
   @Column({type: 'boolean', default: false})
   canceled: boolean;
+
+  @UpdateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
+  update_at: Date;
 }

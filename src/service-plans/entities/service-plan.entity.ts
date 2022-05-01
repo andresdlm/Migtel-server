@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PrimaryColumn, Column, Entity } from "typeorm";
+import { PrimaryColumn, Column, Entity, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class ServicePlans {
@@ -18,6 +18,9 @@ export class ServicePlans {
   @Column({type: 'float'})
   price: number;
 
-  @Column({type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
-  created_at: Date;
+  @CreateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
+  create_at: Date;
+
+  @UpdateDateColumn({type: 'timestamptz', default: () => "CURRENT_TIMESTAMP"})
+  update_at: Date;
 }
