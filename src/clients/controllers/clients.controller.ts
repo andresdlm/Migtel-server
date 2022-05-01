@@ -8,6 +8,7 @@ import {
   Body,
   ParseIntPipe,
 } from '@nestjs/common';
+import { CreateClientDto, UpdateClientDto } from '../dtos/clients.dtos';
 import { ClientsService } from './../services/clients.service';
 
 @Controller('clients')
@@ -25,12 +26,15 @@ export class ClientsController {
   }
 
   @Post('')
-  create(@Body() payload: any) {
+  create(@Body() payload: CreateClientDto) {
     return this.clientsService.create(payload);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() payload: any) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateClientDto,
+  ) {
     return this.clientsService.update(id, payload);
   }
 

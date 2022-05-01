@@ -6,7 +6,7 @@ export class Clients {
   @PrimaryColumn()
   id: number;
 
-  @Column({type: 'varchar', length: 100})
+  @Column({type: 'varchar', length: 200})
   name: string;
 
   @Column({type: 'varchar', length: 10, default: 'V'})

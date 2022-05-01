@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { DatabaseModule } from './database/database.module';
+import { ServicePlansModule } from './service-plans/service-plans.module';
 import config from './../config';
 
 @Module({
@@ -28,6 +29,7 @@ import config from './../config';
     ClientsModule,
     InvoicesModule,
     DatabaseModule,
+    ServicePlansModule,
   ],
   controllers: [AppController],
   providers: [AppService],
