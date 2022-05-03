@@ -5,11 +5,11 @@ import { PartialType } from '@nestjs/mapped-types';
 export class CreateConceptInvoiceDto {
   @IsInt()
   @IsNotEmpty()
-  readonly invoice: number;
+  readonly invoiceInvoiceNumber: number;
 
   @IsInt()
   @IsNotEmpty()
-  readonly serviceClient: number;
+  readonly serviceClientId: number;
 }
 
 export class UpdateConceptInvoiceDto extends PartialType(CreateConceptInvoiceDto) {}

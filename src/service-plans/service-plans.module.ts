@@ -9,5 +9,6 @@ import { ServicePlans } from './entities/service-plan.entity';
   imports: [TypeOrmModule.forFeature([ServicePlans])],
   controllers: [ServicePlansController],
   providers: [ServicePlansService],
+  exports: [ServicePlansService],
 })
 export class ServicePlansModule {}

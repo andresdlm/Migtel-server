@@ -1,15 +1,16 @@
 /* eslint-disable prettier/prettier */
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsPositive } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
-export class CreateServiceClientDto {
-  @IsInt()
-  @IsNotEmpty()
-  readonly client: number;
 
-  @IsInt()
+export class CreateServiceClientDto {
+  @IsPositive()
   @IsNotEmpty()
-  readonly servicePlan: number;
+  readonly clientId: number;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly servicePlanId: number;
 }
 
 export class UpdateServiceClientDto extends PartialType(CreateServiceClientDto) {}

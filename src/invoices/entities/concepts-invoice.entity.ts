@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Column,
 } from 'typeorm';
 import { Invoices } from './invoice.entity';
 import { ServicesClient } from 'src/clients/entities/service-client.entity';
@@ -17,8 +18,14 @@ export class ConceptsInvoice {
   @ManyToOne(() => Invoices, (invoice) => invoice.concepts)
   invoice: Invoices;
 
+  @Column()
+  invoiceInvoiceNumber: number;
+
   @ManyToOne(() => ServicesClient, (servicesClient) => servicesClient.invoiceConcept)
   serviceClient: ServicesClient;
+
+  @Column()
+  serviceClientId: number;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   create_at: Date;

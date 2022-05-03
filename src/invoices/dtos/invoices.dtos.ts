@@ -9,7 +9,7 @@ export class CreateInvoiceDto {
 
   @IsInt()
   @IsNotEmpty()
-  readonly client: number;
+  readonly clientId: number;
 
   @IsDate()
   @IsNotEmpty()

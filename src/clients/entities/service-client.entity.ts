@@ -5,7 +5,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany
+  OneToMany,
+  Column
 } from 'typeorm';
 import { Clients } from './client.entity';
 import { ServicePlans } from 'src/service-plans/entities/service-plan.entity';
@@ -19,8 +20,14 @@ export class ServicesClient {
   @ManyToOne(() => Clients, (client) => client.services)
   client: Clients;
 
+  @Column()
+  clientId: number;
+
   @ManyToOne(() => ServicePlans, (servicePlan) => servicePlan.servicesClients)
   servicePlan: ServicePlans;
+
+  @Column()
+  servicePlanId: number;
 
   @OneToMany(() => ConceptsInvoice, (conceptsInvoice) => conceptsInvoice.serviceClient)
   invoiceConcept: ConceptsInvoice[];

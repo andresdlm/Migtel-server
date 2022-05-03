@@ -8,9 +8,15 @@ import { ServicesClientController } from './controllers/services-client.controll
 import { ServicesClientService } from './services/services-client.service';
 import { ServicesClient } from './entities/service-client.entity';
 
+import { ServicePlansModule } from 'src/service-plans/service-plans.module';
+
 @Module({
   controllers: [ClientsController, ServicesClientController],
   providers: [ClientsService, ServicesClientService],
-  imports: [TypeOrmModule.forFeature([Clients, ServicesClient])],
+  imports: [
+    TypeOrmModule.forFeature([Clients, ServicesClient]),
+    ServicePlansModule,
+  ],
+  exports: [ClientsService, ServicesClientService],
 })
 export class ClientsModule {}
