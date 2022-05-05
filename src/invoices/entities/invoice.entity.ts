@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Client } from 'src/clients/entities/client.entity';
 import {
   PrimaryColumn,
@@ -8,7 +7,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm';
 import { InvoiceConcept } from './invoice-concept.entity';
 
@@ -24,7 +23,11 @@ export class Invoice {
   @Column({ name: 'client_id' })
   clientId: number;
 
-  @CreateDateColumn({ name: 'register_date',type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    name: 'register_date',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   registerDate: Date;
 
   @Column({ type: 'int' })
@@ -66,6 +69,10 @@ export class Invoice {
   @OneToMany(() => InvoiceConcept, (invoiceConcept) => invoiceConcept.invoice)
   concepts: InvoiceConcept[];
 
-  @UpdateDateColumn({ name: 'update_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updateAt: Date;
 }

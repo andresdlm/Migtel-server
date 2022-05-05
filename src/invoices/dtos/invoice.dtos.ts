@@ -1,6 +1,11 @@
-/* eslint-disable prettier/prettier */
-import { IsInt, IsString, IsNotEmpty, IsDate, IsBoolean } from "class-validator";
-import { PartialType } from "@nestjs/mapped-types";
+import {
+  IsInt,
+  IsString,
+  IsNotEmpty,
+  IsDate,
+  IsBoolean,
+} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateInvoiceDto {
   @IsInt()

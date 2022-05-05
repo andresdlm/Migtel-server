@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsInt, IsString, IsNotEmpty } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 

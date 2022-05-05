@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsInt, IsNotEmpty } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -12,4 +11,6 @@ export class CreateInvoiceConceptDto {
   readonly clientServiceId: number;
 }
 
-export class UpdateInvoiceConceptDto extends PartialType(CreateInvoiceConceptDto) {}
+export class UpdateInvoiceConceptDto extends PartialType(
+  CreateInvoiceConceptDto,
+) {}
