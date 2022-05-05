@@ -13,7 +13,7 @@ export class CreateClientDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly person_type: string;
+  readonly personType: string;
 
   @IsString()
   @IsNotEmpty()

@@ -5,7 +5,7 @@ import { PartialType } from "@nestjs/mapped-types";
 export class CreateInvoiceDto {
   @IsInt()
   @IsNotEmpty()
-  readonly invoice_number: number;
+  readonly invoiceNumber: number;
 
   @IsInt()
   @IsNotEmpty()
@@ -13,7 +13,7 @@ export class CreateInvoiceDto {
 
   @IsDate()
   @IsNotEmpty()
-  readonly register_date: Date;
+  readonly registerDate: Date;
 
   @IsInt()
   @IsNotEmpty()
@@ -49,11 +49,11 @@ export class CreateInvoiceDto {
 
   @IsInt()
   @IsNotEmpty()
-  readonly total_amount: number;
+  readonly totalAmount: number;
 
   @IsInt()
   @IsNotEmpty()
-  readonly exhange_rate: number;
+  readonly exhangeRate: number;
 
   @IsString()
   @IsNotEmpty()

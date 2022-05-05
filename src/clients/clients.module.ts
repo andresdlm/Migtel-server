@@ -3,20 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ClientsController } from './controllers/clients.controller';
 import { ClientsService } from './services/clients.service';
-import { Clients } from './entities/client.entity';
-import { ServicesClientController } from './controllers/services-client.controller';
-import { ServicesClientService } from './services/services-client.service';
-import { ServicesClient } from './entities/service-client.entity';
+import { Client } from './entities/client.entity';
+import { ClientServicesController } from './controllers/client-services.controller';
+import { ClientServicesService } from './services/client-services.service';
+import { ClientService } from './entities/client-service.entity';
 
 import { ServicePlansModule } from 'src/service-plans/service-plans.module';
 
 @Module({
-  controllers: [ClientsController, ServicesClientController],
-  providers: [ClientsService, ServicesClientService],
+  controllers: [ClientsController, ClientServicesController],
+  providers: [ClientsService, ClientServicesService],
   imports: [
-    TypeOrmModule.forFeature([Clients, ServicesClient]),
+    TypeOrmModule.forFeature([Client, ClientService]),
     ServicePlansModule,
   ],
-  exports: [ClientsService, ServicesClientService],
+  exports: [ClientsService, ClientServicesService],
 })
 export class ClientsModule {}

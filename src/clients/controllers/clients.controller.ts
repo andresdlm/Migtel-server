@@ -8,7 +8,7 @@ import {
   Body,
   ParseIntPipe,
 } from '@nestjs/common';
-import { CreateClientDto, UpdateClientDto } from '../dtos/clients.dtos';
+import { CreateClientDto, UpdateClientDto } from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
 
 @Controller('clients')

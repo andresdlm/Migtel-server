@@ -2,14 +2,14 @@
 import { IsInt, IsNotEmpty } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
-export class CreateConceptInvoiceDto {
+export class CreateInvoiceConceptDto {
   @IsInt()
   @IsNotEmpty()
-  readonly invoiceInvoiceNumber: number;
+  readonly invoiceNumber: number;
 
   @IsInt()
   @IsNotEmpty()
-  readonly serviceClientId: number;
+  readonly clientServiceId: number;
 }
 
-export class UpdateConceptInvoiceDto extends PartialType(CreateConceptInvoiceDto) {}
+export class UpdateInvoiceConceptDto extends PartialType(CreateInvoiceConceptDto) {}

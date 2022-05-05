@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ServicePlansController } from './controllers/service-plans.controller';
 import { ServicePlansService } from './services/service-plans.service';
-import { ServicePlans } from './entities/service-plan.entity';
+import { ServicePlan } from './entities/service-plan.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ServicePlans])],
+  imports: [TypeOrmModule.forFeature([ServicePlan])],
   controllers: [ServicePlansController],
   providers: [ServicePlansService],
   exports: [ServicePlansService],

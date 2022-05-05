@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Clients } from 'src/clients/entities/client.entity';
+import { Client } from 'src/clients/entities/client.entity';
 import {
   PrimaryColumn,
   Column,
@@ -7,20 +7,25 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany
+  OneToMany,
+  JoinColumn
 } from 'typeorm';
-import { ConceptsInvoice } from './concepts-invoice.entity';
+import { InvoiceConcept } from './invoice-concept.entity';
 
-@Entity()
-export class Invoices {
-  @PrimaryColumn()
-  invoice_number: number;
+@Entity({ name: 'invoices' })
+export class Invoice {
+  @PrimaryColumn({ name: 'invoice_number' })
+  invoiceNumber: number;
 
-  @ManyToOne(() => Clients, (client) => client.invoices)
-  client: Clients;
+  @ManyToOne(() => Client, (client) => client.invoices)
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
 
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  register_date: Date;
+  @Column({ name: 'client_id' })
+  clientId: number;
+
+  @CreateDateColumn({ name: 'register_date',type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  registerDate: Date;
 
   @Column({ type: 'int' })
   group: number;
@@ -46,11 +51,11 @@ export class Invoices {
   @Column({ type: 'real' })
   igtf: number;
 
-  @Column({ type: 'real' })
-  total_amount: number;
+  @Column({ name: 'total_amount', type: 'real' })
+  totalAmount: number;
 
-  @Column({ type: 'real' })
-  exhange_rate: number;
+  @Column({ name: 'exhange_rate', type: 'real' })
+  exhangeRate: number;
 
   @Column({ type: 'varchar', length: 500 })
   comment: string;
@@ -58,9 +63,9 @@ export class Invoices {
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
 
-  @OneToMany(() => ConceptsInvoice, (conceptsInvoice) => conceptsInvoice.invoice)
-  concepts: ConceptsInvoice[];
+  @OneToMany(() => InvoiceConcept, (invoiceConcept) => invoiceConcept.invoice)
+  concepts: InvoiceConcept[];
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  update_at: Date;
+  @UpdateDateColumn({ name: 'update_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  updateAt: Date;
 }

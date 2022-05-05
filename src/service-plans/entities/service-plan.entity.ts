@@ -5,33 +5,41 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany
+  OneToMany,
 } from 'typeorm';
-import { ServicesClient } from 'src/clients/entities/service-client.entity';
+import { ClientService } from 'src/clients/entities/client-service.entity';
 
-@Entity()
-export class ServicePlans {
+@Entity({ name: 'service_plans' })
+export class ServicePlan {
   @PrimaryColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ name: 'invoice_label', type: 'varchar', length: 100 })
   invoiceLabel: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ name: 'service_plan_type', type: 'varchar', length: 100 })
   servicePlanType: string;
 
   @Column({ type: 'float' })
   price: number;
 
-  @OneToMany(() => ServicesClient, (serviceClient) => serviceClient.servicePlan)
-  servicesClients: ServicesClient[];
+  @OneToMany(() => ClientService, (clientService) => clientService.servicePlan)
+  clientServices: ClientService[];
 
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  create_at: Date;
+  @CreateDateColumn({
+    name: 'create_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  update_at: Date;
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
 }

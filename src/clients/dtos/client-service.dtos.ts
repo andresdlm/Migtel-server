@@ -3,7 +3,7 @@ import { IsNotEmpty, IsPositive } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 
-export class CreateServiceClientDto {
+export class CreateClientServiceDto {
   @IsPositive()
   @IsNotEmpty()
   readonly clientId: number;
@@ -13,4 +13,4 @@ export class CreateServiceClientDto {
   readonly servicePlanId: number;
 }
 
-export class UpdateServiceClientDto extends PartialType(CreateServiceClientDto) {}
+export class UpdateClientServiceDto extends PartialType(CreateClientServiceDto) {}

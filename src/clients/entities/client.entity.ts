@@ -1,5 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { Invoices } from 'src/invoices/entities/invoice.entity';
 import {
   PrimaryColumn,
   Column,
@@ -8,18 +7,19 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { ServicesClient } from './service-client.entity';
+import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { ClientService } from './client-service.entity';
 
-@Entity()
-export class Clients {
+@Entity({ name: 'clients' })
+export class Client {
   @PrimaryColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 200 })
   name: string;
 
-  @Column({ type: 'varchar', length: 10, default: 'V' })
-  person_type: string;
+  @Column({ name: 'person_type', type: 'varchar', length: 10, default: 'V' })
+  personType: string;
 
   @Column({ type: 'varchar', length: 20 })
   document: string;
@@ -30,15 +30,23 @@ export class Clients {
   @Column({ type: 'int' })
   retention: number;
 
-  @OneToMany(() => ServicesClient, (service) => service.client)
-  services: ServicesClient[];
+  @OneToMany(() => ClientService, (service) => service.client)
+  services: ClientService[];
 
-  @OneToMany(() => Invoices, (invoices) => invoices.client)
-  invoices: Invoices[];
+  @OneToMany(() => Invoice, (invoice) => invoice.client)
+  invoices: Invoice[];
 
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  create_at: Date;
+  @CreateDateColumn({
+    name: 'create_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  update_at: Date;
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
 }

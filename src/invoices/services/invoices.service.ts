@@ -2,15 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoices.dtos';
-import { Invoices } from '../entities/invoice.entity';
+import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoice.dtos';
+import { Invoice } from '../entities/invoice.entity';
 
 import { ClientsService } from 'src/clients/services/clients.service';
 
 @Injectable()
 export class InvoicesService {
   constructor(
-    @InjectRepository(Invoices) private invoiceRepo: Repository<Invoices>,
+    @InjectRepository(Invoice) private invoiceRepo: Repository<Invoice>,
     private clientsService: ClientsService,
   ) {}
 
@@ -18,10 +18,10 @@ export class InvoicesService {
     return this.invoiceRepo.find();
   }
 
-  findOne(invoice_number: number) {
-    const invoice = this.invoiceRepo.findOne(invoice_number);
+  findOne(invoiceNumber: number) {
+    const invoice = this.invoiceRepo.findOne(invoiceNumber);
     if (!invoice) {
-      throw new NotFoundException(`Invoice #${invoice_number} not found`);
+      throw new NotFoundException(`Invoice #${invoiceNumber} not found`);
     }
     return invoice;
   }
@@ -35,8 +35,8 @@ export class InvoicesService {
     return this.invoiceRepo.save(newInvoice);
   }
 
-  async update(invoice_number: number, changes: UpdateInvoiceDto) {
-    const invoice = await this.invoiceRepo.findOne(invoice_number);
+  async update(invoiceNumber: number, changes: UpdateInvoiceDto) {
+    const invoice = await this.invoiceRepo.findOne(invoiceNumber);
     if (changes.clientId) {
       const client = await this.clientsService.findOne(changes.clientId);
       invoice.client = client;
@@ -45,7 +45,7 @@ export class InvoicesService {
     return this.invoiceRepo.save(invoice);
   }
 
-  delete(invoice_number: number) {
-    return this.invoiceRepo.delete(invoice_number);
+  delete(invoiceNumber: number) {
+    return this.invoiceRepo.delete(invoiceNumber);
   }
 }

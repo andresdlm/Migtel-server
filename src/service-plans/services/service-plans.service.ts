@@ -5,14 +5,14 @@ import { Repository } from 'typeorm';
 import {
   CreateServicePlanDto,
   UpdateServicePlanDto,
-} from '../dtos/service-plans.dtos';
-import { ServicePlans } from '../entities/service-plan.entity';
+} from '../dtos/service-plan.dtos';
+import { ServicePlan } from '../entities/service-plan.entity';
 
 @Injectable()
 export class ServicePlansService {
   constructor(
-    @InjectRepository(ServicePlans)
-    private servicePlanRepo: Repository<ServicePlans>,
+    @InjectRepository(ServicePlan)
+    private servicePlanRepo: Repository<ServicePlan>,
   ) {}
 
   findAll() {

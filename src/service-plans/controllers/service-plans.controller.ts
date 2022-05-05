@@ -12,7 +12,7 @@ import {
 import {
   CreateServicePlanDto,
   UpdateServicePlanDto,
-} from '../dtos/service-plans.dtos';
+} from '../dtos/service-plan.dtos';
 import { ServicePlansService } from '../services/service-plans.service';
 
 @Controller('service-plans')
