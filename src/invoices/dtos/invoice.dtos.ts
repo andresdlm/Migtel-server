@@ -2,8 +2,9 @@ import {
   IsInt,
   IsString,
   IsNotEmpty,
-  IsDate,
   IsBoolean,
+  IsNumber,
+  IsPositive,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -16,10 +17,6 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly clientId: number;
 
-  @IsDate()
-  @IsNotEmpty()
-  readonly registerDate: Date;
-
   @IsInt()
   @IsNotEmpty()
   readonly group: number;
@@ -28,35 +25,43 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly coc: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly subtotal: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly iva: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly iva_r: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly iva_p: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly islr: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly igtf: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly totalAmount: number;
 
-  @IsInt()
+  @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   readonly exhangeRate: number;
 

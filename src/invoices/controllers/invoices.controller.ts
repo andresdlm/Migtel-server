@@ -20,9 +20,9 @@ export class InvoicesController {
     return this.invoiceService.findAll();
   }
 
-  @Get(':invoice_number')
-  getOne(@Param(':invoice_number', ParseIntPipe) invoice_number: number) {
-    return this.invoiceService.findOne(invoice_number);
+  @Get(':invoiceNumber')
+  getOne(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.findOne(invoiceNumber);
   }
 
   @Post('')
@@ -30,12 +30,12 @@ export class InvoicesController {
     return this.invoiceService.create(payload);
   }
 
-  @Put(':invoice_number')
+  @Put(':invoiceNumber')
   update(
-    @Param('invoice_number', ParseIntPipe) invoice_number: number,
+    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
     @Body() payload: UpdateInvoiceDto,
   ) {
-    return this.invoiceService.update(invoice_number, payload);
+    return this.invoiceService.update(invoiceNumber, payload);
   }
 
   @Delete(':invoice_number')

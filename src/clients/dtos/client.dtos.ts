@@ -22,6 +22,10 @@ export class CreateClientDto {
   @IsNotEmpty()
   readonly address: string;
 
+  @IsString()
+  @IsNotEmpty()
+  readonly city: string;
+
   @IsInt()
   @IsNotEmpty()
   readonly retention: number;

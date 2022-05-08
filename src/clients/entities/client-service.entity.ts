@@ -31,6 +31,12 @@ export class ClientService {
   @Column({ name: 'service_plan_id' })
   servicePlanId: number;
 
+  @Column({ name: 'has_individual_price', type: 'boolean' })
+  hasIndividualPrice: boolean;
+
+  @Column({ name: 'individual_price', type: 'real', default: 0 })
+  individualPrice: number;
+
   @OneToMany(
     () => InvoiceConcept,
     (invoiceConcept) => invoiceConcept.clientService,

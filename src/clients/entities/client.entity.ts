@@ -26,6 +26,9 @@ export class Client {
   @Column({ type: 'varchar', length: 500 })
   address: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  city: string;
+
   @Column({ type: 'int' })
   retention: number;
 
