@@ -71,6 +71,10 @@ export class CreateInvoiceDto {
 
   @IsBoolean()
   @IsNotEmpty()
+  readonly usdInvoice: boolean;
+
+  @IsBoolean()
+  @IsNotEmpty()
   readonly canceled: boolean;
 }
 

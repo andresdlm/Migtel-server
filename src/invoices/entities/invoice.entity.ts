@@ -69,6 +69,9 @@ export class Invoice {
   @Column({ type: 'varchar', length: 500 })
   comment: string;
 
+  @Column({ name: 'usd_invoice', type: 'boolean', default: false })
+  usdInvoice: boolean;
+
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
 

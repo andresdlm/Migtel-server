@@ -47,7 +47,6 @@ export class InvoicesService {
       throw new NotFoundException(`Client #${clientId} has any invoice`);
     }
     // TODO:
-    this.calculateInvoiceAmount(clientId, 'f');
     return invoices;
   }
 
@@ -63,6 +62,19 @@ export class InvoicesService {
       data.paymentMethodId,
     );
     newInvoice.paymentMethod = paymentMethod;
+    const invoiceAmounts = this.calculateInvoiceAmount(
+      data.clientId,
+      data.paymentMethodId,
+      data.usdInvoice,
+    );
+    newInvoice.subtotal = (await invoiceAmounts).subtotal;
+    newInvoice.iva = (await invoiceAmounts).iva;
+    newInvoice.iva_r = (await invoiceAmounts).iva_r;
+    newInvoice.iva_p = (await invoiceAmounts).iva_p;
+    newInvoice.islr = (await invoiceAmounts).islr;
+    newInvoice.igtf = (await invoiceAmounts).igtf;
+    newInvoice.totalAmount = (await invoiceAmounts).totalAmount;
+    newInvoice.exhangeRate = (await invoiceAmounts).exhangeRate;
     return this.invoiceRepo.save(newInvoice);
   }
 
@@ -86,7 +98,11 @@ export class InvoicesService {
     return this.invoiceRepo.delete(invoiceNumber);
   }
 
-  async calculateInvoiceAmount(clientId: number, coc: string) {
+  async calculateInvoiceAmount(
+    clientId: number,
+    coc: string,
+    UsdInvoice: boolean,
+  ) {
     const clientServices: ClientService[] =
       await this.clientServicesService.findByClientId(clientId);
     let amount = 0;
@@ -107,6 +123,7 @@ export class InvoicesService {
       islr: 0,
       igtf: 0,
       totalAmount: 0,
+      exhangeRate: 0,
     };
     invoiceAmounts.totalAmount = invoiceAmounts.subtotal + invoiceAmounts.iva;
     if (clientServices[0].client.hasIslr) {
@@ -120,6 +137,17 @@ export class InvoicesService {
       invoiceAmounts.igtf = invoiceAmounts.totalAmount * 0.03;
       invoiceAmounts.totalAmount = +invoiceAmounts.igtf;
     }
-    console.log(invoiceAmounts);
+    if (!UsdInvoice) {
+      invoiceAmounts.subtotal =
+        invoiceAmounts.subtotal * invoiceAmounts.exhangeRate;
+      invoiceAmounts.iva = invoiceAmounts.iva * invoiceAmounts.exhangeRate;
+      invoiceAmounts.iva_r = invoiceAmounts.iva_r * invoiceAmounts.exhangeRate;
+      invoiceAmounts.iva_p = invoiceAmounts.iva_p * invoiceAmounts.exhangeRate;
+      invoiceAmounts.islr = invoiceAmounts.islr * invoiceAmounts.exhangeRate;
+      invoiceAmounts.igtf = invoiceAmounts.igtf * invoiceAmounts.exhangeRate;
+      invoiceAmounts.totalAmount =
+        invoiceAmounts.totalAmount * invoiceAmounts.exhangeRate;
+    }
+    return invoiceAmounts;
   }
 }
