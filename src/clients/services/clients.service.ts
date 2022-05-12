@@ -12,11 +12,15 @@ export class ClientsService {
   ) {}
 
   findAll() {
-    return this.clientRepo.find();
+    return this.clientRepo.find({
+      relations: ['services'],
+    });
   }
 
   findOne(id: number) {
-    const client = this.clientRepo.findOne(id);
+    const client = this.clientRepo.findOne(id, {
+      relations: ['services'],
+    });
     if (!client) {
       throw new NotFoundException(`Client #${id} not found`);
     }

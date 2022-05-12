@@ -28,6 +28,11 @@ export class ClientServicesController {
     return this.clientServicesService.findOne(id);
   }
 
+  @Get('client/:clientId')
+  getByClientId(@Param('clientId', ParseIntPipe) clientId: number) {
+    return this.clientServicesService.findByClientId(clientId);
+  }
+
   @Post('')
   create(@Body() payload: CreateClientServiceDto) {
     return this.clientServicesService.create(payload);

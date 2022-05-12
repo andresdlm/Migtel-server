@@ -16,7 +16,9 @@ export class PaymentMethodsService {
   ) {}
 
   findAll() {
-    return this.paymentMethodRepo.find();
+    return this.paymentMethodRepo.find({
+      relations: ['invoices'],
+    });
   }
 
   findOne(id: string) {

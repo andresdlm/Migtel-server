@@ -32,6 +32,12 @@ export class Client {
   @Column({ type: 'int' })
   retention: number;
 
+  @Column({ name: 'has_islr', type: 'boolean' })
+  hasIslr: boolean;
+
+  @Column({ name: 'amount_islr', type: 'int' })
+  amountIslr: number;
+
   @OneToMany(() => ClientService, (service) => service.client)
   services: ClientService[];
 

@@ -1,4 +1,6 @@
+import { ClientService } from 'src/clients/entities/client-service.entity';
 import { Client } from 'src/clients/entities/client.entity';
+import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import {
   PrimaryColumn,
   Column,
@@ -6,10 +8,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
-import { InvoiceConcept } from './invoice-concept.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -33,8 +35,12 @@ export class Invoice {
   @Column({ type: 'int' })
   group: number;
 
-  @Column({ type: 'int' })
-  coc: number;
+  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.invoices)
+  @JoinColumn({ name: 'payment_method_id' })
+  paymentMethod: PaymentMethod;
+
+  @Column({ name: 'payment_method_id', type: 'varchar' })
+  paymentMethodId: string;
 
   @Column({ type: 'real' })
   subtotal: number;
@@ -66,8 +72,20 @@ export class Invoice {
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
 
-  @OneToMany(() => InvoiceConcept, (invoiceConcept) => invoiceConcept.invoice)
-  concepts: InvoiceConcept[];
+  @ManyToMany(
+    () => ClientService,
+    (clientsServices) => clientsServices.invoices,
+  )
+  @JoinTable({
+    name: 'invoice_concepts',
+    joinColumn: {
+      name: 'invoice_number',
+    },
+    inverseJoinColumn: {
+      name: 'client_service_id',
+    },
+  })
+  clientsServices: ClientService[];
 
   @UpdateDateColumn({
     name: 'update_at',

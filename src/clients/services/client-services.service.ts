@@ -20,15 +20,32 @@ export class ClientServicesService {
   ) {}
 
   findAll() {
-    return this.clientServiceRepo.find();
+    return this.clientServiceRepo.find({
+      relations: ['client', 'servicePlan'],
+    });
   }
 
   findOne(id: number) {
-    const clientService = this.clientServiceRepo.findOne(id);
+    const clientService = this.clientServiceRepo.findOne(id, {
+      relations: ['client', 'servicePlan'],
+    });
     if (!clientService) {
       throw new NotFoundException(`Service Client #${id} not found`);
     }
     return clientService;
+  }
+
+  findByClientId(clientId: number) {
+    const clientServices = this.clientServiceRepo.find({
+      where: {
+        clientId: clientId,
+      },
+      relations: ['client', 'servicePlan'],
+    });
+    if (!clientServices) {
+      throw new NotFoundException(`Client #${clientId} has any service`);
+    }
+    return clientServices;
   }
 
   async create(data: CreateClientServiceDto) {

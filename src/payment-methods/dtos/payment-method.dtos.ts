@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsNotEmpty } from 'class-validator';
+import { IsInt, IsString, IsNotEmpty, IsBoolean } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreatePaymentMethodDto {
@@ -13,6 +13,10 @@ export class CreatePaymentMethodDto {
   @IsInt()
   @IsNotEmpty()
   readonly coc: number;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  readonly hasIgtf: boolean;
 }
 
 export class UpdatePaymentMethodDto extends PartialType(

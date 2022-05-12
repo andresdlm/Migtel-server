@@ -25,6 +25,11 @@ export class InvoicesController {
     return this.invoiceService.findOne(invoiceNumber);
   }
 
+  @Get('client/:clientId')
+  getByClientId(@Param('clientId', ParseIntPipe) clientId: number) {
+    return this.invoiceService.findByClientId(clientId);
+  }
+
   @Post('')
   create(@Body() payload: CreateInvoiceDto) {
     return this.invoiceService.create(payload);

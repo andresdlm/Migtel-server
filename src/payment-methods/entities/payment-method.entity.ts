@@ -1,9 +1,11 @@
+import { Invoice } from 'src/invoices/entities/invoice.entity';
 import {
   PrimaryColumn,
   Column,
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'payment_methods' })
@@ -16,6 +18,12 @@ export class PaymentMethod {
 
   @Column({ type: 'int' })
   coc: number;
+
+  @Column({ name: 'has_igtf', type: 'boolean' })
+  hasIgtf: boolean;
+
+  @OneToMany(() => Invoice, (invoice) => invoice.paymentMethod)
+  invoices: Invoice[];
 
   @CreateDateColumn({
     name: 'create_at',

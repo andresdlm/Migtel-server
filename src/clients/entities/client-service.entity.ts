@@ -4,13 +4,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Column,
+  ManyToMany,
 } from 'typeorm';
 import { Client } from './client.entity';
 import { ServicePlan } from 'src/service-plans/entities/service-plan.entity';
-import { InvoiceConcept } from 'src/invoices/entities/invoice-concept.entity';
+import { Invoice } from 'src/invoices/entities/invoice.entity';
 
 @Entity({ name: 'client_services' })
 export class ClientService {
@@ -37,11 +37,8 @@ export class ClientService {
   @Column({ name: 'individual_price', type: 'real', default: 0 })
   individualPrice: number;
 
-  @OneToMany(
-    () => InvoiceConcept,
-    (invoiceConcept) => invoiceConcept.clientService,
-  )
-  invoiceConcept: InvoiceConcept[];
+  @ManyToMany(() => Invoice, (invoices) => invoices.clientsServices)
+  invoices: Invoice[];
 
   @CreateDateColumn({
     name: 'create_at',

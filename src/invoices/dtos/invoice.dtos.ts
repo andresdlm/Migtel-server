@@ -23,7 +23,7 @@ export class CreateInvoiceDto {
 
   @IsInt()
   @IsNotEmpty()
-  readonly coc: number;
+  readonly paymentMethodId: string;
 
   @IsNumber()
   @IsPositive()
