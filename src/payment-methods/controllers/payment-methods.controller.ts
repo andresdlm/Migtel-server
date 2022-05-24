@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -23,7 +24,7 @@ export class PaymentMethodsController {
   }
 
   @Get(':id')
-  getOne(@Param('id') id: string) {
+  getOne(@Param('id', ParseIntPipe) id: number) {
     return this.paymentMethodService.findOne(id);
   }
 
@@ -33,12 +34,15 @@ export class PaymentMethodsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: UpdatePaymentMethodDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdatePaymentMethodDto,
+  ) {
     return this.paymentMethodService.update(id, payload);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.paymentMethodService.delete(id);
   }
 }

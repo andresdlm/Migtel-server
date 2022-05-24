@@ -1,17 +1,17 @@
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import {
-  PrimaryColumn,
   Column,
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity({ name: 'payment_methods' })
 export class PaymentMethod {
-  @PrimaryColumn({ type: 'varchar' })
-  id: string;
+  @PrimaryGeneratedColumn({ type: 'int' })
+  id: number;
 
   @Column({ type: 'varchar', length: 200 })
   name: string;

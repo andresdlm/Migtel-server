@@ -43,8 +43,30 @@ export class InvoicesController {
     return this.invoiceService.update(invoiceNumber, payload);
   }
 
-  @Delete(':invoice_number')
-  delete(@Param('invoice_number', ParseIntPipe) invoice_number: number) {
+  @Delete(':invoiceNumber')
+  delete(@Param('invoiceNumber', ParseIntPipe) invoice_number: number) {
     return this.invoiceService.delete(invoice_number);
+  }
+
+  @Delete(':invoiceNumber/client-service/:clientServiceId')
+  deleteCategory(
+    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
+    @Param('clientServiceId', ParseIntPipe) clientServiceId: number,
+  ) {
+    return this.invoiceService.removeServiceByInvoice(
+      invoiceNumber,
+      clientServiceId,
+    );
+  }
+
+  @Put(':invoiceNumber/client-service/:clientServiceId')
+  addCategoryToProduct(
+    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
+    @Param('clientServiceId', ParseIntPipe) clientServiceId: number,
+  ) {
+    return this.invoiceService.addServiceToInvoice(
+      invoiceNumber,
+      clientServiceId,
+    );
   }
 }

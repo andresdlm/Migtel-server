@@ -39,8 +39,8 @@ export class Invoice {
   @JoinColumn({ name: 'payment_method_id' })
   paymentMethod: PaymentMethod;
 
-  @Column({ name: 'payment_method_id', type: 'varchar' })
-  paymentMethodId: string;
+  @Column({ name: 'payment_method_id', type: 'int' })
+  paymentMethodId: number;
 
   @Column({ type: 'real' })
   subtotal: number;
