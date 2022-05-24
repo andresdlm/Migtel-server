@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreateClientServiceDto,
@@ -14,6 +15,9 @@ import {
 } from '../dtos/client-service.dtos';
 import { ClientServicesService } from '../services/client-services.service';
 
+import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+
+@UseGuards(ApiKeyGuard)
 @Controller('client-services')
 export class ClientServicesController {
   constructor(private clientServicesService: ClientServicesService) {}

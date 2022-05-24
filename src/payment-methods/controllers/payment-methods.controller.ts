@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreatePaymentMethodDto,
@@ -14,6 +15,9 @@ import {
 } from '../dtos/payment-method.dtos';
 import { PaymentMethodsService } from '../services/payment-methods.service';
 
+import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+
+@UseGuards(ApiKeyGuard)
 @Controller('payment-methods')
 export class PaymentMethodsController {
   constructor(private paymentMethodService: PaymentMethodsService) {}

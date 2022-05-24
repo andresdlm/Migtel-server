@@ -10,6 +10,7 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { DatabaseModule } from './database/database.module';
 import { ServicePlansModule } from './service-plans/service-plans.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
+import { AuthModule } from './auth/auth.module';
 import config from './../config';
 
 @Module({
@@ -24,6 +25,7 @@ import config from './../config';
         USER: Joi.string().required(),
         PASSWORD: Joi.string().required(),
         PORT: Joi.number().required(),
+        API_KEY: Joi.string().required(),
       }),
     }),
     UsersModule,
@@ -32,6 +34,7 @@ import config from './../config';
     DatabaseModule,
     ServicePlansModule,
     PaymentMethodsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

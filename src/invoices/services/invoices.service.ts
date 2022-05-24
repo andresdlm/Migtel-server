@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,6 +15,7 @@ export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
+    @Inject('DOLAR_API') private dolarApi: any[],
     private clientsService: ClientsService,
     private clientServicesService: ClientServicesService,
     private paymentMethodService: PaymentMethodsService,
@@ -159,7 +160,7 @@ export class InvoicesService {
       islr: 0,
       igtf: 0,
       totalAmount: 0,
-      exhangeRate: 4.77,
+      exhangeRate: this.dolarApi['USD']['sicad2'],
     };
 
     if (invoiceAmounts.iva_r == 0) {
@@ -227,6 +228,16 @@ export class InvoicesService {
     if (invoice.paymentMethod.hasIgtf) {
       invoice.igtf = invoice.totalAmount * 0.03;
       invoice.totalAmount = invoice.totalAmount + invoice.igtf;
+    }
+
+    if (!invoice.usdInvoice) {
+      invoice.subtotal = invoice.subtotal * invoice.exhangeRate;
+      invoice.iva = invoice.iva * invoice.exhangeRate;
+      invoice.iva_p = invoice.iva_p * invoice.exhangeRate;
+      invoice.iva_r = invoice.iva_r * invoice.exhangeRate;
+      invoice.islr = invoice.islr * invoice.exhangeRate;
+      invoice.igtf = invoice.igtf * invoice.exhangeRate;
+      invoice.totalAmount = invoice.totalAmount * invoice.exhangeRate;
     }
 
     return invoice;

@@ -7,10 +7,14 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateClientDto, UpdateClientDto } from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
 
+import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+
+@UseGuards(ApiKeyGuard)
 @Controller('clients')
 export class ClientsController {
   constructor(private clientsService: ClientsService) {}

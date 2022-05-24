@@ -7,10 +7,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
+import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+
+@UseGuards(ApiKeyGuard)
 @Controller('invoices')
 export class InvoicesController {
   constructor(private invoiceService: InvoicesService) {}

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('config', () => {
@@ -10,5 +9,6 @@ export default registerAs('config', () => {
       password: process.env.PASSWORD,
       port: parseInt(process.env.DATABASE_PORT, 10),
     },
+    apiKey: process.env.API_KEY,
   };
 });
