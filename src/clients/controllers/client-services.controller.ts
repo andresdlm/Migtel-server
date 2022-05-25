@@ -16,8 +16,10 @@ import {
 import { ClientServicesService } from '../services/client-services.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(ApiKeyGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('client-services')
 export class ClientServicesController {
   constructor(private clientServicesService: ClientServicesService) {}

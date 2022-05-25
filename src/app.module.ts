@@ -11,7 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import { ServicePlansModule } from './service-plans/service-plans.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { AuthModule } from './auth/auth.module';
-import config from './../config';
+import config from './config';
 
 @Module({
   imports: [
@@ -26,6 +26,7 @@ import config from './../config';
         PASSWORD: Joi.string().required(),
         PORT: Joi.number().required(),
         API_KEY: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     UsersModule,

@@ -13,8 +13,10 @@ import { CreateClientDto, UpdateClientDto } from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(ApiKeyGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('clients')
 export class ClientsController {
   constructor(private clientsService: ClientsService) {}

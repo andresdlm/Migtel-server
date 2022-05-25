@@ -16,8 +16,10 @@ import {
 import { PaymentMethodsService } from '../services/payment-methods.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(ApiKeyGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('payment-methods')
 export class PaymentMethodsController {
   constructor(private paymentMethodService: PaymentMethodsService) {}

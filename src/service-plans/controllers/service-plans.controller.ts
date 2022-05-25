@@ -17,8 +17,10 @@ import {
 import { ServicePlansService } from '../services/service-plans.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(ApiKeyGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('service-plans')
 export class ServicePlansController {
   constructor(private servicePlansService: ServicePlansService) {}

@@ -13,8 +13,10 @@ import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @UseGuards(ApiKeyGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('invoices')
 export class InvoicesController {
   constructor(private invoiceService: InvoicesService) {}
