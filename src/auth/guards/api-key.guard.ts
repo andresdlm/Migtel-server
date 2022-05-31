@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ConfigType } from '@nestjs/config';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorators';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import config from '../../config';
 
 import { Request } from 'express';
