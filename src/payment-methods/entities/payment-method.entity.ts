@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import {
   Column,
@@ -22,6 +23,7 @@ export class PaymentMethod {
   @Column({ name: 'has_igtf', type: 'boolean' })
   hasIgtf: boolean;
 
+  @Exclude()
   @OneToMany(() => Invoice, (invoice) => invoice.paymentMethod)
   invoices: Invoice[];
 
