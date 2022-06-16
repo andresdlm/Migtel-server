@@ -14,6 +14,8 @@ export class ClientsService {
   findAll() {
     return this.clientRepo.find({
       relations: ['services'],
+      order: { id: 'DESC' },
+      take: 15,
     });
   }
 
