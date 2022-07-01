@@ -8,8 +8,13 @@ import {
   Body,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
-import { CreateClientDto, UpdateClientDto } from '../dtos/client.dtos';
+import {
+  CreateClientDto,
+  UpdateClientDto,
+  FilterClientDto,
+} from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -25,8 +30,8 @@ export class ClientsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.clientsService.findAll();
+  getAll(@Query() params: FilterClientDto) {
+    return this.clientsService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

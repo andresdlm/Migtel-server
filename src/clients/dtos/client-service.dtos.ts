@@ -1,4 +1,12 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  Min,
+} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateClientServiceDto {
@@ -20,3 +28,15 @@ export class CreateClientServiceDto {
 export class UpdateClientServiceDto extends PartialType(
   CreateClientServiceDto,
 ) {}
+
+export class FilterClientServiceDto {
+  @IsInt()
+  @IsOptional()
+  @IsPositive()
+  limit: number;
+
+  @IsInt()
+  @IsOptional()
+  @Min(0)
+  offset: number;
+}

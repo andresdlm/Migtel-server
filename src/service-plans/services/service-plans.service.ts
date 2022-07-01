@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import {
   CreateServicePlanDto,
+  FilterServicePlanDto,
   UpdateServicePlanDto,
 } from '../dtos/service-plan.dtos';
 import { ServicePlan } from '../entities/service-plan.entity';
@@ -15,8 +16,18 @@ export class ServicePlansService {
     private servicePlanRepo: Repository<ServicePlan>,
   ) {}
 
-  findAll() {
-    return this.servicePlanRepo.find();
+  findAll(params?: FilterServicePlanDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.servicePlanRepo.find({
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
+    return this.servicePlanRepo.find({
+      order: { id: 'DESC' },
+    });
   }
 
   findOne(id: number) {

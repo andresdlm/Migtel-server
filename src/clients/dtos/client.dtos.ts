@@ -1,14 +1,22 @@
-import { IsInt, IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsOptional,
+  IsPositive,
+  Min,
+} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateClientDto {
-  @IsInt()
-  @IsNotEmpty()
-  readonly id: number;
-
   @IsString()
   @IsNotEmpty()
   readonly name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly phone: string;
 
   @IsString()
   @IsNotEmpty()
@@ -40,3 +48,15 @@ export class CreateClientDto {
 }
 
 export class UpdateClientDto extends PartialType(CreateClientDto) {}
+
+export class FilterClientDto {
+  @IsInt()
+  @IsOptional()
+  @IsPositive()
+  limit: number;
+
+  @IsInt()
+  @IsOptional()
+  @Min(0)
+  offset: number;
+}

@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   CreatePaymentMethodDto,
+  FilterPaymentMethodDto,
   UpdatePaymentMethodDto,
 } from '../dtos/payment-method.dtos';
 import { PaymentMethodsService } from '../services/payment-methods.service';
@@ -28,8 +30,8 @@ export class PaymentMethodsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.paymentMethodService.findAll();
+  getAll(@Query() params: FilterPaymentMethodDto) {
+    return this.paymentMethodService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

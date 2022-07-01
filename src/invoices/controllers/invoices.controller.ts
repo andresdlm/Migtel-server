@@ -7,9 +7,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoice.dtos';
+import {
+  CreateInvoiceDto,
+  FilterInvoiceDto,
+  UpdateInvoiceDto,
+} from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -25,8 +30,8 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.invoiceService.findAll();
+  getAll(@Query() params: FilterInvoiceDto) {
+    return this.invoiceService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

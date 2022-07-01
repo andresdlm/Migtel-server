@@ -4,14 +4,28 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
-import { CreateUserDto, UpdateUserDto } from '../dtos/user.dtos';
+import {
+  CreateUserDto,
+  FilterUsersDto,
+  UpdateUserDto,
+} from '../dtos/user.dtos';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  findAll() {
-    return this.userRepo.find();
+  findAll(params?: FilterUsersDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.userRepo.find({
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
+    return this.userRepo.find({
+      order: { id: 'DESC' },
+    });
   }
 
   async findOne(id: number) {

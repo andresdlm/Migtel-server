@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
   CreateClientServiceDto,
+  FilterClientServiceDto,
   UpdateClientServiceDto,
 } from '../dtos/client-service.dtos';
 import { ClientServicesService } from '../services/client-services.service';
@@ -28,8 +30,8 @@ export class ClientServicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.clientServicesService.findAll();
+  getAll(@Query() params: FilterClientServiceDto) {
+    return this.clientServicesService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateClientDto, UpdateClientDto } from '../dtos/client.dtos';
+import {
+  CreateClientDto,
+  UpdateClientDto,
+  FilterClientDto,
+} from '../dtos/client.dtos';
 import { Client } from '../entities/client.entity';
 
 @Injectable()
@@ -11,11 +15,19 @@ export class ClientsService {
     @InjectRepository(Client) private clientRepo: Repository<Client>,
   ) {}
 
-  findAll() {
+  findAll(params?: FilterClientDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.clientRepo.find({
+        relations: ['services'],
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
     return this.clientRepo.find({
       relations: ['services'],
       order: { id: 'DESC' },
-      take: 15,
     });
   }
 

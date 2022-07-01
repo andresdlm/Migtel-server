@@ -7,11 +7,13 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
 import {
   CreateServicePlanDto,
+  FilterServicePlanDto,
   UpdateServicePlanDto,
 } from '../dtos/service-plan.dtos';
 import { ServicePlansService } from '../services/service-plans.service';
@@ -29,8 +31,8 @@ export class ServicePlansController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.servicePlansService.findAll();
+  getAll(@Query() params: FilterServicePlanDto) {
+    return this.servicePlansService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

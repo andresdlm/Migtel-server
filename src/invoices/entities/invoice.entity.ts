@@ -2,7 +2,7 @@ import { ClientService } from 'src/clients/entities/client-service.entity';
 import { Client } from 'src/clients/entities/client.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import {
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   Column,
   Entity,
   CreateDateColumn,
@@ -15,7 +15,7 @@ import {
 
 @Entity({ name: 'invoices' })
 export class Invoice {
-  @PrimaryColumn({ name: 'invoice_number' })
+  @PrimaryGeneratedColumn({ name: 'invoice_number' })
   invoiceNumber: number;
 
   @ManyToOne(() => Client, (client) => client.invoices)

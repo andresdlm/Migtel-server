@@ -1,16 +1,16 @@
 import {
-  PrimaryColumn,
   Column,
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ClientService } from 'src/clients/entities/client-service.entity';
 
 @Entity({ name: 'service_plans' })
 export class ServicePlan {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 100 })

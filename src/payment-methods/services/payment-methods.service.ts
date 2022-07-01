@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import {
   CreatePaymentMethodDto,
+  FilterPaymentMethodDto,
   UpdatePaymentMethodDto,
 } from '../dtos/payment-method.dtos';
 import { PaymentMethod } from '../entities/payment-method.entity';
@@ -15,9 +16,19 @@ export class PaymentMethodsService {
     private paymentMethodRepo: Repository<PaymentMethod>,
   ) {}
 
-  findAll() {
+  findAll(params?: FilterPaymentMethodDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.paymentMethodRepo.find({
+        relations: ['invoices'],
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
     return this.paymentMethodRepo.find({
       relations: ['invoices'],
+      order: { id: 'DESC' },
     });
   }
 

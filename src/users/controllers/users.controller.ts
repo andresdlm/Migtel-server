@@ -8,10 +8,15 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 
 import { UsersService } from '../services/users.service';
-import { CreateUserDto, UpdateUserDto } from '../dtos/user.dtos';
+import {
+  CreateUserDto,
+  FilterUsersDto,
+  UpdateUserDto,
+} from '../dtos/user.dtos';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -26,8 +31,8 @@ export class UsersController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() params: FilterUsersDto) {
+    return this.usersService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

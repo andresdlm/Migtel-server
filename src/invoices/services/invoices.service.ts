@@ -2,7 +2,11 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateInvoiceDto, UpdateInvoiceDto } from '../dtos/invoice.dtos';
+import {
+  CreateInvoiceDto,
+  FilterInvoiceDto,
+  UpdateInvoiceDto,
+} from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
 
 import { ClientsService } from 'src/clients/services/clients.service';
@@ -21,15 +25,32 @@ export class InvoicesService {
     private paymentMethodService: PaymentMethodsService,
   ) {}
 
-  findAll() {
+  findAll(params?: FilterInvoiceDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.invoiceRepo.find({
+        relations: ['client', 'clientsServices', 'paymentMethod'],
+        order: { invoiceNumber: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
     return this.invoiceRepo.find({
-      relations: ['client', 'clientsServices'],
+      relations: ['client', 'clientsServices', 'paymentMethod'],
+      order: { invoiceNumber: 'DESC' },
     });
   }
 
   findOne(invoiceNumber: number) {
     const invoice = this.invoiceRepo.findOne(invoiceNumber, {
-      relations: ['client', 'clientsServices', 'paymentMethod'],
+      relations: ['client', 'paymentMethod'],
+      join: {
+        alias: 'invoice',
+        innerJoinAndSelect: {
+          clientsServices: 'invoice.clientsServices',
+          servicePlan: 'clientsServices.servicePlan',
+        },
+      },
     });
     if (!invoice) {
       throw new NotFoundException(`Invoice #${invoiceNumber} not found`);
@@ -42,7 +63,7 @@ export class InvoicesService {
       where: {
         clientId: clientId,
       },
-      relations: ['client', 'clientsServices'],
+      relations: ['client', 'clientsServices', 'paymentMethod'],
     });
     if (!invoices) {
       throw new NotFoundException(`Client #${clientId} has any invoice`);

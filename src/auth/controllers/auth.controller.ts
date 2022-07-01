@@ -4,7 +4,9 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from '../services/auth.service';
 import { User } from 'src/users/entities/user.entity';
+import { ApiKeyGuard } from '../guards/api-key.guard';
 
+@UseGuards(ApiKeyGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

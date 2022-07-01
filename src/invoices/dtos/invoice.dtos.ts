@@ -3,67 +3,26 @@ import {
   IsString,
   IsNotEmpty,
   IsBoolean,
-  IsNumber,
   IsPositive,
+  IsOptional,
+  Min,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateInvoiceDto {
   @IsInt()
   @IsNotEmpty()
-  readonly invoiceNumber: number;
-
-  @IsInt()
-  @IsNotEmpty()
   readonly clientId: number;
 
   @IsInt()
+  @IsPositive()
   @IsNotEmpty()
   readonly group: number;
 
   @IsInt()
+  @IsPositive()
   @IsNotEmpty()
   readonly paymentMethodId: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly subtotal: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly iva: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly iva_r: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly iva_p: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly islr: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly igtf: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly totalAmount: number;
-
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly exhangeRate: number;
 
   @IsString()
   @IsNotEmpty()
@@ -72,10 +31,18 @@ export class CreateInvoiceDto {
   @IsBoolean()
   @IsNotEmpty()
   readonly usdInvoice: boolean;
-
-  @IsBoolean()
-  @IsNotEmpty()
-  readonly canceled: boolean;
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}
+
+export class FilterInvoiceDto {
+  @IsInt()
+  @IsOptional()
+  @IsPositive()
+  limit: number;
+
+  @IsInt()
+  @IsOptional()
+  @Min(0)
+  offset: number;
+}

@@ -1,5 +1,5 @@
 import {
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   Column,
   Entity,
   CreateDateColumn,
@@ -11,11 +11,14 @@ import { ClientService } from './client-service.entity';
 
 @Entity({ name: 'clients' })
 export class Client {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 200 })
   name: string;
+
+  @Column({ type: 'varchar', length: 20 })
+  phone: string;
 
   @Column({ name: 'person_type', type: 'varchar', length: 10, default: 'V' })
   personType: string;

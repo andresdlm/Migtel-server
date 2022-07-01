@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import {
   CreateClientServiceDto,
+  FilterClientServiceDto,
   UpdateClientServiceDto,
 } from '../dtos/client-service.dtos';
 import { ClientService } from '../entities/client-service.entity';
@@ -19,9 +20,19 @@ export class ClientServicesService {
     private servicePlanService: ServicePlansService,
   ) {}
 
-  findAll() {
+  findAll(params?: FilterClientServiceDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.clientServiceRepo.find({
+        relations: ['client', 'servicePlan'],
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+      });
+    }
     return this.clientServiceRepo.find({
       relations: ['client', 'servicePlan'],
+      order: { id: 'DESC' },
     });
   }
 
