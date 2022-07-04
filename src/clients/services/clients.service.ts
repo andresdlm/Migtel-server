@@ -41,6 +41,13 @@ export class ClientsService {
     return client;
   }
 
+  searchClient(searchInput: string) {
+    return this.clientRepo.query(
+      `SELECT * FROM "clients" WHERE LOWER( clients.name )
+      LIKE LOWER( '%${searchInput}%' )`,
+    );
+  }
+
   create(data: CreateClientDto) {
     const newClient = this.clientRepo.create(data);
     return this.clientRepo.save(newClient);

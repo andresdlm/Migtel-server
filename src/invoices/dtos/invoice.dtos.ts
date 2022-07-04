@@ -17,11 +17,6 @@ export class CreateInvoiceDto {
   @IsInt()
   @IsPositive()
   @IsNotEmpty()
-  readonly group: number;
-
-  @IsInt()
-  @IsPositive()
-  @IsNotEmpty()
   readonly paymentMethodId: number;
 
   @IsString()

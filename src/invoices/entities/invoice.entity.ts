@@ -15,7 +15,10 @@ import {
 
 @Entity({ name: 'invoices' })
 export class Invoice {
-  @PrimaryGeneratedColumn({ name: 'invoice_number' })
+  @PrimaryGeneratedColumn({ name: 'id' })
+  id: number;
+
+  @Column({ name: 'invoice_number', type: 'int' })
   invoiceNumber: number;
 
   @ManyToOne(() => Client, (client) => client.invoices)
@@ -31,9 +34,6 @@ export class Invoice {
     default: () => 'CURRENT_TIMESTAMP',
   })
   registerDate: Date;
-
-  @Column({ type: 'int' })
-  group: number;
 
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.invoices)
   @JoinColumn({ name: 'payment_method_id' })

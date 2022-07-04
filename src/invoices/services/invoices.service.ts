@@ -30,14 +30,14 @@ export class InvoicesService {
       const { limit, offset } = params;
       return this.invoiceRepo.find({
         relations: ['client', 'clientsServices', 'paymentMethod'],
-        order: { invoiceNumber: 'DESC' },
+        order: { id: 'DESC' },
         take: limit,
         skip: offset,
       });
     }
     return this.invoiceRepo.find({
       relations: ['client', 'clientsServices', 'paymentMethod'],
-      order: { invoiceNumber: 'DESC' },
+      order: { id: 'DESC' },
     });
   }
 
@@ -73,22 +73,27 @@ export class InvoicesService {
   }
 
   async create(data: CreateInvoiceDto) {
-    const newInvoice = this.invoiceRepo.create(data);
+    let newInvoice = this.invoiceRepo.create(data);
     const client = await this.clientsService.findOne(data.clientId);
+
     newInvoice.client = client;
     const clientServices = await this.clientServicesService.findByClientId(
       data.clientId,
     );
+
     newInvoice.clientsServices = clientServices;
     const paymentMethod = await this.paymentMethodService.findOne(
       data.paymentMethodId,
     );
+
     newInvoice.paymentMethod = paymentMethod;
     const invoiceAmounts = this.calculateInvoiceAmount(
       data.clientId,
       data.paymentMethodId,
       data.usdInvoice,
     );
+
+    newInvoice.invoiceNumber = 0;
     newInvoice.subtotal = (await invoiceAmounts).subtotal;
     newInvoice.iva = (await invoiceAmounts).iva;
     newInvoice.iva_r = (await invoiceAmounts).iva_r;
@@ -97,6 +102,10 @@ export class InvoicesService {
     newInvoice.igtf = (await invoiceAmounts).igtf;
     newInvoice.totalAmount = (await invoiceAmounts).totalAmount;
     newInvoice.exhangeRate = (await invoiceAmounts).exhangeRate;
+
+    newInvoice = await this.invoiceRepo.save(newInvoice);
+    newInvoice.invoiceNumber = newInvoice.id + 5000; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
+
     return this.invoiceRepo.save(newInvoice);
   }
 
@@ -157,7 +166,7 @@ export class InvoicesService {
   async calculateInvoiceAmount(
     clientId: number,
     coc: number,
-    UsdInvoice: boolean,
+    usdInvoice: boolean,
   ) {
     const clientServices: ClientService[] =
       await this.clientServicesService.findByClientId(clientId);
@@ -205,7 +214,7 @@ export class InvoicesService {
         invoiceAmounts.totalAmount + invoiceAmounts.igtf;
     }
 
-    if (!UsdInvoice) {
+    if (!usdInvoice) {
       invoiceAmounts.subtotal =
         invoiceAmounts.subtotal * invoiceAmounts.exhangeRate;
       invoiceAmounts.iva = invoiceAmounts.iva * invoiceAmounts.exhangeRate;

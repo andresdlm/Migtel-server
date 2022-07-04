@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsPositive,
   Min,
+  Max,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -36,6 +37,8 @@ export class CreateClientDto {
 
   @IsInt()
   @IsNotEmpty()
+  @Min(0)
+  @Max(100)
   readonly retention: number;
 
   @IsBoolean()
@@ -44,6 +47,8 @@ export class CreateClientDto {
 
   @IsInt()
   @IsNotEmpty()
+  @Min(0)
+  @Max(100)
   readonly amountIslr: number;
 }
 

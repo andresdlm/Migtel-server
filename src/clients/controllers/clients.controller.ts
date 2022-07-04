@@ -40,6 +40,12 @@ export class ClientsController {
     return this.clientsService.findOne(id);
   }
 
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('search/:searchParam')
+  searchClient(@Param('searchParam') searchParam: string) {
+    return this.clientsService.searchClient(searchParam);
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('')
   create(@Body() payload: CreateClientDto) {
