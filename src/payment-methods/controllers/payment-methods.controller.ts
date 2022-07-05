@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -30,7 +31,11 @@ export class PaymentMethodsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll(@Query() params: FilterPaymentMethodDto) {
+  getAll(
+    @Query() params: FilterPaymentMethodDto,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    params.getArchive = getArchive;
     return this.paymentMethodService.findAll(params);
   }
 
@@ -53,6 +58,12 @@ export class PaymentMethodsController {
     @Body() payload: UpdatePaymentMethodDto,
   ) {
     return this.paymentMethodService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('archive/:id')
+  archive(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentMethodService.archive(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

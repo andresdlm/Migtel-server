@@ -41,6 +41,9 @@ export class Client {
   @Column({ name: 'amount_islr', type: 'int' })
   amountIslr: number;
 
+  @Column({ type: 'boolean', default: false })
+  archived: boolean;
+
   @OneToMany(() => ClientService, (service) => service.client)
   services: ClientService[];
 

@@ -39,4 +39,8 @@ export class FilterClientServiceDto {
   @IsOptional()
   @Min(0)
   offset: number;
+
+  @IsBoolean()
+  @IsOptional()
+  getArchive: boolean;
 }

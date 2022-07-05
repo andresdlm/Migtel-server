@@ -37,6 +37,9 @@ export class ClientService {
   @Column({ name: 'individual_price', type: 'real', default: 0 })
   individualPrice: number;
 
+  @Column({ type: 'boolean', default: false })
+  archived: boolean;
+
   @ManyToMany(() => Invoice, (invoices) => invoices.clientsServices)
   invoices: Invoice[];
 

@@ -23,6 +23,9 @@ export class PaymentMethod {
   @Column({ name: 'has_igtf', type: 'boolean' })
   hasIgtf: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  archived: boolean;
+
   @Exclude()
   @OneToMany(() => Invoice, (invoice) => invoice.paymentMethod)
   invoices: Invoice[];

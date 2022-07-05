@@ -6,6 +6,7 @@ import {
   IsInt,
   IsOptional,
   Min,
+  IsBoolean,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -40,4 +41,8 @@ export class FilterServicePlanDto {
   @IsOptional()
   @Min(0)
   offset: number;
+
+  @IsBoolean()
+  @IsOptional()
+  getArchive: boolean;
 }

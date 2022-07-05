@@ -25,6 +25,9 @@ export class ServicePlan {
   @Column({ type: 'float' })
   price: number;
 
+  @Column({ type: 'boolean', default: false })
+  archived: boolean;
+
   @OneToMany(() => ClientService, (clientService) => clientService.servicePlan)
   clientServices: ClientService[];
 

@@ -16,11 +16,12 @@ export class UsersService {
 
   findAll(params?: FilterUsersDto) {
     if (params) {
-      const { limit, offset } = params;
+      const { limit, offset, getActive } = params;
       return this.userRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        where: { active: getActive },
       });
     }
     return this.userRepo.find({
@@ -50,6 +51,12 @@ export class UsersService {
   async update(id: number, changes: UpdateUserDto) {
     const user = await this.findOne(id);
     this.userRepo.merge(user, changes);
+    return this.userRepo.save(user);
+  }
+
+  async activate(id: number) {
+    const user = await this.userRepo.findOne(id);
+    user.active = !user.active;
     return this.userRepo.save(user);
   }
 

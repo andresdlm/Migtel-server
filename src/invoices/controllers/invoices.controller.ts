@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -30,7 +31,11 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll(@Query() params: FilterInvoiceDto) {
+  getAll(
+    @Query() params: FilterInvoiceDto,
+    @Query('getCanceled', ParseBoolPipe) getCanceled: boolean,
+  ) {
+    params.getCanceled = getCanceled;
     return this.invoiceService.findAll(params);
   }
 

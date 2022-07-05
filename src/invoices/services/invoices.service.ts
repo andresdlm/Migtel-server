@@ -33,6 +33,7 @@ export class InvoicesService {
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        where: { canceled: params.getCanceled },
       });
     }
     return this.invoiceRepo.find({

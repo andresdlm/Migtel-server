@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -31,7 +32,11 @@ export class ServicePlansController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll(@Query() params: FilterServicePlanDto) {
+  getAll(
+    @Query() params: FilterServicePlanDto,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    params.getArchive = getArchive;
     return this.servicePlansService.findAll(params);
   }
 
@@ -54,6 +59,12 @@ export class ServicePlansController {
     @Body() payload: UpdateServicePlanDto,
   ) {
     return this.servicePlansService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('archive/:id')
+  archive(@Param('id', ParseIntPipe) id: number) {
+    return this.servicePlansService.archive(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

@@ -22,12 +22,13 @@ export class ClientServicesService {
 
   findAll(params?: FilterClientServiceDto) {
     if (params) {
-      const { limit, offset } = params;
+      const { limit, offset, getArchive } = params;
       return this.clientServiceRepo.find({
         relations: ['client', 'servicePlan'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        where: { archived: getArchive },
       });
     }
     return this.clientServiceRepo.find({
@@ -87,6 +88,12 @@ export class ClientServicesService {
       clientService.servicePlan = servicePlan;
     }
     this.clientServiceRepo.merge(clientService, changes);
+    return this.clientServiceRepo.save(clientService);
+  }
+
+  async archive(id: number) {
+    const clientService = await this.clientServiceRepo.findOne(id);
+    clientService.archived = !clientService.archived;
     return this.clientServiceRepo.save(clientService);
   }
 

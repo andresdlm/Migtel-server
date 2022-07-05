@@ -40,4 +40,8 @@ export class FilterInvoiceDto {
   @IsOptional()
   @Min(0)
   offset: number;
+
+  @IsBoolean()
+  @IsOptional()
+  getCanceled: boolean;
 }

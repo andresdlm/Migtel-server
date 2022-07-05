@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Put,
@@ -30,7 +31,11 @@ export class ClientServicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll(@Query() params: FilterClientServiceDto) {
+  getAll(
+    @Query() params: FilterClientServiceDto,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    params.getArchive = getArchive;
     return this.clientServicesService.findAll(params);
   }
 
@@ -59,6 +64,12 @@ export class ClientServicesController {
     @Body() payload: UpdateClientServiceDto,
   ) {
     return this.clientServicesService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('archive/:id')
+  archive(@Param('id', ParseIntPipe) id: number) {
+    return this.clientServicesService.archive(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

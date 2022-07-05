@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsPositive,
   Min,
+  IsBoolean,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -39,4 +40,8 @@ export class FilterUsersDto {
   @IsOptional()
   @Min(0)
   offset: number;
+
+  @IsBoolean()
+  @IsOptional()
+  getActive: boolean;
 }

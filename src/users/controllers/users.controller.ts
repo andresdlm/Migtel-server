@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 
 import { UsersService } from '../services/users.service';
@@ -31,7 +32,11 @@ export class UsersController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get()
-  findAll(@Query() params: FilterUsersDto) {
+  findAll(
+    @Query() params: FilterUsersDto,
+    @Query('getActive', ParseBoolPipe) getActive: boolean,
+  ) {
+    params.getActive = getActive;
     return this.usersService.findAll(params);
   }
 
@@ -54,6 +59,12 @@ export class UsersController {
     @Body() payload: UpdateUserDto,
   ) {
     return this.usersService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN)
+  @Delete('activate/:id')
+  activate(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.activate(id);
   }
 
   @Roles(Role.SUPER_ADMIN)

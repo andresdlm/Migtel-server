@@ -18,12 +18,13 @@ export class PaymentMethodsService {
 
   findAll(params?: FilterPaymentMethodDto) {
     if (params) {
-      const { limit, offset } = params;
+      const { limit, offset, getArchive } = params;
       return this.paymentMethodRepo.find({
         relations: ['invoices'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        where: { archived: getArchive },
       });
     }
     return this.paymentMethodRepo.find({
@@ -48,6 +49,12 @@ export class PaymentMethodsService {
   async update(id: number, changes: UpdatePaymentMethodDto) {
     const paymentMethod = await this.paymentMethodRepo.findOne(id);
     this.paymentMethodRepo.merge(paymentMethod, changes);
+    return this.paymentMethodRepo.save(paymentMethod);
+  }
+
+  async archive(id: number) {
+    const paymentMethod = await this.paymentMethodRepo.findOne(id);
+    paymentMethod.archived = !paymentMethod.archived;
     return this.paymentMethodRepo.save(paymentMethod);
   }
 

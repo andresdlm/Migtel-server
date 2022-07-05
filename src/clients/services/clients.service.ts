@@ -17,12 +17,13 @@ export class ClientsService {
 
   findAll(params?: FilterClientDto) {
     if (params) {
-      const { limit, offset } = params;
+      const { limit, offset, getArchive } = params;
       return this.clientRepo.find({
         relations: ['services'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        where: { archived: getArchive },
       });
     }
     return this.clientRepo.find({
@@ -43,7 +44,7 @@ export class ClientsService {
 
   searchClient(searchInput: string) {
     return this.clientRepo.query(
-      `SELECT * FROM "clients" WHERE LOWER( clients.name )
+      `SELECT * FROM "clients" WHERE clients.archived = FALSE AND LOWER( clients.name )
       LIKE LOWER( '%${searchInput}%' )`,
     );
   }
@@ -56,6 +57,12 @@ export class ClientsService {
   async update(id: number, changes: UpdateClientDto) {
     const client = await this.clientRepo.findOne(id);
     this.clientRepo.merge(client, changes);
+    return this.clientRepo.save(client);
+  }
+
+  async archive(id: number) {
+    const client = await this.clientRepo.findOne(id);
+    client.archived = !client.archived;
     return this.clientRepo.save(client);
   }
 

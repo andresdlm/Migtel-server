@@ -26,6 +26,9 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   role: string;
 
+  @Column({ type: 'boolean', default: true })
+  active: boolean;
+
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',

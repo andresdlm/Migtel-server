@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import {
   CreateClientDto,
@@ -30,7 +31,11 @@ export class ClientsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll(@Query() params: FilterClientDto) {
+  getAll(
+    @Query() params: FilterClientDto,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    params.getArchive = getArchive;
     return this.clientsService.findAll(params);
   }
 
@@ -59,6 +64,12 @@ export class ClientsController {
     @Body() payload: UpdateClientDto,
   ) {
     return this.clientsService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('archive/:id')
+  archive(@Param('id', ParseIntPipe) id: number) {
+    return this.clientsService.archive(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
