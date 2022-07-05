@@ -72,6 +72,15 @@ export class InvoicesService {
     return invoices;
   }
 
+  async cancelInvoice(invoiceId: number) {
+    const changes = {
+      canceled: true,
+    };
+    const invoice = await this.invoiceRepo.findOne(invoiceId);
+    this.invoiceRepo.merge(invoice, changes);
+    return this.invoiceRepo.save(invoice);
+  }
+
   async create(data: CreateInvoiceDto) {
     let newInvoice = this.invoiceRepo.create(data);
     const client = await this.clientsService.findOne(data.clientId);

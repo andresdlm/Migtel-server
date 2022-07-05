@@ -68,6 +68,12 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':invoiceNumber/cancelInvoice')
+  cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.cancelInvoice(invoiceNumber);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':invoiceNumber/client-service/:clientServiceId')
   deleteServiceFromInvoice(
     @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
