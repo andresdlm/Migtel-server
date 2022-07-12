@@ -6,6 +6,7 @@ import {
   IsPositive,
   IsOptional,
   Min,
+  IsArray,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -18,6 +19,14 @@ export class CreateInvoiceDto {
   @IsPositive()
   @IsNotEmpty()
   readonly paymentMethodId: number;
+
+  @IsArray()
+  @IsNotEmpty()
+  readonly clientServices: number[];
+
+  @IsArray()
+  @IsNotEmpty()
+  readonly invoiceConcept: number[];
 
   @IsString()
   @IsNotEmpty()

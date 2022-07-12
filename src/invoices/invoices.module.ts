@@ -10,16 +10,19 @@ import { Invoice } from './entities/invoice.entity';
 import { ClientsModule } from 'src/clients/clients.module';
 import { ServicePlansModule } from 'src/service-plans/service-plans.module';
 import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module';
+import { InvoiceConceptsController } from './controllers/invoice-concepts.controller';
+import { InvoiceConceptsService } from './services/invoice-concepts.service';
+import { InvoiceConcept } from './entities/invoice-concept.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([Invoice]),
+    TypeOrmModule.forFeature([Invoice, InvoiceConcept]),
     ClientsModule,
     ServicePlansModule,
     PaymentMethodsModule,
   ],
-  controllers: [InvoicesController],
+  controllers: [InvoicesController, InvoiceConceptsController],
   providers: [
     InvoicesService,
     {
@@ -32,6 +35,7 @@ import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module
       },
       inject: [HttpService],
     },
+    InvoiceConceptsService,
   ],
 })
 export class InvoicesModule {}

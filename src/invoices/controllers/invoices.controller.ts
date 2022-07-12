@@ -7,15 +7,10 @@ import {
   ParseBoolPipe,
   ParseIntPipe,
   Post,
-  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import {
-  CreateInvoiceDto,
-  FilterInvoiceDto,
-  UpdateInvoiceDto,
-} from '../dtos/invoice.dtos';
+import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dto';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -33,9 +28,9 @@ export class InvoicesController {
   @Get()
   getAll(
     @Query() params: FilterInvoiceDto,
-    @Query('getCanceled', ParseBoolPipe) getCanceled: boolean,
+    @Query('getCanceled', ParseBoolPipe) getCanceled?: boolean,
   ) {
-    params.getCanceled = getCanceled;
+    if (params) params.getCanceled = getCanceled;
     return this.invoiceService.findAll(params);
   }
 
@@ -58,12 +53,9 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Put(':invoiceNumber')
-  update(
-    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
-    @Body() payload: UpdateInvoiceDto,
-  ) {
-    return this.invoiceService.update(invoiceNumber, payload);
+  @Post('preview')
+  getPreview(@Body() payload: CreateInvoiceDto) {
+    return this.invoiceService.getPreview(payload);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
@@ -76,29 +68,5 @@ export class InvoicesController {
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.cancelInvoice(invoiceNumber);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':invoiceNumber/client-service/:clientServiceId')
-  deleteServiceFromInvoice(
-    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
-    @Param('clientServiceId', ParseIntPipe) clientServiceId: number,
-  ) {
-    return this.invoiceService.removeServiceByInvoice(
-      invoiceNumber,
-      clientServiceId,
-    );
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Put(':invoiceNumber/client-service/:clientServiceId')
-  addServiceToInvoice(
-    @Param('invoiceNumber', ParseIntPipe) invoiceNumber: number,
-    @Param('clientServiceId', ParseIntPipe) clientServiceId: number,
-  ) {
-    return this.invoiceService.addServiceToInvoice(
-      invoiceNumber,
-      clientServiceId,
-    );
   }
 }

@@ -1,6 +1,3 @@
-import { ClientService } from 'src/clients/entities/client-service.entity';
-import { Client } from 'src/clients/entities/client.entity';
-import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -12,6 +9,11 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+
+import { ClientService } from 'src/clients/entities/client-service.entity';
+import { Client } from 'src/clients/entities/client.entity';
+import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
+import { InvoiceConcept } from './invoice-concept.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -80,7 +82,7 @@ export class Invoice {
     (clientsServices) => clientsServices.invoices,
   )
   @JoinTable({
-    name: 'invoice_concepts',
+    name: 'invoice_services',
     joinColumn: {
       name: 'invoice_number',
     },
@@ -89,6 +91,21 @@ export class Invoice {
     },
   })
   clientsServices: ClientService[];
+
+  @ManyToMany(
+    () => InvoiceConcept,
+    (invoiceConcepts) => invoiceConcepts.invoices,
+  )
+  @JoinTable({
+    name: 'invoice_concept_relation',
+    joinColumn: {
+      name: 'invoice_number',
+    },
+    inverseJoinColumn: {
+      name: 'invoice_concept_id',
+    },
+  })
+  invoiceConcepts: InvoiceConcept[];
 
   @UpdateDateColumn({
     name: 'update_at',
