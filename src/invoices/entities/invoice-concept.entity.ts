@@ -1,5 +1,5 @@
-import { PrimaryGeneratedColumn, Column, Entity, ManyToMany } from 'typeorm';
-import { Invoice } from './invoice.entity';
+import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
+import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
 
 @Entity({ name: 'invoice_concepts' })
 export class InvoiceConcept {
@@ -12,6 +12,12 @@ export class InvoiceConcept {
   @Column({ name: 'price', type: 'real' })
   price: number;
 
-  @ManyToMany(() => Invoice, (invoices) => invoices.invoiceConcepts)
-  invoices: Invoice[];
+  @Column({ name: 'archive', type: 'boolean', default: false })
+  archive: boolean;
+
+  @OneToMany(
+    () => InvoiceConceptRelation,
+    (invoiceConceptRelation) => invoiceConceptRelation.invoiceConcept,
+  )
+  invoiceConceptRelation: InvoiceConceptRelation[];
 }

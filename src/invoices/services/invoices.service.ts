@@ -11,6 +11,7 @@ import { PaymentMethodsService } from 'src/payment-methods/services/payment-meth
 import { InvoiceConceptsService } from './invoice-concepts.service';
 import { InvoiceConcept } from '../entities/invoice-concept.entity';
 import { ClientService } from 'src/clients/entities/client-service.entity';
+import { InvoiceServicesService } from './invoice-services.service';
 
 @Injectable()
 export class InvoicesService {
@@ -22,6 +23,7 @@ export class InvoicesService {
     private clientServicesService: ClientServicesService,
     private paymentMethodService: PaymentMethodsService,
     private invoiceConceptsService: InvoiceConceptsService,
+    private invoiceServicesService: InvoiceServicesService,
   ) {}
 
   findAll(params?: FilterInvoiceDto) {
@@ -43,12 +45,15 @@ export class InvoicesService {
 
   findOne(invoiceNumber: number) {
     const invoice = this.invoiceRepo.findOne(invoiceNumber, {
-      relations: ['client', 'paymentMethod', 'invoiceConcepts'],
+      relations: ['client', 'paymentMethod'],
       join: {
         alias: 'invoice',
-        innerJoinAndSelect: {
-          clientsServices: 'invoice.clientsServices',
-          servicePlan: 'clientsServices.servicePlan',
+        leftJoinAndSelect: {
+          invoiceServices: 'invoice.invoiceServices',
+          clientServices: 'invoiceServices.clientService',
+          servicePlan: 'clientServices.servicePlan',
+          invoiceConceptRelation: 'invoice.invoiceConceptRelation',
+          invoiceConcept: 'invoiceConceptRelation.invoiceConcept',
         },
       },
     });
@@ -73,27 +78,32 @@ export class InvoicesService {
   }
 
   async create(data: CreateInvoiceDto) {
-    let newInvoice = this.invoiceRepo.create(data);
+    let newInvoice = this.invoiceRepo.create();
     const client = await this.clientsService.findOne(data.clientId);
     newInvoice.client = client;
 
+    newInvoice.usdInvoice = data.usdInvoice;
+    newInvoice.comment = data.comment;
+
     const clientServicesArray: ClientService[] = [];
-    for await (const clientService of data.clientServices) {
+    for await (const clientService of data.clientsServices) {
       await this.clientServicesService
         .findOne(clientService)
         .then((clientService) => {
           clientServicesArray.push(clientService);
-          newInvoice.clientsServices = clientServicesArray;
+          newInvoice.clientServices = clientServicesArray;
+          newInvoice.clientServicesCount = data.clientsServicesCount;
         });
     }
 
     const invoiceConceptArray: InvoiceConcept[] = [];
-    for await (const invoiceConceptId of data.invoiceConcept) {
+    for await (const invoiceConceptId of data.invoiceConcepts) {
       await this.invoiceConceptsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {
           invoiceConceptArray.push(invoiceConcept);
           newInvoice.invoiceConcepts = invoiceConceptArray;
+          newInvoice.invoiceConceptCount = data.invoiceConceptsCount;
         });
     }
 
@@ -109,31 +119,55 @@ export class InvoicesService {
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + 5000; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
 
+    let index = 0;
+    for await (const service of data.clientsServices) {
+      await this.invoiceServicesService.createRelationInvoice({
+        invoiceId: newInvoice.id,
+        clientServiceId: service,
+        count: data.clientsServicesCount[index],
+      });
+      index++;
+    }
+
+    index = 0;
+    for await (const concept of data.invoiceConcepts) {
+      await this.invoiceConceptsService.createRelationInvoice({
+        invoiceId: newInvoice.id,
+        invoiceConceptId: concept,
+        count: data.invoiceConceptsCount[index],
+      });
+      index++;
+    }
+
     return this.invoiceRepo.save(newInvoice);
   }
 
   async getPreview(data: CreateInvoiceDto) {
-    const preInvoice = this.invoiceRepo.create(data);
+    const preInvoice = this.invoiceRepo.create();
     const client = await this.clientsService.findOne(data.clientId);
     preInvoice.client = client;
 
+    preInvoice.usdInvoice = data.usdInvoice;
+
     const clientServicesArray: ClientService[] = [];
-    for await (const clientService of data.clientServices) {
+    for await (const clientService of data.clientsServices) {
       await this.clientServicesService
         .findOne(clientService)
         .then((clientService) => {
           clientServicesArray.push(clientService);
-          preInvoice.clientsServices = clientServicesArray;
+          preInvoice.clientServices = clientServicesArray;
+          preInvoice.clientServicesCount = data.clientsServicesCount;
         });
     }
 
     const invoiceConceptArray: InvoiceConcept[] = [];
-    for await (const invoiceConceptId of data.invoiceConcept) {
+    for await (const invoiceConceptId of data.invoiceConcepts) {
       await this.invoiceConceptsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {
           invoiceConceptArray.push(invoiceConcept);
           preInvoice.invoiceConcepts = invoiceConceptArray;
+          preInvoice.invoiceConceptCount = data.invoiceConceptsCount;
         });
     }
 
@@ -143,7 +177,6 @@ export class InvoicesService {
     preInvoice.paymentMethod = paymentMethod;
 
     this.calculateInvoiceAmount(preInvoice);
-
     return preInvoice;
   }
 
@@ -162,13 +195,23 @@ export class InvoicesService {
 
   async calculateInvoiceAmount(invoice: Invoice) {
     let amount = 0;
-    console.log(invoice.clientsServices);
-    invoice.clientsServices.forEach((clientService) => {
-      amount = amount + clientService.servicePlan.price;
-    });
-    invoice.invoiceConcepts.forEach((invoiceConcept) => {
-      amount = amount + invoiceConcept.price;
-    });
+    if (invoice.clientServices) {
+      let index = 0;
+      invoice.clientServices.forEach((clientService) => {
+        amount =
+          amount +
+          clientService.servicePlan.price * invoice.clientServicesCount[index];
+        index++;
+      });
+    }
+    if (invoice.invoiceConcepts) {
+      let index = 0;
+      invoice.invoiceConcepts.forEach((invoiceConcept) => {
+        amount =
+          amount + invoiceConcept.price * invoice.invoiceConceptCount[index];
+        index++;
+      });
+    }
 
     invoice.subtotal = amount;
     invoice.iva = amount * 0.16;

@@ -6,11 +6,11 @@ import {
   ManyToOne,
   JoinColumn,
   Column,
-  ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { Client } from './client.entity';
 import { ServicePlan } from 'src/service-plans/entities/service-plan.entity';
-import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { InvoiceServices } from 'src/invoices/entities/invoice-service-relation.entity';
 
 @Entity({ name: 'client_services' })
 export class ClientService {
@@ -40,8 +40,11 @@ export class ClientService {
   @Column({ type: 'boolean', default: false })
   archived: boolean;
 
-  @ManyToMany(() => Invoice, (invoices) => invoices.clientsServices)
-  invoices: Invoice[];
+  @OneToMany(
+    () => InvoiceServices,
+    (invoiceServices) => invoiceServices.clientService,
+  )
+  invoiceServices: InvoiceServices[];
 
   @CreateDateColumn({
     name: 'create_at',

@@ -3,13 +3,18 @@ import {
   Controller,
   Get,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
 import { InvoiceConceptsService } from '../services/invoice-concepts.service';
-import { CreateInvoiceConceptDto } from '../dtos/invoice-concept.dto';
+import {
+  CreateInvoiceConceptDto,
+  FilterInvoiceConceptDto,
+} from '../dtos/invoice-concept.dto';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -24,8 +29,12 @@ export class InvoiceConceptsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get()
-  getAll() {
-    return this.invoiceConceptsService.findAll();
+  getAll(
+    @Query() params: FilterInvoiceConceptDto,
+    @Query('getArchive', ParseBoolPipe) getArchive?: boolean,
+  ) {
+    if (params) params.getArchive = getArchive;
+    return this.invoiceConceptsService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)

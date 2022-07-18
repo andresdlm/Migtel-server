@@ -44,3 +44,17 @@ export class FilterClientServiceDto {
   @IsOptional()
   getArchive: boolean;
 }
+
+export class CreateInvoiceServiceDto {
+  @IsPositive()
+  @IsNotEmpty()
+  readonly invoiceId: number;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly clientServiceId: number;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly count: number;
+}

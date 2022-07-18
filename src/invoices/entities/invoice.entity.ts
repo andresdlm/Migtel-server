@@ -6,14 +6,15 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  ManyToMany,
-  JoinTable,
+  OneToMany,
 } from 'typeorm';
 
-import { ClientService } from 'src/clients/entities/client-service.entity';
 import { Client } from 'src/clients/entities/client.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
+import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
 import { InvoiceConcept } from './invoice-concept.entity';
+import { InvoiceServices } from './invoice-service-relation.entity';
+import { ClientService } from 'src/clients/entities/client-service.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -77,35 +78,17 @@ export class Invoice {
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
 
-  @ManyToMany(
-    () => ClientService,
-    (clientsServices) => clientsServices.invoices,
+  @OneToMany(
+    () => InvoiceServices,
+    (invoiceServices) => invoiceServices.invoice,
   )
-  @JoinTable({
-    name: 'invoice_services',
-    joinColumn: {
-      name: 'invoice_number',
-    },
-    inverseJoinColumn: {
-      name: 'client_service_id',
-    },
-  })
-  clientsServices: ClientService[];
+  invoiceServices: InvoiceServices[];
 
-  @ManyToMany(
-    () => InvoiceConcept,
-    (invoiceConcepts) => invoiceConcepts.invoices,
+  @OneToMany(
+    () => InvoiceConceptRelation,
+    (invoiceConceptRelation) => invoiceConceptRelation.invoice,
   )
-  @JoinTable({
-    name: 'invoice_concept_relation',
-    joinColumn: {
-      name: 'invoice_number',
-    },
-    inverseJoinColumn: {
-      name: 'invoice_concept_id',
-    },
-  })
-  invoiceConcepts: InvoiceConcept[];
+  invoiceConceptRelation: InvoiceConceptRelation[];
 
   @UpdateDateColumn({
     name: 'update_at',
@@ -113,4 +96,9 @@ export class Invoice {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;
+
+  invoiceConcepts?: InvoiceConcept[];
+  invoiceConceptCount?: number[];
+  clientServices?: ClientService[];
+  clientServicesCount?: number[];
 }

@@ -3,18 +3,34 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { InvoiceConcept } from '../entities/invoice-concept.entity';
-import { CreateInvoiceConceptDto } from '../dtos/invoice-concept.dto';
+import {
+  CreateInvoiceConceptDto,
+  FilterInvoiceConceptDto,
+} from '../dtos/invoice-concept.dto';
+import { CreateInvoiceConceptRelationDto } from '../dtos/invoice-concept-relation.dto';
+import { InvoiceConceptRelation } from '../entities/invoice-concept-relation.entity';
 
 @Injectable()
 export class InvoiceConceptsService {
   constructor(
     @InjectRepository(InvoiceConcept)
     private invoiceConceptRepo: Repository<InvoiceConcept>,
+    @InjectRepository(InvoiceConceptRelation)
+    private invoiceConceptRelRepo: Repository<InvoiceConceptRelation>,
   ) {}
 
-  findAll() {
+  findAll(params?: FilterInvoiceConceptDto) {
+    if (params) {
+      const { limit, offset, getArchive } = params;
+      return this.invoiceConceptRepo.find({
+        order: { id: 'DESC' },
+        take: limit,
+        skip: offset,
+        where: { archive: getArchive },
+      });
+    }
     return this.invoiceConceptRepo.find({
-      order: { id: 'ASC' },
+      order: { id: 'DESC' },
     });
   }
 
@@ -31,5 +47,10 @@ export class InvoiceConceptsService {
   create(data: CreateInvoiceConceptDto) {
     const newInvoiceConcept = this.invoiceConceptRepo.create(data);
     return this.invoiceConceptRepo.save(newInvoiceConcept);
+  }
+
+  createRelationInvoice(data: CreateInvoiceConceptRelationDto) {
+    const newInvoiceConceptRel = this.invoiceConceptRelRepo.create(data);
+    return this.invoiceConceptRelRepo.save(newInvoiceConceptRel);
   }
 }

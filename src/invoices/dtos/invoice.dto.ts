@@ -22,11 +22,19 @@ export class CreateInvoiceDto {
 
   @IsArray()
   @IsNotEmpty()
-  readonly clientServices: number[];
+  readonly clientsServices: number[];
 
   @IsArray()
   @IsNotEmpty()
-  readonly invoiceConcept: number[];
+  readonly clientsServicesCount: number[];
+
+  @IsArray()
+  @IsNotEmpty()
+  readonly invoiceConcepts: number[];
+
+  @IsArray()
+  @IsNotEmpty()
+  readonly invoiceConceptsCount: number[];
 
   @IsString()
   @IsNotEmpty()
