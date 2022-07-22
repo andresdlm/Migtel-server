@@ -38,6 +38,12 @@ export class InvoiceConceptsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('count')
+  getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
+    return this.invoiceConceptsService.getCount(getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':invoiceConcept')
   getOne(@Param('invoiceConcept', ParseIntPipe) invoiceConcept: number) {
     return this.invoiceConceptsService.findOne(invoiceConcept);

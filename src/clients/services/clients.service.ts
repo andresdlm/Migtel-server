@@ -49,6 +49,12 @@ export class ClientsService {
     );
   }
 
+  getCount(getArchive: boolean) {
+    return this.clientRepo.count({
+      where: { archived: getArchive },
+    });
+  }
+
   create(data: CreateClientDto) {
     const newClient = this.clientRepo.create(data);
     return this.clientRepo.save(newClient);

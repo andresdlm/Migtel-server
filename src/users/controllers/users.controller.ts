@@ -40,6 +40,12 @@ export class UsersController {
     return this.usersService.findAll(params);
   }
 
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('count')
+  getCount(@Query('getActive', ParseBoolPipe) getActive: boolean) {
+    return this.usersService.getCount(getActive);
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get(':id')
   get(@Param('id', ParseIntPipe) id: number) {

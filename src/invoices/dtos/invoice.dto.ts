@@ -30,7 +30,7 @@ export class CreateInvoiceDto {
 
   @IsArray()
   @IsNotEmpty()
-  readonly invoiceConcepts: number[];
+  readonly invoiceConcept: number[];
 
   @IsArray()
   @IsNotEmpty()

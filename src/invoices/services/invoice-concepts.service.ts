@@ -44,6 +44,12 @@ export class InvoiceConceptsService {
     return invoiceConcept;
   }
 
+  getCount(getArchive: boolean) {
+    return this.invoiceConceptRepo.count({
+      where: { archive: getArchive },
+    });
+  }
+
   create(data: CreateInvoiceConceptDto) {
     const newInvoiceConcept = this.invoiceConceptRepo.create(data);
     return this.invoiceConceptRepo.save(newInvoiceConcept);

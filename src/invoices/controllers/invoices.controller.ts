@@ -35,6 +35,12 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('count')
+  getCount(@Query('getCanceled', ParseBoolPipe) getCanceled: boolean) {
+    return this.invoiceService.getCount(getCanceled);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':invoiceNumber')
   getOne(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.findOne(invoiceNumber);
@@ -42,8 +48,13 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get('client/:clientId')
-  getByClientId(@Param('clientId', ParseIntPipe) clientId: number) {
-    return this.invoiceService.findByClientId(clientId);
+  getByClientId(
+    @Param('clientId', ParseIntPipe) clientId: number,
+    @Query() params: FilterInvoiceDto,
+    @Query('getCanceled', ParseBoolPipe) getCanceled?: boolean,
+  ) {
+    if (params) params.getCanceled = getCanceled;
+    return this.invoiceService.findByClientId(clientId, params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

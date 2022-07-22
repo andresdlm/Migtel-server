@@ -41,6 +41,12 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
+  getCount(getActive: boolean) {
+    return this.userRepo.count({
+      where: { active: getActive },
+    });
+  }
+
   async create(data: CreateUserDto) {
     const newUser = this.userRepo.create(data);
     const hashPassword = await bcrypt.hash(newUser.password, 10);

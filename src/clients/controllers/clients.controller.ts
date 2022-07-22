@@ -40,6 +40,12 @@ export class ClientsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('count')
+  getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
+    return this.clientsService.getCount(getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.findOne(id);

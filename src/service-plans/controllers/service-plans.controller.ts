@@ -41,6 +41,12 @@ export class ServicePlansController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('count')
+  getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
+    return this.servicePlansService.getCount(getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.servicePlansService.findOne(id);

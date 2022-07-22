@@ -30,7 +30,7 @@ export class InvoicesService {
     if (params) {
       const { limit, offset, getCanceled } = params;
       return this.invoiceRepo.find({
-        relations: ['client', 'clientsServices', 'paymentMethod'],
+        relations: ['client', 'paymentMethod'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
@@ -38,7 +38,7 @@ export class InvoicesService {
       });
     }
     return this.invoiceRepo.find({
-      relations: ['client', 'clientsServices', 'paymentMethod'],
+      relations: ['client', 'paymentMethod'],
       order: { id: 'DESC' },
     });
   }
@@ -63,18 +63,29 @@ export class InvoicesService {
     return invoice;
   }
 
-  findByClientId(clientId: number) {
+  findByClientId(clientId: number, params?: FilterInvoiceDto) {
+    const { limit, offset, getCanceled } = params;
     const invoices = this.invoiceRepo.find({
+      order: { id: 'DESC' },
+      take: limit,
+      skip: offset,
       where: {
         clientId: clientId,
+        canceled: getCanceled,
       },
-      relations: ['client', 'clientsServices', 'paymentMethod'],
+      relations: [],
     });
     if (!invoices) {
       throw new NotFoundException(`Client #${clientId} has any invoice`);
     }
     // TODO:
     return invoices;
+  }
+
+  getCount(getCanceled: boolean) {
+    return this.invoiceRepo.count({
+      where: { canceled: getCanceled },
+    });
   }
 
   async create(data: CreateInvoiceDto) {
@@ -97,7 +108,7 @@ export class InvoicesService {
     }
 
     const invoiceConceptArray: InvoiceConcept[] = [];
-    for await (const invoiceConceptId of data.invoiceConcepts) {
+    for await (const invoiceConceptId of data.invoiceConcept) {
       await this.invoiceConceptsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {
@@ -130,7 +141,7 @@ export class InvoicesService {
     }
 
     index = 0;
-    for await (const concept of data.invoiceConcepts) {
+    for await (const concept of data.invoiceConcept) {
       await this.invoiceConceptsService.createRelationInvoice({
         invoiceId: newInvoice.id,
         invoiceConceptId: concept,
@@ -161,7 +172,7 @@ export class InvoicesService {
     }
 
     const invoiceConceptArray: InvoiceConcept[] = [];
-    for await (const invoiceConceptId of data.invoiceConcepts) {
+    for await (const invoiceConceptId of data.invoiceConcept) {
       await this.invoiceConceptsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {

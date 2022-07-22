@@ -39,6 +39,12 @@ export class ServicePlansService {
     return servicePlan;
   }
 
+  getCount(getArchive: boolean) {
+    return this.servicePlanRepo.count({
+      where: { archived: getArchive },
+    });
+  }
+
   create(data: CreateServicePlanDto) {
     const newServicePlan = this.servicePlanRepo.create(data);
     return this.servicePlanRepo.save(newServicePlan);

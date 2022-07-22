@@ -20,7 +20,6 @@ export class PaymentMethodsService {
     if (params) {
       const { limit, offset, getArchive } = params;
       return this.paymentMethodRepo.find({
-        relations: ['invoices'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
@@ -28,7 +27,6 @@ export class PaymentMethodsService {
       });
     }
     return this.paymentMethodRepo.find({
-      relations: ['invoices'],
       order: { id: 'DESC' },
     });
   }
@@ -39,6 +37,12 @@ export class PaymentMethodsService {
       throw new NotFoundException(`Payment Method #${id} not found`);
     }
     return paymentMethod;
+  }
+
+  getCount(getArchive: boolean) {
+    return this.paymentMethodRepo.count({
+      where: { archived: getArchive },
+    });
   }
 
   create(data: CreatePaymentMethodDto) {
