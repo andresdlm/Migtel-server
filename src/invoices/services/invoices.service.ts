@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
 
 import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dto';
 import { Invoice } from '../entities/invoice.entity';
@@ -86,6 +87,14 @@ export class InvoicesService {
     return this.invoiceRepo.count({
       where: { canceled: getCanceled },
     });
+  }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.invoiceRepo.find({
+        where: [{ invoiceNumber: searchInput, canceled: getArchive }],
+      });
+    }
   }
 
   async create(data: CreateInvoiceDto) {

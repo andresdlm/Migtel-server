@@ -47,6 +47,15 @@ export class ServicePlansController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    return this.servicePlansService.search(searchParam, getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.servicePlansService.findOne(id);

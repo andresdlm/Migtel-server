@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Raw, Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
 
 import { InvoiceConcept } from '../entities/invoice-concept.entity';
 import {
@@ -48,6 +49,29 @@ export class InvoiceConceptsService {
     return this.invoiceConceptRepo.count({
       where: { archive: getArchive },
     });
+  }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.invoiceConceptRepo.find({
+        where: [
+          { id: searchInput, archive: getArchive },
+          { price: searchInput, archive: getArchive },
+        ],
+      });
+    } else {
+      return await getRepository(InvoiceConcept).find({
+        where: [
+          {
+            ['invoiceDescription']: Raw(
+              (invoiceDescription) =>
+                `LOWER(${invoiceDescription}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archive: getArchive,
+          },
+        ],
+      });
+    }
   }
 
   create(data: CreateInvoiceConceptDto) {

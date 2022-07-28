@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
+import { getRepository, Raw, Repository } from 'typeorm';
 
 import {
   CreatePaymentMethodDto,
@@ -43,6 +44,26 @@ export class PaymentMethodsService {
     return this.paymentMethodRepo.count({
       where: { archived: getArchive },
     });
+  }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.paymentMethodRepo.find({
+        where: [
+          { id: searchInput, archived: getArchive },
+          { coc: searchInput, archived: getArchive },
+        ],
+      });
+    } else {
+      return await getRepository(PaymentMethod).find({
+        where: {
+          ['name']: Raw(
+            (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
+          ),
+          archived: getArchive,
+        },
+      });
+    }
   }
 
   create(data: CreatePaymentMethodDto) {

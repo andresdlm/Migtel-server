@@ -12,25 +12,25 @@ import { ClientService } from './client-service.entity';
 @Entity({ name: 'clients' })
 export class Client {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number; // Listo
 
   @Column({ type: 'varchar', length: 200 })
-  name: string;
+  name: string; // Listo
 
   @Column({ type: 'varchar', length: 20 })
-  phone: string;
+  phone: string; //
 
   @Column({ name: 'person_type', type: 'varchar', length: 10, default: 'V' })
   personType: string;
 
   @Column({ type: 'varchar', length: 20 })
-  document: string;
+  document: string; // Listo
 
   @Column({ type: 'varchar', length: 500 })
-  address: string;
+  address: string; //
 
   @Column({ type: 'varchar', length: 100 })
-  city: string;
+  city: string; // Listo
 
   @Column({ type: 'int' })
   retention: number;

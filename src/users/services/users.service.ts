@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getRepository, Raw, Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
@@ -46,6 +47,48 @@ export class UsersService {
       where: { active: getActive },
     });
   }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.userRepo.find({
+        where: [{ id: searchInput, active: getArchive }],
+      });
+    } else {
+      return await getRepository(User).find({
+        where: [
+          {
+            ['name']: Raw(
+              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            active: getArchive,
+          },
+          {
+            ['email']: Raw(
+              (email) =>
+                `LOWER(${email}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            active: getArchive,
+          },
+          {
+            ['role']: Raw(
+              (role) => `LOWER(${role}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            active: getArchive,
+          },
+        ],
+      });
+    }
+  }
+
+  /* search(searchInput: string, getArchive: boolean) {
+    return this.userRepo.query(
+      `SELECT * FROM "users" WHERE users.active = ${getArchive}
+      AND (users.id = ${searchInput}
+      OR LOWER( users.name ) LIKE LOWER( '%${searchInput}%')
+      OR LOWER( users.email ) LIKE LOWER( '%${searchInput}%')
+      OR LOWER( users.role ) LIKE LOWER( '%${searchInput}%'))`,
+    );
+  } */
 
   async create(data: CreateUserDto) {
     const newUser = this.userRepo.create(data);

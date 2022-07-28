@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
+import { getRepository, Raw, Repository } from 'typeorm';
 
 import {
   CreateClientDto,
@@ -42,11 +43,45 @@ export class ClientsService {
     return client;
   }
 
-  searchClient(searchInput: string) {
-    return this.clientRepo.query(
-      `SELECT * FROM "clients" WHERE clients.archived = FALSE AND LOWER( clients.name )
-      LIKE LOWER( '%${searchInput}%' )`,
-    );
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return await getRepository(Client).find({
+        where: [
+          { id: searchInput, archived: getArchive },
+          {
+            ['document']: Raw(
+              (document) =>
+                `LOWER(${document}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+        ],
+      });
+    } else {
+      return await getRepository(Client).find({
+        where: [
+          {
+            ['name']: Raw(
+              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+          {
+            ['city']: Raw(
+              (city) => `LOWER(${city}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+          {
+            ['address']: Raw(
+              (address) =>
+                `LOWER(${address}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+        ],
+      });
+    }
   }
 
   getCount(getArchive: boolean) {

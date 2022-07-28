@@ -46,15 +46,18 @@ export class ClientsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
-  @Get(':id')
-  getOne(@Param('id', ParseIntPipe) id: number) {
-    return this.clientsService.findOne(id);
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    return this.clientsService.search(searchParam, getArchive);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
-  @Get('search/:searchParam')
-  searchClient(@Param('searchParam') searchParam: string) {
-    return this.clientsService.searchClient(searchParam);
+  @Get(':id')
+  getOne(@Param('id', ParseIntPipe) id: number) {
+    return this.clientsService.findOne(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

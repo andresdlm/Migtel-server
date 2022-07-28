@@ -41,6 +41,15 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    return this.invoiceService.search(searchParam, getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':invoiceNumber')
   getOne(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.findOne(invoiceNumber);

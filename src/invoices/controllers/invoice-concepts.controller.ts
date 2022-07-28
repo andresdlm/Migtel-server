@@ -44,6 +44,15 @@ export class InvoiceConceptsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    return this.invoiceConceptsService.search(searchParam, getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get(':invoiceConcept')
   getOne(@Param('invoiceConcept', ParseIntPipe) invoiceConcept: number) {
     return this.invoiceConceptsService.findOne(invoiceConcept);

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { isNumber } from 'class-validator';
+import { getRepository, Repository, Raw } from 'typeorm';
 
 import {
   CreateServicePlanDto,
@@ -43,6 +44,42 @@ export class ServicePlansService {
     return this.servicePlanRepo.count({
       where: { archived: getArchive },
     });
+  }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.servicePlanRepo.find({
+        where: [
+          { id: searchInput, archived: getArchive },
+          { price: searchInput, archived: getArchive },
+        ],
+      });
+    } else {
+      return await getRepository(ServicePlan).find({
+        where: [
+          {
+            ['name']: Raw(
+              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+          {
+            ['invoiceLabel']: Raw(
+              (invoiceLabel) =>
+                `LOWER(${invoiceLabel}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+          {
+            ['servicePlanType']: Raw(
+              (servicePlanType) =>
+                `LOWER(${servicePlanType}) Like '%${searchInput.toLowerCase()}%'`,
+            ),
+            archived: getArchive,
+          },
+        ],
+      });
+    }
   }
 
   create(data: CreateServicePlanDto) {

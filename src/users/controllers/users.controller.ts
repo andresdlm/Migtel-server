@@ -46,6 +46,15 @@ export class UsersController {
     return this.usersService.getCount(getActive);
   }
 
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    return this.usersService.search(searchParam, getArchive);
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get(':id')
   get(@Param('id', ParseIntPipe) id: number) {
