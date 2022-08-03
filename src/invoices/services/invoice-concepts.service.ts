@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Raw, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 
 import { InvoiceConcept } from '../entities/invoice-concept.entity';
@@ -36,7 +36,11 @@ export class InvoiceConceptsService {
   }
 
   findOne(invoiceConceptId: number) {
-    const invoiceConcept = this.invoiceConceptRepo.findOne(invoiceConceptId);
+    const invoiceConcept = this.invoiceConceptRepo.findOne({
+      where: {
+        id: invoiceConceptId,
+      },
+    });
     if (!invoiceConcept) {
       throw new NotFoundException(
         `Invoice Concept #${invoiceConceptId} not found`,
@@ -55,18 +59,15 @@ export class InvoiceConceptsService {
     if (isNumber(Number(searchInput))) {
       return this.invoiceConceptRepo.find({
         where: [
-          { id: searchInput, archive: getArchive },
-          { price: searchInput, archive: getArchive },
+          { id: Number(searchInput), archive: getArchive },
+          { price: Number(searchInput), archive: getArchive },
         ],
       });
     } else {
-      return await getRepository(InvoiceConcept).find({
+      return this.invoiceConceptRepo.find({
         where: [
           {
-            ['invoiceDescription']: Raw(
-              (invoiceDescription) =>
-                `LOWER(${invoiceDescription}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            invoiceDescription: ILike(`%${searchInput}%`),
             archive: getArchive,
           },
         ],

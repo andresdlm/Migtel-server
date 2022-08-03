@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isNumber } from 'class-validator';
-import { getRepository, Raw, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 import {
   CreateClientDto,
@@ -34,8 +34,13 @@ export class ClientsService {
   }
 
   findOne(id: number) {
-    const client = this.clientRepo.findOne(id, {
-      relations: ['services'],
+    const client = this.clientRepo.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        services: true,
+      },
     });
     if (!client) {
       throw new NotFoundException(`Client #${id} not found`);
@@ -45,38 +50,28 @@ export class ClientsService {
 
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
-      return await getRepository(Client).find({
+      return this.clientRepo.find({
         where: [
-          { id: searchInput, archived: getArchive },
+          { id: Number(searchInput), archived: getArchive },
           {
-            ['document']: Raw(
-              (document) =>
-                `LOWER(${document}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            document: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
         ],
       });
     } else {
-      return await getRepository(Client).find({
+      return this.clientRepo.find({
         where: [
           {
-            ['name']: Raw(
-              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            name: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
           {
-            ['city']: Raw(
-              (city) => `LOWER(${city}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            city: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
           {
-            ['address']: Raw(
-              (address) =>
-                `LOWER(${address}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            address: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
         ],
@@ -96,13 +91,13 @@ export class ClientsService {
   }
 
   async update(id: number, changes: UpdateClientDto) {
-    const client = await this.clientRepo.findOne(id);
+    const client = await this.findOne(id);
     this.clientRepo.merge(client, changes);
     return this.clientRepo.save(client);
   }
 
   async archive(id: number) {
-    const client = await this.clientRepo.findOne(id);
+    const client = await this.findOne(id);
     client.archived = !client.archived;
     return this.clientRepo.save(client);
   }

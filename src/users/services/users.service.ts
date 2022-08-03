@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Raw, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 import * as bcrypt from 'bcrypt';
 
@@ -31,7 +31,11 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRepo.findOne(id);
+    const user = await this.userRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
@@ -51,44 +55,27 @@ export class UsersService {
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
       return this.userRepo.find({
-        where: [{ id: searchInput, active: getArchive }],
+        where: [{ id: Number(searchInput), active: getArchive }],
       });
     } else {
-      return await getRepository(User).find({
+      return this.userRepo.find({
         where: [
           {
-            ['name']: Raw(
-              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            name: ILike(`%${searchInput}%`),
             active: getArchive,
           },
           {
-            ['email']: Raw(
-              (email) =>
-                `LOWER(${email}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            email: ILike(`%${searchInput}%`),
             active: getArchive,
           },
           {
-            ['role']: Raw(
-              (role) => `LOWER(${role}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            role: ILike(`%${searchInput}%`),
             active: getArchive,
           },
         ],
       });
     }
   }
-
-  /* search(searchInput: string, getArchive: boolean) {
-    return this.userRepo.query(
-      `SELECT * FROM "users" WHERE users.active = ${getArchive}
-      AND (users.id = ${searchInput}
-      OR LOWER( users.name ) LIKE LOWER( '%${searchInput}%')
-      OR LOWER( users.email ) LIKE LOWER( '%${searchInput}%')
-      OR LOWER( users.role ) LIKE LOWER( '%${searchInput}%'))`,
-    );
-  } */
 
   async create(data: CreateUserDto) {
     const newUser = this.userRepo.create(data);
@@ -104,7 +91,7 @@ export class UsersService {
   }
 
   async activate(id: number) {
-    const user = await this.userRepo.findOne(id);
+    const user = await this.findOne(id);
     user.active = !user.active;
     return this.userRepo.save(user);
   }

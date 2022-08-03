@@ -9,7 +9,9 @@ describe('InvoiceConceptsController', () => {
       controllers: [InvoiceConceptsController],
     }).compile();
 
-    controller = module.get<InvoiceConceptsController>(InvoiceConceptsController);
+    controller = module.get<InvoiceConceptsController>(
+      InvoiceConceptsController,
+    );
   });
 
   it('should be defined', () => {

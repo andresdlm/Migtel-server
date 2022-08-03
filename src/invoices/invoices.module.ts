@@ -16,6 +16,7 @@ import { InvoiceConcept } from './entities/invoice-concept.entity';
 import { InvoiceConceptRelation } from './entities/invoice-concept-relation.entity';
 import { InvoiceServices } from './entities/invoice-service-relation.entity';
 import { InvoiceServicesService } from './services/invoice-services.service';
+import { InvoicesService as InvoiceService } from './services/invoices.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { InvoiceServicesService } from './services/invoice-services.service';
     ServicePlansModule,
     PaymentMethodsModule,
   ],
+  exports: [InvoiceService],
   controllers: [InvoicesController, InvoiceConceptsController],
   providers: [
     InvoicesService,

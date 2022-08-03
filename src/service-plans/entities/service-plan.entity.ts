@@ -33,14 +33,14 @@ export class ServicePlan {
 
   @CreateDateColumn({
     name: 'create_at',
-    type: 'timestamptz',
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createAt: Date;
 
   @UpdateDateColumn({
     name: 'update_at',
-    type: 'timestamptz',
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isNumber } from 'class-validator';
-import { getRepository, Raw, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 import {
   CreatePaymentMethodDto,
@@ -33,7 +33,11 @@ export class PaymentMethodsService {
   }
 
   findOne(id: number) {
-    const paymentMethod = this.paymentMethodRepo.findOne(id);
+    const paymentMethod = this.paymentMethodRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
     if (!paymentMethod) {
       throw new NotFoundException(`Payment Method #${id} not found`);
     }
@@ -50,17 +54,14 @@ export class PaymentMethodsService {
     if (isNumber(Number(searchInput))) {
       return this.paymentMethodRepo.find({
         where: [
-          { id: searchInput, archived: getArchive },
-          { coc: searchInput, archived: getArchive },
+          { id: Number(searchInput), archived: getArchive },
+          { coc: Number(searchInput), archived: getArchive },
         ],
       });
     } else {
-      return await getRepository(PaymentMethod).find({
+      return this.paymentMethodRepo.find({
         where: {
-          ['name']: Raw(
-            (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
-          ),
-          archived: getArchive,
+          name: ILike(`%${searchInput}%`),
         },
       });
     }
@@ -72,13 +73,13 @@ export class PaymentMethodsService {
   }
 
   async update(id: number, changes: UpdatePaymentMethodDto) {
-    const paymentMethod = await this.paymentMethodRepo.findOne(id);
+    const paymentMethod = await this.findOne(id);
     this.paymentMethodRepo.merge(paymentMethod, changes);
     return this.paymentMethodRepo.save(paymentMethod);
   }
 
   async archive(id: number) {
-    const paymentMethod = await this.paymentMethodRepo.findOne(id);
+    const paymentMethod = await this.findOne(id);
     paymentMethod.archived = !paymentMethod.archived;
     return this.paymentMethodRepo.save(paymentMethod);
   }

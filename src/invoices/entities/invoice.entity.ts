@@ -33,8 +33,8 @@ export class Invoice {
 
   @CreateDateColumn({
     name: 'register_date',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    type: 'date',
+    default: () => 'CURRENT_DATE',
   })
   registerDate: Date;
 
@@ -92,7 +92,7 @@ export class Invoice {
 
   @UpdateDateColumn({
     name: 'update_at',
-    type: 'timestamptz',
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;

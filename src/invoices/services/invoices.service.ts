@@ -45,16 +45,20 @@ export class InvoicesService {
   }
 
   findOne(invoiceNumber: number) {
-    const invoice = this.invoiceRepo.findOne(invoiceNumber, {
-      relations: ['client', 'paymentMethod'],
-      join: {
-        alias: 'invoice',
-        leftJoinAndSelect: {
-          invoiceServices: 'invoice.invoiceServices',
-          clientServices: 'invoiceServices.clientService',
-          servicePlan: 'clientServices.servicePlan',
-          invoiceConceptRelation: 'invoice.invoiceConceptRelation',
-          invoiceConcept: 'invoiceConceptRelation.invoiceConcept',
+    const invoice = this.invoiceRepo.findOne({
+      where: {
+        id: invoiceNumber,
+      },
+      relations: {
+        client: true,
+        paymentMethod: true,
+        invoiceServices: {
+          clientService: {
+            servicePlan: true,
+          },
+        },
+        invoiceConceptRelation: {
+          invoiceConcept: true,
         },
       },
     });
@@ -92,7 +96,10 @@ export class InvoicesService {
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
       return this.invoiceRepo.find({
-        where: [{ invoiceNumber: searchInput, canceled: getArchive }],
+        where: [{ invoiceNumber: Number(searchInput), canceled: getArchive }],
+        relations: {
+          client: true,
+        },
       });
     }
   }
@@ -208,7 +215,7 @@ export class InvoicesService {
     const changes = {
       canceled: true,
     };
-    const invoice = await this.invoiceRepo.findOne(invoiceId);
+    const invoice = await this.findOne(invoiceId);
     this.invoiceRepo.merge(invoice, changes);
     return this.invoiceRepo.save(invoice);
   }

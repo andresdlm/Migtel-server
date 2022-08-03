@@ -38,8 +38,14 @@ export class ClientServicesService {
   }
 
   findOne(id: number) {
-    const clientService = this.clientServiceRepo.findOne(id, {
-      relations: ['client', 'servicePlan'],
+    const clientService = this.clientServiceRepo.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        client: true,
+        servicePlan: true,
+      },
     });
     if (!clientService) {
       throw new NotFoundException(`Service Client #${id} not found`);
@@ -76,7 +82,7 @@ export class ClientServicesService {
   }
 
   async update(id: number, changes: UpdateClientServiceDto) {
-    const clientService = await this.clientServiceRepo.findOne(id);
+    const clientService = await this.findOne(id);
     if (changes.clientId) {
       const client = await this.clientsService.findOne(changes.clientId);
       clientService.client = client;
@@ -92,7 +98,7 @@ export class ClientServicesService {
   }
 
   async archive(id: number) {
-    const clientService = await this.clientServiceRepo.findOne(id);
+    const clientService = await this.findOne(id);
     clientService.archived = !clientService.archived;
     return this.clientServiceRepo.save(clientService);
   }

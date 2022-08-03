@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isNumber } from 'class-validator';
-import { getRepository, Repository, Raw } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 import {
   CreateServicePlanDto,
@@ -33,7 +33,11 @@ export class ServicePlansService {
   }
 
   findOne(id: number) {
-    const servicePlan = this.servicePlanRepo.findOne(id);
+    const servicePlan = this.servicePlanRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
     if (!servicePlan) {
       throw new NotFoundException(`Service Plan #${id} not found`);
     }
@@ -50,31 +54,23 @@ export class ServicePlansService {
     if (isNumber(Number(searchInput))) {
       return this.servicePlanRepo.find({
         where: [
-          { id: searchInput, archived: getArchive },
-          { price: searchInput, archived: getArchive },
+          { id: Number(searchInput), archived: getArchive },
+          { price: Number(searchInput), archived: getArchive },
         ],
       });
     } else {
-      return await getRepository(ServicePlan).find({
+      return this.servicePlanRepo.find({
         where: [
           {
-            ['name']: Raw(
-              (name) => `LOWER(${name}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            name: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
           {
-            ['invoiceLabel']: Raw(
-              (invoiceLabel) =>
-                `LOWER(${invoiceLabel}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            invoiceLabel: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
           {
-            ['servicePlanType']: Raw(
-              (servicePlanType) =>
-                `LOWER(${servicePlanType}) Like '%${searchInput.toLowerCase()}%'`,
-            ),
+            servicePlanType: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
         ],
@@ -88,13 +84,13 @@ export class ServicePlansService {
   }
 
   async update(id: number, changes: UpdateServicePlanDto) {
-    const servicePlan = await this.servicePlanRepo.findOne(id);
+    const servicePlan = await this.findOne(id);
     this.servicePlanRepo.merge(servicePlan, changes);
     return this.servicePlanRepo.save(servicePlan);
   }
 
   async archive(id: number) {
-    const servicePlan = await this.servicePlanRepo.findOne(id);
+    const servicePlan = await this.findOne(id);
     servicePlan.archived = !servicePlan.archived;
     return this.servicePlanRepo.save(servicePlan);
   }
