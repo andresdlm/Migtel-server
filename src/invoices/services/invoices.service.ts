@@ -104,6 +104,63 @@ export class InvoicesService {
     }
   }
 
+  async getUnprinted(params?: FilterInvoiceDto) {
+    const { limit, offset } = params;
+    const invoices = await this.invoiceRepo.find({
+      order: { invoiceNumber: 'ASC' },
+      take: limit,
+      skip: offset,
+      where: {
+        printed: false,
+      },
+      relations: {
+        client: true,
+        paymentMethod: true,
+        invoiceServices: {
+          clientService: {
+            servicePlan: true,
+          },
+        },
+        invoiceConceptRelation: {
+          invoiceConcept: true,
+        },
+      },
+    });
+    return invoices;
+  }
+
+  getUnprintedCount() {
+    return this.invoiceRepo.count({
+      where: { printed: false },
+    });
+  }
+
+  print(invoiceNumber: number) {
+    return this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        printed: true,
+      })
+      .where('invoice_number = :invoice_number', {
+        invoice_number: invoiceNumber,
+      })
+      .execute();
+  }
+
+  unprint(invoiceNumber: number) {
+    this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        printed: false,
+      })
+      .where('invoice_number = :invoice_number', {
+        invoice_number: invoiceNumber,
+      })
+      .execute();
+  }
+
   async create(data: CreateInvoiceDto) {
     let newInvoice = this.invoiceRepo.create();
     const client = await this.clientsService.findOne(data.clientId);
@@ -212,12 +269,14 @@ export class InvoicesService {
   }
 
   async cancelInvoice(invoiceId: number) {
-    const changes = {
-      canceled: true,
-    };
-    const invoice = await this.findOne(invoiceId);
-    this.invoiceRepo.merge(invoice, changes);
-    return this.invoiceRepo.save(invoice);
+    this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        canceled: true,
+      })
+      .where('id = :id', { id: invoiceId })
+      .execute();
   }
 
   async calculateInvoiceAmount(invoice: Invoice) {

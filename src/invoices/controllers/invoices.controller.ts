@@ -35,6 +35,18 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('unprinted')
+  getUnprinted(@Query() params: FilterInvoiceDto) {
+    return this.invoiceService.getUnprinted(params);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Get('unprinted-count')
+  getUnprintedCount() {
+    return this.invoiceService.getUnprintedCount();
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
   @Get('count')
   getCount(@Query('getCanceled', ParseBoolPipe) getCanceled: boolean) {
     return this.invoiceService.getCount(getCanceled);
@@ -47,6 +59,12 @@ export class InvoicesController {
     @Query('getArchive', ParseBoolPipe) getArchive: boolean,
   ) {
     return this.invoiceService.search(searchParam, getArchive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('printInvoice/:invoiceNumber')
+  printInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.print(invoiceNumber);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
@@ -88,5 +106,11 @@ export class InvoicesController {
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.cancelInvoice(invoiceNumber);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':invoiceNumber/unprintInvoice')
+  unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.unprint(invoiceNumber);
   }
 }

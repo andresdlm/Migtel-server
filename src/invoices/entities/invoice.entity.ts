@@ -78,6 +78,9 @@ export class Invoice {
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  printed: boolean;
+
   @OneToMany(
     () => InvoiceServices,
     (invoiceServices) => invoiceServices.invoice,
