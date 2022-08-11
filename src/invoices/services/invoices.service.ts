@@ -16,6 +16,8 @@ import { InvoiceServicesService } from './invoice-services.service';
 
 @Injectable()
 export class InvoicesService {
+  initialInvoiceNumber = 5000;
+
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
@@ -201,7 +203,7 @@ export class InvoicesService {
     this.calculateInvoiceAmount(newInvoice);
 
     newInvoice = await this.invoiceRepo.save(newInvoice);
-    newInvoice.invoiceNumber = newInvoice.id + 5000; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
+    newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
 
     let index = 0;
     for await (const service of data.clientsServices) {
@@ -269,7 +271,7 @@ export class InvoicesService {
   }
 
   async cancelInvoice(invoiceId: number) {
-    this.invoiceRepo
+    await this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -277,6 +279,28 @@ export class InvoicesService {
       })
       .where('id = :id', { id: invoiceId })
       .execute();
+    const invoiceCanceled = await this.findOne(invoiceId);
+    let creditNote = this.invoiceRepo.create();
+    creditNote.client = invoiceCanceled.client;
+    creditNote.clientId = invoiceCanceled.clientId;
+    creditNote.comment = invoiceCanceled.comment;
+    creditNote.exhangeRate = invoiceCanceled.exhangeRate;
+    creditNote.igtf = -invoiceCanceled.igtf;
+    creditNote.islr = -invoiceCanceled.islr;
+    creditNote.iva = -invoiceCanceled.iva;
+    creditNote.iva_p = -invoiceCanceled.iva_p;
+    creditNote.iva_r = -invoiceCanceled.iva_r;
+    creditNote.paymentMethod = invoiceCanceled.paymentMethod;
+    creditNote.paymentMethodId = invoiceCanceled.paymentMethodId;
+    creditNote.subtotal = -invoiceCanceled.subtotal;
+    creditNote.totalAmount = -invoiceCanceled.totalAmount;
+    creditNote.type = 'N/C';
+    creditNote.usdInvoice = invoiceCanceled.usdInvoice;
+    creditNote.invoiceNumber = 0;
+
+    creditNote = await this.invoiceRepo.save(creditNote);
+    creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
+    creditNote = await this.invoiceRepo.save(creditNote);
   }
 
   async calculateInvoiceAmount(invoice: Invoice) {

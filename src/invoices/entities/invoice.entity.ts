@@ -81,6 +81,9 @@ export class Invoice {
   @Column({ type: 'boolean', default: false })
   printed: boolean;
 
+  @Column({ type: 'varchar', length: 20, default: 'FACT' })
+  type: string;
+
   @OneToMany(
     () => InvoiceServices,
     (invoiceServices) => invoiceServices.invoice,

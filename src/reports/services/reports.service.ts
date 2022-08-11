@@ -184,7 +184,7 @@ export class ReportsService {
       if (invoice.usdInvoice) {
         content.push([
           { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
-          { text: `FACT`, fontSize: this.tableFontSize },
+          { text: `${invoice.type}`, fontSize: this.tableFontSize },
           { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
           { text: ``, fontSize: this.tableFontSize },
           {
@@ -229,7 +229,7 @@ export class ReportsService {
       } else {
         content.push([
           { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
-          { text: `FACT`, fontSize: this.tableFontSize },
+          { text: `${invoice.type}`, fontSize: this.tableFontSize },
           { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
           { text: ``, fontSize: this.tableFontSize },
           {
