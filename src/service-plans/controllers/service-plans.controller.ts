@@ -30,7 +30,7 @@ import { Role } from 'src/auth/models/roles.model';
 export class ServicePlansController {
   constructor(private servicePlansService: ServicePlansService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
   getAll(
     @Query() params: FilterServicePlanDto,
@@ -40,13 +40,13 @@ export class ServicePlansController {
     return this.servicePlansService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
     return this.servicePlansService.getCount(getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string,
@@ -55,7 +55,7 @@ export class ServicePlansController {
     return this.servicePlansService.search(searchParam, getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.servicePlansService.findOne(id);

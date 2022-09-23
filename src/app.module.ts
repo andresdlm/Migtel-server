@@ -12,6 +12,7 @@ import { ServicePlansModule } from './service-plans/service-plans.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import config from './config';
 
 @Module({
@@ -38,6 +39,7 @@ import config from './config';
     PaymentMethodsModule,
     AuthModule,
     ReportsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

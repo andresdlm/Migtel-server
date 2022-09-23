@@ -27,7 +27,7 @@ import { Role } from 'src/auth/models/roles.model';
 export class InvoiceConceptsController {
   constructor(private invoiceConceptsService: InvoiceConceptsService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
   getAll(
     @Query() params: FilterInvoiceConceptDto,
@@ -37,13 +37,13 @@ export class InvoiceConceptsController {
     return this.invoiceConceptsService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
     return this.invoiceConceptsService.getCount(getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string,
@@ -52,7 +52,7 @@ export class InvoiceConceptsController {
     return this.invoiceConceptsService.search(searchParam, getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':invoiceConcept')
   getOne(@Param('invoiceConcept', ParseIntPipe) invoiceConcept: number) {
     return this.invoiceConceptsService.findOne(invoiceConcept);

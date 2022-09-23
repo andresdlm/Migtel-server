@@ -29,7 +29,7 @@ import { Role } from 'src/auth/models/roles.model';
 export class ClientServicesController {
   constructor(private clientServicesService: ClientServicesService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
   getAll(
     @Query() params: FilterClientServiceDto,
@@ -39,19 +39,19 @@ export class ClientServicesController {
     return this.clientServicesService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientServicesService.findOne(id);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('client/:clientId')
   getByClientId(@Param('clientId', ParseIntPipe) clientId: number) {
     return this.clientServicesService.findByClientId(clientId);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreateClientServiceDto) {
     return this.clientServicesService.create(payload);

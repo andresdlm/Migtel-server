@@ -40,13 +40,13 @@ export class UsersController {
     return this.usersService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('count')
   getCount(@Query('getActive', ParseBoolPipe) getActive: boolean) {
     return this.usersService.getCount(getActive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string,
@@ -67,7 +67,7 @@ export class UsersController {
     return this.usersService.create(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,

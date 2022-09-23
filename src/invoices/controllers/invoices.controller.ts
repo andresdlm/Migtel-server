@@ -24,7 +24,7 @@ import { Role } from 'src/auth/models/roles.model';
 export class InvoicesController {
   constructor(private invoiceService: InvoicesService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
   getAll(
     @Query() params: FilterInvoiceDto,
@@ -34,25 +34,25 @@ export class InvoicesController {
     return this.invoiceService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('unprinted')
   getUnprinted(@Query() params: FilterInvoiceDto) {
     return this.invoiceService.getUnprinted(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('unprinted-count')
   getUnprintedCount() {
     return this.invoiceService.getUnprintedCount();
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount(@Query('getCanceled', ParseBoolPipe) getCanceled: boolean) {
     return this.invoiceService.getCount(getCanceled);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string,
@@ -67,13 +67,13 @@ export class InvoicesController {
     return this.invoiceService.print(invoiceNumber);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':invoiceNumber')
   getOne(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.findOne(invoiceNumber);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('client/:clientId')
   getByClientId(
     @Param('clientId', ParseIntPipe) clientId: number,
@@ -84,13 +84,13 @@ export class InvoicesController {
     return this.invoiceService.findByClientId(clientId, params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreateInvoiceDto) {
     return this.invoiceService.create(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('preview')
   getPreview(@Body() payload: CreateInvoiceDto) {
     return this.invoiceService.getPreview(payload);

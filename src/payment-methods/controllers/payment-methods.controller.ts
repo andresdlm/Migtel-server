@@ -29,7 +29,7 @@ import { Role } from 'src/auth/models/roles.model';
 export class PaymentMethodsController {
   constructor(private paymentMethodService: PaymentMethodsService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
   getAll(
     @Query() params: FilterPaymentMethodDto,
@@ -39,13 +39,13 @@ export class PaymentMethodsController {
     return this.paymentMethodService.findAll(params);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
     return this.paymentMethodService.getCount(getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string,
@@ -54,7 +54,7 @@ export class PaymentMethodsController {
     return this.paymentMethodService.search(searchParam, getArchive);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.paymentMethodService.findOne(id);

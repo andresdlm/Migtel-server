@@ -181,96 +181,190 @@ export class ReportsService {
       { text: 'IGTF', fontSize: this.tableFontSize, alignment: 'center' },
     ]);
     invoices.forEach((invoice) => {
-      if (invoice.usdInvoice) {
-        content.push([
-          { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
-          { text: `${invoice.type}`, fontSize: this.tableFontSize },
-          { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
-          { text: ``, fontSize: this.tableFontSize },
-          {
-            text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
-            fontSize: this.tableFontSize,
-          },
-          {
-            text: `${invoice.client.personType}-${invoice.client.document}`,
-            fontSize: this.tableFontSize,
-          },
-          {
-            text: `${(invoice.subtotal * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${(invoice.iva * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${(invoice.totalAmount * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${(invoice.iva_r * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${(invoice.iva_p * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${(invoice.igtf * invoice.exhangeRate).toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-        ]);
+      if (invoice.type === 'FACT') {
+        if (invoice.usdInvoice) {
+          content.push([
+            { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
+            { text: `${invoice.type}`, fontSize: this.tableFontSize },
+            { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
+            { text: ``, fontSize: this.tableFontSize },
+            {
+              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.client.personType}-${invoice.client.document}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${(invoice.subtotal * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.totalAmount * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva_r * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva_p * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.igtf * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+          ]);
+        } else {
+          content.push([
+            { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
+            { text: `${invoice.type}`, fontSize: this.tableFontSize },
+            { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
+            { text: ``, fontSize: this.tableFontSize },
+            {
+              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.client.personType}-${invoice.client.document}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.subtotal.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.totalAmount.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva_r.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva_p.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.igtf.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+          ]);
+        }
       } else {
-        content.push([
-          { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
-          { text: `${invoice.type}`, fontSize: this.tableFontSize },
-          { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
-          { text: ``, fontSize: this.tableFontSize },
-          {
-            text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
-            fontSize: this.tableFontSize,
-          },
-          {
-            text: `${invoice.client.personType}-${invoice.client.document}`,
-            fontSize: this.tableFontSize,
-          },
-          {
-            text: `${invoice.subtotal.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${invoice.iva.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${invoice.totalAmount.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${invoice.iva_r.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${invoice.iva_p.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-          {
-            text: `${invoice.igtf.toFixed(2)}`,
-            fontSize: this.tableFontSize,
-            alignment: 'right',
-          },
-        ]);
+        if (invoice.usdInvoice) {
+          content.push([
+            { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
+            { text: `${invoice.type}`, fontSize: this.tableFontSize },
+            { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
+            { text: `${invoice.comment}`, fontSize: this.tableFontSize },
+            {
+              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.client.personType}-${invoice.client.document}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${(invoice.subtotal * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.totalAmount * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva_r * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.iva_p * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${(invoice.igtf * invoice.exhangeRate).toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+          ]);
+        } else {
+          content.push([
+            { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
+            { text: `${invoice.type}`, fontSize: this.tableFontSize },
+            { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
+            { text: `${invoice.comment}`, fontSize: this.tableFontSize },
+            {
+              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.client.personType}-${invoice.client.document}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `${invoice.subtotal.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.totalAmount.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva_r.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.iva_p.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+            {
+              text: `${invoice.igtf.toFixed(2)}`,
+              fontSize: this.tableFontSize,
+              alignment: 'right',
+            },
+          ]);
+        }
       }
     });
     return content;

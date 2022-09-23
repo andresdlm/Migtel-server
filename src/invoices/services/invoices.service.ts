@@ -271,36 +271,39 @@ export class InvoicesService {
   }
 
   async cancelInvoice(invoiceId: number) {
-    await this.invoiceRepo
-      .createQueryBuilder()
-      .update(Invoice)
-      .set({
-        canceled: true,
-      })
-      .where('id = :id', { id: invoiceId })
-      .execute();
-    const invoiceCanceled = await this.findOne(invoiceId);
-    let creditNote = this.invoiceRepo.create();
-    creditNote.client = invoiceCanceled.client;
-    creditNote.clientId = invoiceCanceled.clientId;
-    creditNote.comment = invoiceCanceled.comment;
-    creditNote.exhangeRate = invoiceCanceled.exhangeRate;
-    creditNote.igtf = -invoiceCanceled.igtf;
-    creditNote.islr = -invoiceCanceled.islr;
-    creditNote.iva = -invoiceCanceled.iva;
-    creditNote.iva_p = -invoiceCanceled.iva_p;
-    creditNote.iva_r = -invoiceCanceled.iva_r;
-    creditNote.paymentMethod = invoiceCanceled.paymentMethod;
-    creditNote.paymentMethodId = invoiceCanceled.paymentMethodId;
-    creditNote.subtotal = -invoiceCanceled.subtotal;
-    creditNote.totalAmount = -invoiceCanceled.totalAmount;
-    creditNote.type = 'N/C';
-    creditNote.usdInvoice = invoiceCanceled.usdInvoice;
-    creditNote.invoiceNumber = 0;
+    const invoice = await this.findOne(invoiceId);
+    if (invoice.type === 'FACT') {
+      await this.invoiceRepo
+        .createQueryBuilder()
+        .update(Invoice)
+        .set({
+          canceled: true,
+        })
+        .where('id = :id', { id: invoiceId })
+        .execute();
+      const invoiceCanceled = await this.findOne(invoiceId);
+      let creditNote = this.invoiceRepo.create();
+      creditNote.client = invoiceCanceled.client;
+      creditNote.clientId = invoiceCanceled.clientId;
+      creditNote.comment = invoice.invoiceNumber.toString();
+      creditNote.exhangeRate = invoiceCanceled.exhangeRate;
+      creditNote.igtf = -invoiceCanceled.igtf;
+      creditNote.islr = -invoiceCanceled.islr;
+      creditNote.iva = -invoiceCanceled.iva;
+      creditNote.iva_p = -invoiceCanceled.iva_p;
+      creditNote.iva_r = -invoiceCanceled.iva_r;
+      creditNote.paymentMethod = invoiceCanceled.paymentMethod;
+      creditNote.paymentMethodId = invoiceCanceled.paymentMethodId;
+      creditNote.subtotal = -invoiceCanceled.subtotal;
+      creditNote.totalAmount = -invoiceCanceled.totalAmount;
+      creditNote.type = 'N/C';
+      creditNote.usdInvoice = invoiceCanceled.usdInvoice;
+      creditNote.invoiceNumber = 0;
 
-    creditNote = await this.invoiceRepo.save(creditNote);
-    creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
-    creditNote = await this.invoiceRepo.save(creditNote);
+      creditNote = await this.invoiceRepo.save(creditNote);
+      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
+      creditNote = await this.invoiceRepo.save(creditNote);
+    }
   }
 
   async calculateInvoiceAmount(invoice: Invoice) {
@@ -326,27 +329,29 @@ export class InvoicesService {
     invoice.subtotal = amount;
     invoice.iva = amount * 0.16;
     invoice.iva_r = amount * 0.16 * invoice.client.retention * 0.01;
-    invoice.iva_p =
-      amount * 0.16 - amount * 0.16 * invoice.client.retention * 0.01;
+    invoice.iva_p = invoice.iva - invoice.iva_r;
     invoice.islr = 0;
     invoice.igtf = 0;
     invoice.totalAmount = 0;
     invoice.exhangeRate = this.dolarApi['USD']['sicad2'];
 
-    if (invoice.iva_r == 0) {
-      invoice.totalAmount = invoice.subtotal + invoice.iva;
-    } else {
-      invoice.totalAmount = invoice.subtotal + invoice.iva_p;
-    }
+    invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (invoice.client.hasIslr) {
       invoice.islr = invoice.totalAmount * invoice.client.amountIslr * 0.01;
-      invoice.totalAmount = invoice.totalAmount + invoice.islr;
+      invoice.totalAmount = invoice.totalAmount;
     }
 
     if (invoice.paymentMethod.hasIgtf) {
-      invoice.igtf = invoice.totalAmount * 0.03;
-      invoice.totalAmount = invoice.totalAmount + invoice.igtf;
+      if (invoice.client.retention === 0) {
+        invoice.igtf = invoice.totalAmount * 0.03;
+        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
+      } else {
+        invoice.igtf =
+          (invoice.totalAmount - invoice.iva + invoice.iva_p - invoice.islr) *
+          0.03;
+        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
+      }
     }
 
     if (!invoice.usdInvoice) {
