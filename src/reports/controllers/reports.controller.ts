@@ -1,4 +1,5 @@
 import { Body, Controller, Post, StreamableFile } from '@nestjs/common';
+import { ReportDto } from '../dtos/reports.dto';
 import { SalesBookDto } from '../dtos/salesBook.dto';
 import { ReportsService } from '../services/reports.service';
 
@@ -9,6 +10,13 @@ export class ReportsController {
   @Post('libroventas.pdf')
   async getFile(@Body() payload: SalesBookDto): Promise<StreamableFile> {
     const buffer = await this.reportsService.generateSalesBookPDF(payload);
+
+    return new StreamableFile(buffer);
+  }
+
+  @Post('paymentReport.pdf')
+  async paymentReport(@Body() payload: ReportDto): Promise<StreamableFile> {
+    const buffer = await this.reportsService.generatePaymentReport(payload);
 
     return new StreamableFile(buffer);
   }

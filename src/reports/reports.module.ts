@@ -4,9 +4,10 @@ import { ReportsService } from './services/reports.service';
 import { ReportsLogicService } from './services/reports-logic.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invoice])],
+  imports: [TypeOrmModule.forFeature([Invoice, PaymentMethod])],
   controllers: [ReportsController],
   providers: [ReportsService, ReportsLogicService],
 })

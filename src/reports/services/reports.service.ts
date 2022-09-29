@@ -6,6 +6,7 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { ReportsLogicService } from './reports-logic.service';
 import { SalesBookDto } from '../dtos/salesBook.dto';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { AccountReport, ReportDto } from '../dtos/reports.dto';
 
 @Injectable()
 export class ReportsService {
@@ -403,5 +404,141 @@ export class ReportsService {
       totalCanceled: totalCanceled,
       totalValid: totalValid,
     };
+  }
+
+  async generatePaymentReport(params: ReportDto) {
+    const payments: AccountReport[] =
+      await this.reportsLogicService.paymentMethodReport(params);
+    const content = await this.generatePaymentReportTable(payments);
+    console.log(payments);
+    const pdfdefinition: any = {
+      pageOrientation: 'landscape',
+      header: function (currentPage, pageCount) {
+        return {
+          margin: [0, 25, 40, 0],
+          text: [
+            {
+              text: `PÁGINA NRO. ${currentPage} DE ${pageCount}`,
+              fontSize: 10,
+              bold: true,
+            },
+          ],
+          alignment: 'right',
+        };
+      },
+      content: [
+        {
+          text: '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------',
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          text: 'EMPRESA: COMUNICACIONES MIGTEL C. A.',
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          text: 'REPORTE DE CUENTAS',
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          // auto-sized columns have their widths based on their content
+          text: `DEL ${params.since.toLocaleDateString()} AL ${params.until.toLocaleDateString()}`,
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          text: '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------',
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          style: 'tableExample',
+          table: {
+            headerRows: 1,
+            body: content,
+          },
+          layout: 'headerLineOnly',
+        },
+        {
+          text: '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------',
+          fontSize: 10,
+          bold: true,
+          margin: [0, 0, 0, 0],
+        },
+        {
+          columns: [
+            {
+              text: `CANTIDAD DE METODOS DE PAGO UTILIZADOS: ${payments.length}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `CANTIDAD DE PAGOS RECIBIDOS: ${payments.reduce(
+                (count, obj) => {
+                  return count + obj.payments;
+                },
+                0,
+              )}`,
+              fontSize: this.tableFontSize,
+            },
+            {
+              text: `BALANCE TOTAL: ${payments
+                .reduce((count, obj) => {
+                  return count + obj.balance;
+                }, 0)
+                .toFixed(2)}`,
+              fontSize: this.tableFontSize,
+            },
+          ],
+        },
+      ],
+    };
+
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = pdfMake.createPdf(pdfdefinition);
+
+      doc.getBuffer((buffer) => {
+        resolve(buffer);
+      });
+    });
+
+    return pdfBuffer;
+  }
+
+  async generatePaymentReportTable(accounts: AccountReport[]) {
+    const content = [];
+    content.push([
+      { text: 'ID', fontSize: this.tableFontSize },
+      { text: 'NOMBRE', fontSize: this.tableFontSize },
+      { text: 'CANTIDAD DE PAGOS', fontSize: this.tableFontSize },
+      { text: 'BALANCE', fontSize: this.tableFontSize },
+    ]);
+    accounts.forEach((account) => {
+      content.push([
+        {
+          text: `${account.id}`,
+          fontSize: this.tableFontSize,
+          alignment: 'right',
+        },
+        { text: `${account.name}`, fontSize: this.tableFontSize },
+        {
+          text: `${account.payments}`,
+          fontSize: this.tableFontSize,
+          alignment: 'center',
+        },
+        {
+          text: `${account.balance.toFixed(2)}`,
+          fontSize: this.tableFontSize,
+          alignment: 'right',
+        },
+      ]);
+    });
+    return content;
   }
 }
