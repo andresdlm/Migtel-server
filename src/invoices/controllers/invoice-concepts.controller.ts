@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseBoolPipe,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { InvoiceConceptsService } from '../services/invoice-concepts.service';
 import {
   CreateInvoiceConceptDto,
   FilterInvoiceConceptDto,
+  UpdateInvoiceConceptDto,
 } from '../dtos/invoice-concept.dto';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -62,5 +65,20 @@ export class InvoiceConceptsController {
   @Post('')
   create(@Body() payload: CreateInvoiceConceptDto) {
     return this.invoiceConceptsService.create(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateInvoiceConceptDto,
+  ) {
+    return this.invoiceConceptsService.update(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete('archive/:id')
+  archive(@Param('id', ParseIntPipe) id: number) {
+    return this.invoiceConceptsService.archive(id);
   }
 }

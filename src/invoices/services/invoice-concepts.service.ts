@@ -7,6 +7,7 @@ import { InvoiceConcept } from '../entities/invoice-concept.entity';
 import {
   CreateInvoiceConceptDto,
   FilterInvoiceConceptDto,
+  UpdateInvoiceConceptDto,
 } from '../dtos/invoice-concept.dto';
 import { CreateInvoiceConceptRelationDto } from '../dtos/invoice-concept-relation.dto';
 import { InvoiceConceptRelation } from '../entities/invoice-concept-relation.entity';
@@ -78,6 +79,18 @@ export class InvoiceConceptsService {
   create(data: CreateInvoiceConceptDto) {
     const newInvoiceConcept = this.invoiceConceptRepo.create(data);
     return this.invoiceConceptRepo.save(newInvoiceConcept);
+  }
+
+  async update(id: number, changes: UpdateInvoiceConceptDto) {
+    const concept = await this.findOne(id);
+    this.invoiceConceptRepo.merge(concept, changes);
+    return this.invoiceConceptRepo.save(concept);
+  }
+
+  async archive(id: number) {
+    const concept = await this.findOne(id);
+    concept.archive = !concept.archive;
+    return this.invoiceConceptRepo.save(concept);
   }
 
   createRelationInvoice(data: CreateInvoiceConceptRelationDto) {

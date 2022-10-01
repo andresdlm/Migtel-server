@@ -41,6 +41,12 @@ export class UsersController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('count')
   getCount(@Query('getActive', ParseBoolPipe) getActive: boolean) {
     return this.usersService.getCount(getActive);
@@ -53,12 +59,6 @@ export class UsersController {
     @Query('getArchive', ParseBoolPipe) getArchive: boolean,
   ) {
     return this.usersService.search(searchParam, getArchive);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Get(':id')
-  get(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
   }
 
   @Roles(Role.SUPER_ADMIN)

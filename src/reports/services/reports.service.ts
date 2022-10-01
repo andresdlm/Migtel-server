@@ -410,7 +410,6 @@ export class ReportsService {
     const payments: AccountReport[] =
       await this.reportsLogicService.paymentMethodReport(params);
     const content = await this.generatePaymentReportTable(payments);
-    console.log(payments);
     const pdfdefinition: any = {
       pageOrientation: 'landscape',
       header: function (currentPage, pageCount) {
