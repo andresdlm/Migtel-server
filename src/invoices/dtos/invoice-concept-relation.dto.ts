@@ -12,4 +12,8 @@ export class CreateInvoiceConceptRelationDto {
   @IsPositive()
   @IsNotEmpty()
   readonly count: number;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly price: number;
 }

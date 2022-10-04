@@ -7,6 +7,9 @@ export class InvoiceConceptRelation {
   @Column()
   count: number;
 
+  @Column({ type: 'real' })
+  price: number;
+
   @ManyToOne(() => Invoice, (invoice) => invoice.invoiceConceptRelation)
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice;

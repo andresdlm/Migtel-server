@@ -57,4 +57,8 @@ export class CreateInvoiceServiceDto {
   @IsPositive()
   @IsNotEmpty()
   readonly count: number;
+
+  @IsPositive()
+  @IsNotEmpty()
+  readonly price: number;
 }

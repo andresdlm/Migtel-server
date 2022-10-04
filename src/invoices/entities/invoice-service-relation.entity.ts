@@ -7,6 +7,9 @@ export class InvoiceServices {
   @Column()
   count: number;
 
+  @Column({ type: 'real' })
+  price: number;
+
   @ManyToOne(() => Invoice, (invoice) => invoice.invoiceServices)
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice;

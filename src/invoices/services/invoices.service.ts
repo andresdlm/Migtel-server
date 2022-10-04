@@ -206,21 +206,25 @@ export class InvoicesService {
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
 
     let index = 0;
-    for await (const service of data.clientsServices) {
+    for await (const serviceId of data.clientsServices) {
+      const service = await this.clientServicesService.findOne(serviceId);
       await this.invoiceServicesService.createRelationInvoice({
         invoiceId: newInvoice.id,
-        clientServiceId: service,
+        clientServiceId: serviceId,
         count: data.clientsServicesCount[index],
+        price: service.servicePlan.price,
       });
       index++;
     }
 
     index = 0;
-    for await (const concept of data.invoiceConcept) {
+    for await (const conceptId of data.invoiceConcept) {
+      const concept = await this.invoiceConceptsService.findOne(conceptId);
       await this.invoiceConceptsService.createRelationInvoice({
         invoiceId: newInvoice.id,
-        invoiceConceptId: concept,
+        invoiceConceptId: conceptId,
         count: data.invoiceConceptsCount[index],
+        price: concept.price,
       });
       index++;
     }
