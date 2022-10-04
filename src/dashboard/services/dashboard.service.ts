@@ -23,32 +23,55 @@ export class DashboardService {
       yearIncome: [],
       cities: [],
       plans: [],
+      accountsBalance: [],
     };
 
-    const todayInvoices = await this.invoiceRepo.find({
-      where: {
-        registerDate: Raw((registerDate) => `${registerDate} = :date`, {
-          date: `${todayDate.getFullYear()}-${
-            todayDate.getMonth() + 1
-          }-${todayDate.getUTCDate()}`,
-        }),
-      },
-    });
-    todayInvoices.forEach((invoice) => {
-      dashboardData.dailyIncome += invoice.totalAmount;
-    });
+    const dailyIncome = await this.invoiceRepo.query(
+      `SELECT COALESCE(SUM(CAST(
+        CASE
+            WHEN invoices.usd_invoice = false
+              THEN invoices.total_amount/invoices.exhange_rate
+            ELSE invoices.total_amount
+        END AS real
+        )), 0) AS dailyIncome
+        FROM invoices
+        WHERE invoices.type = 'FACT'
+          AND invoices.canceled = false
+          AND EXTRACT(MONTH FROM invoices.register_date) = EXTRACT(MONTH FROM now())
+          AND EXTRACT(DAY FROM invoices.register_date) = EXTRACT(DAY FROM now());`,
+    );
+    dashboardData.dailyIncome = dailyIncome[0]['dailyincome'];
 
-    const monthInvoices = await this.invoiceRepo.find({
-      where: {
-        registerDate: Raw((registerDate) => `${registerDate} >= :date`, {
-          date: `${todayDate.getFullYear()}-${todayDate.getMonth() + 1}-1`,
-        }),
-      },
-    });
-    monthInvoices.forEach((invoice) => {
-      dashboardData.monthIncome += invoice.totalAmount;
-      dashboardData.taxesGeneratedByMonth += invoice.iva;
-    });
+    const monthIncome = await this.invoiceRepo.query(
+      `SELECT COALESCE(SUM(CAST(
+        CASE
+            WHEN invoices.usd_invoice = false
+              THEN invoices.total_amount/invoices.exhange_rate
+            ELSE invoices.total_amount
+        END AS real
+        )), 0) AS monthIncome
+        FROM invoices
+        WHERE invoices.type = 'FACT'
+          AND invoices.canceled = false
+          AND EXTRACT(MONTH FROM invoices.register_date) = EXTRACT(MONTH FROM now());`,
+    );
+    dashboardData.monthIncome = monthIncome[0]['monthincome'];
+
+    const taxesGeneratedByMonth = await this.invoiceRepo.query(
+      `SELECT COALESCE(SUM(CAST(
+        CASE
+            WHEN invoices.usd_invoice = false
+              THEN invoices.iva/invoices.exhange_rate
+            ELSE invoices.iva
+        END AS real
+        )), 0) AS taxesGeneratedByMonth
+        FROM invoices
+        WHERE invoices.type = 'FACT'
+          AND invoices.canceled = false
+          AND EXTRACT(MONTH FROM invoices.register_date) = EXTRACT(MONTH FROM now());`,
+    );
+    dashboardData.taxesGeneratedByMonth =
+      taxesGeneratedByMonth[0]['taxesgeneratedbymonth'];
 
     dashboardData.newClientsInMonth = await this.clientRepo.count({
       where: {
@@ -105,6 +128,26 @@ export class DashboardService {
       GROUP BY service_plans.name
       ORDER BY raised DESC
       LIMIT 7;`,
+    );
+
+    dashboardData.accountsBalance = await this.invoiceRepo.query(
+      `SELECT payment_methods.id AS id,
+        payment_methods.name AS name,
+        COUNT(invoices)::INT AS count,
+        COALESCE(SUM(CAST(
+        CASE
+            WHEN invoices.usd_invoice = false
+              THEN invoices.total_amount/invoices.exhange_rate
+            ELSE invoices.total_amount
+        END AS real
+        )), 0) AS y
+        FROM payment_methods
+        LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id
+        WHERE invoices.type = 'FACT'
+          AND invoices.canceled = false
+          AND EXTRACT(MONTH FROM invoices.register_date) = EXTRACT(MONTH FROM now())
+        GROUP BY payment_methods.id
+        ORDER BY y DESC, id ASC;`,
     );
 
     return dashboardData;

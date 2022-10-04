@@ -66,7 +66,7 @@ export class ClientsController {
     return this.clientsService.create(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -75,7 +75,7 @@ export class ClientsController {
     return this.clientsService.update(id, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete('archive/:id')
   archive(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.archive(id);

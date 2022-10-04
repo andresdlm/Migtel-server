@@ -6,6 +6,7 @@ export interface Dashboard {
   yearIncome: number[];
   cities: CityDashboard[];
   plans: PlansDashboard[];
+  accountsBalance: PaymentMethodDashboard[];
 }
 
 export interface CityDashboard {
@@ -18,4 +19,11 @@ export interface PlansDashboard {
   name: string;
   count: number;
   raised: number;
+}
+
+export interface PaymentMethodDashboard {
+  id: number;
+  name: string;
+  count: number;
+  balance: number;
 }
