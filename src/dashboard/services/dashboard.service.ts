@@ -82,16 +82,17 @@ export class DashboardService {
     });
 
     const data = await this.invoiceRepo.query(
-      `SELECT sale_month, month_total, SUM(month_total) OVER (
-          ORDER BY sale_month ASC rows 11 preceding
-        ) AS sum_series
-        FROM (
-          SELECT date_trunc('month', register_date) AS sale_month
-              ,sum(total_amount) AS month_total
-          FROM invoices
-          GROUP BY 1
-          ORDER BY 1
-        ) t;`,
+      `SELECT date_trunc('month', register_date) AS sale_month,
+        COALESCE(SUM(CAST(
+        CASE
+          WHEN invoices.usd_invoice = false
+            THEN invoices.total_amount/invoices.exhange_rate
+          ELSE invoices.total_amount
+        END AS real
+        )), 0) AS month_total
+        FROM invoices
+        GROUP BY 1
+        ORDER BY 1`,
     );
 
     data.forEach((month) => {
