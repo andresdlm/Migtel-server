@@ -56,6 +56,7 @@ export class UsersService {
     if (isNumber(Number(searchInput))) {
       return this.userRepo.find({
         where: [{ id: Number(searchInput), active: getArchive }],
+        take: 20,
       });
     } else {
       return this.userRepo.find({
@@ -73,6 +74,7 @@ export class UsersService {
             active: getArchive,
           },
         ],
+        take: 20,
       });
     }
   }

@@ -57,12 +57,14 @@ export class PaymentMethodsService {
           { id: Number(searchInput), archived: getArchive },
           { coc: Number(searchInput), archived: getArchive },
         ],
+        take: 20,
       });
     } else {
       return this.paymentMethodRepo.find({
         where: {
           name: ILike(`%${searchInput}%`),
         },
+        take: 20,
       });
     }
   }

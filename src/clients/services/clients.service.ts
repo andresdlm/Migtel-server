@@ -58,6 +58,7 @@ export class ClientsService {
             archived: getArchive,
           },
         ],
+        take: 20,
       });
     } else {
       return this.clientRepo.find({
@@ -75,6 +76,7 @@ export class ClientsService {
             archived: getArchive,
           },
         ],
+        take: 20,
       });
     }
   }

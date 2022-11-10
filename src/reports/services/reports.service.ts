@@ -381,12 +381,23 @@ export class ReportsService {
     let totalCanceled = 0;
     let totalValid = 0;
     invoices.forEach((invoice) => {
-      totalBaseImponible = totalBaseImponible + invoice.subtotal;
-      totalIva = totalIva + invoice.iva;
-      totalTotalAmount = totalTotalAmount + invoice.totalAmount;
-      totalIvaRet = totalIvaRet + invoice.iva_r;
-      totalIvaPer = totalIvaPer + invoice.iva_p;
-      totalIgtf = totalIgtf + invoice.igtf;
+      if (invoice.usdInvoice) {
+        totalBaseImponible =
+          totalBaseImponible + invoice.subtotal * invoice.exhangeRate;
+        totalIva = totalIva + invoice.iva * invoice.exhangeRate;
+        totalTotalAmount =
+          totalTotalAmount + invoice.totalAmount * invoice.exhangeRate;
+        totalIvaRet = totalIvaRet + invoice.iva_r * invoice.exhangeRate;
+        totalIvaPer = totalIvaPer + invoice.iva_p * invoice.exhangeRate;
+        totalIgtf = totalIgtf + invoice.igtf * invoice.exhangeRate;
+      } else {
+        totalBaseImponible = totalBaseImponible + invoice.subtotal;
+        totalIva = totalIva + invoice.iva;
+        totalTotalAmount = totalTotalAmount + invoice.totalAmount;
+        totalIvaRet = totalIvaRet + invoice.iva_r;
+        totalIvaPer = totalIvaPer + invoice.iva_p;
+        totalIgtf = totalIgtf + invoice.igtf;
+      }
       if (invoice.canceled) {
         totalCanceled++;
       } else {
@@ -516,7 +527,7 @@ export class ReportsService {
       { text: 'ID', fontSize: this.tableFontSize },
       { text: 'NOMBRE', fontSize: this.tableFontSize },
       { text: 'CANTIDAD DE PAGOS', fontSize: this.tableFontSize },
-      { text: 'BALANCE', fontSize: this.tableFontSize },
+      { text: 'BALANCE USD', fontSize: this.tableFontSize },
     ]);
     accounts.forEach((account) => {
       content.push([

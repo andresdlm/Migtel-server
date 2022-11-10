@@ -62,9 +62,9 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Get('printInvoice/:invoiceNumber')
-  printInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
-    return this.invoiceService.print(invoiceNumber);
+  @Get('printInvoice/:count')
+  printInvoice(@Param('count', ParseIntPipe) count: number) {
+    return this.invoiceService.printCount(count);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)

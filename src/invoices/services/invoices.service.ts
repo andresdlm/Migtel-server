@@ -102,6 +102,7 @@ export class InvoicesService {
         relations: {
           client: true,
         },
+        take: 20,
       });
     }
   }
@@ -148,6 +149,18 @@ export class InvoicesService {
         invoice_number: invoiceNumber,
       })
       .execute();
+  }
+
+  async printCount(countToPrint: number) {
+    const invoicesToPrint = await this.invoiceRepo.find({
+      order: { invoiceNumber: 'ASC' },
+      take: countToPrint,
+      skip: 0,
+      where: { printed: false },
+    });
+    for await (const invoice of invoicesToPrint) {
+      await this.print(invoice.invoiceNumber);
+    }
   }
 
   unprint(invoiceNumber: number) {

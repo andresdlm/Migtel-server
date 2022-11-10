@@ -57,6 +57,7 @@ export class ServicePlansService {
           { id: Number(searchInput), archived: getArchive },
           { price: Number(searchInput), archived: getArchive },
         ],
+        take: 20,
       });
     } else {
       return this.servicePlanRepo.find({
@@ -74,6 +75,7 @@ export class ServicePlansService {
             archived: getArchive,
           },
         ],
+        take: 20,
       });
     }
   }

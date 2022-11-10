@@ -63,6 +63,7 @@ export class InvoiceConceptsService {
           { id: Number(searchInput), archive: getArchive },
           { price: Number(searchInput), archive: getArchive },
         ],
+        take: 20,
       });
     } else {
       return this.invoiceConceptRepo.find({
@@ -72,6 +73,7 @@ export class InvoiceConceptsService {
             archive: getArchive,
           },
         ],
+        take: 20,
       });
     }
   }

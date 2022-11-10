@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/build
 
 # Logs
 logs
@@ -36,3 +37,4 @@ lerna-debug.log*
 
 # Sensitive information
 *.env
+docker-compose.yaml

@@ -17,7 +17,7 @@ export class Client {
   @Column({ type: 'varchar', length: 200 })
   name: string; // Listo
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 50 })
   phone: string; //
 
   @Column({ name: 'person_type', type: 'varchar', length: 10, default: 'V' })
