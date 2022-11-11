@@ -71,10 +71,6 @@ export class ClientsService {
             city: ILike(`%${searchInput}%`),
             archived: getArchive,
           },
-          {
-            address: ILike(`%${searchInput}%`),
-            archived: getArchive,
-          },
         ],
         take: 20,
       });
