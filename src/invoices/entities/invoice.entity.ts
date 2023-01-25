@@ -15,6 +15,7 @@ import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
 import { InvoiceConcept } from './invoice-concept.entity';
 import { InvoiceServices } from './invoice-service-relation.entity';
 import { ClientService } from 'src/clients/entities/client-service.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -95,6 +96,13 @@ export class Invoice {
     (invoiceConceptRelation) => invoiceConceptRelation.invoice,
   )
   invoiceConceptRelation: InvoiceConceptRelation[];
+
+  @ManyToOne(() => User, (user) => user.invoices)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column({ name: 'user_id', type: 'int' })
+  userId: number;
 
   @UpdateDateColumn({
     name: 'update_at',

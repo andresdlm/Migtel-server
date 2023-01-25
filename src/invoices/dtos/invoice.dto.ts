@@ -7,6 +7,7 @@ import {
   IsOptional,
   Min,
   IsArray,
+  IsNumber,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -43,6 +44,14 @@ export class CreateInvoiceDto {
   @IsBoolean()
   @IsNotEmpty()
   readonly usdInvoice: boolean;
+
+  @IsNumber()
+  @IsOptional()
+  readonly exhangeRate: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

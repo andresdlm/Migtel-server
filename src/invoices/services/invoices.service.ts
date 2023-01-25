@@ -13,6 +13,7 @@ import { InvoiceConceptsService } from './invoice-concepts.service';
 import { InvoiceConcept } from '../entities/invoice-concept.entity';
 import { ClientService } from 'src/clients/entities/client-service.entity';
 import { InvoiceServicesService } from './invoice-services.service';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class InvoicesService {
@@ -27,6 +28,7 @@ export class InvoicesService {
     private paymentMethodService: PaymentMethodsService,
     private invoiceConceptsService: InvoiceConceptsService,
     private invoiceServicesService: InvoiceServicesService,
+    private userService: UsersService,
   ) {}
 
   findAll(params?: FilterInvoiceDto) {
@@ -62,6 +64,7 @@ export class InvoicesService {
         invoiceConceptRelation: {
           invoiceConcept: true,
         },
+        user: true,
       },
     });
     if (!invoice) {
@@ -179,8 +182,10 @@ export class InvoicesService {
   async create(data: CreateInvoiceDto) {
     let newInvoice = this.invoiceRepo.create();
     const client = await this.clientsService.findOne(data.clientId);
-    newInvoice.client = client;
+    const user = await this.userService.findOne(data.userId);
 
+    newInvoice.client = client;
+    newInvoice.user = user;
     newInvoice.usdInvoice = data.usdInvoice;
     newInvoice.comment = data.comment;
 
@@ -212,6 +217,12 @@ export class InvoicesService {
     newInvoice.paymentMethod = paymentMethod;
 
     newInvoice.invoiceNumber = 0;
+
+    if (data.exhangeRate) {
+      newInvoice.exhangeRate = data.exhangeRate;
+    } else {
+      newInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
+    }
 
     this.calculateInvoiceAmount(newInvoice);
 
@@ -278,6 +289,12 @@ export class InvoicesService {
       data.paymentMethodId,
     );
     preInvoice.paymentMethod = paymentMethod;
+
+    if (data.exhangeRate) {
+      preInvoice.exhangeRate = data.exhangeRate;
+    } else {
+      preInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
+    }
 
     this.calculateInvoiceAmount(preInvoice);
     return preInvoice;
@@ -350,7 +367,6 @@ export class InvoicesService {
     invoice.islr = 0;
     invoice.igtf = 0;
     invoice.totalAmount = 0;
-    invoice.exhangeRate = this.dolarApi['USD']['sicad2'];
 
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 

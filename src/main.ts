@@ -7,9 +7,7 @@ async function bootstrap() {
   const cors = require('cors');
   const corsOptions = {
     origin: '*',
-    methods: 'GET, POST, PUT, DELETE, OPTIONS',
-    allowedHeaders:
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    optionsSuccessStatus: 200,
   };
   app.use(cors(corsOptions));
 

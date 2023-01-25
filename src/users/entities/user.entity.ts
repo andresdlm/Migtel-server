@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
+import { Invoice } from 'src/invoices/entities/invoice.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -28,6 +30,10 @@ export class User {
 
   @Column({ type: 'boolean', default: true })
   active: boolean;
+
+  @Exclude()
+  @OneToMany(() => Invoice, (invoice) => invoice.user)
+  invoices: Invoice[];
 
   @CreateDateColumn({
     type: 'timestamp',
