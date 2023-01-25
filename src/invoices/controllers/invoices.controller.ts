@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { Put } from '@nestjs/common/decorators';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('invoices')
@@ -94,6 +95,15 @@ export class InvoicesController {
   @Post('preview')
   getPreview(@Body() payload: CreateInvoiceDto) {
     return this.invoiceService.getPreview(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Put('setpaid/:invoiceId')
+  setPaid(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Body() nextState: { paid: boolean },
+  ) {
+    return this.invoiceService.setPaid(invoiceId, nextState);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

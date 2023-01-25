@@ -52,6 +52,10 @@ export class CreateInvoiceDto {
   @IsNumber()
   @IsNotEmpty()
   readonly userId: number;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly paid: boolean;
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

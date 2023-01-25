@@ -48,10 +48,10 @@ export class InvoicesService {
     });
   }
 
-  findOne(invoiceNumber: number) {
+  findOne(id: number) {
     const invoice = this.invoiceRepo.findOne({
       where: {
-        id: invoiceNumber,
+        id: id,
       },
       relations: {
         client: true,
@@ -68,7 +68,7 @@ export class InvoicesService {
       },
     });
     if (!invoice) {
-      throw new NotFoundException(`Invoice #${invoiceNumber} not found`);
+      throw new NotFoundException(`Invoice #${id} not found`);
     }
     return invoice;
   }
@@ -154,6 +154,23 @@ export class InvoicesService {
       .execute();
   }
 
+  async setPaid(id: number, nextState: { paid: boolean }) {
+    // const invoice = await this.findOne(id);
+    // invoice.paid = !invoice.paid;
+    // return this.invoiceRepo.save(invoice);
+    this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        paid: nextState.paid,
+      })
+      .where('id = :id', {
+        id: id,
+      })
+      .execute();
+    return this.findOne(id);
+  }
+
   async printCount(countToPrint: number) {
     const invoicesToPrint = await this.invoiceRepo.find({
       order: { invoiceNumber: 'ASC' },
@@ -188,6 +205,7 @@ export class InvoicesService {
     newInvoice.user = user;
     newInvoice.usdInvoice = data.usdInvoice;
     newInvoice.comment = data.comment;
+    newInvoice.paid = data.paid;
 
     const clientServicesArray: ClientService[] = [];
     for await (const clientService of data.clientsServices) {
