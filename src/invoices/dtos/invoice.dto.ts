@@ -56,6 +56,16 @@ export class CreateInvoiceDto {
   @IsBoolean()
   @IsOptional()
   readonly paid: boolean;
+
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  readonly creditAmount: number;
+
+  @IsNumber()
+  @Min(0)
+  @IsNotEmpty()
+  readonly bonusAmount: number;
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

@@ -7,10 +7,16 @@ import {
   IsPositive,
   Min,
   Max,
+  IsNumber,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateClientDto {
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  readonly id: number;
+
   @IsString()
   @IsNotEmpty()
   readonly name: string;

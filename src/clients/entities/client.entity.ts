@@ -1,5 +1,5 @@
 import {
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   Entity,
   CreateDateColumn,
@@ -11,7 +11,7 @@ import { ClientService } from './client-service.entity';
 
 @Entity({ name: 'clients' })
 export class Client {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   id: number; // Listo
 
   @Column({ type: 'varchar', length: 200 })

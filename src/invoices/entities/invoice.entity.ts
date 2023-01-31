@@ -70,6 +70,12 @@ export class Invoice {
   @Column({ name: 'exhange_rate', type: 'real' })
   exhangeRate: number;
 
+  @Column({ name: 'bonus_amount', type: 'real' })
+  bonusAmount: number;
+
+  @Column({ name: 'credit_amount', type: 'real' })
+  creditAmount: number;
+
   @Column({ type: 'varchar', length: 500 })
   comment: string;
 

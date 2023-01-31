@@ -17,7 +17,7 @@ import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class InvoicesService {
-  initialInvoiceNumber = 5000;
+  initialInvoiceNumber = 38060; // NO CAMBIAR;
 
   constructor(
     @InjectRepository(Invoice)
@@ -206,6 +206,8 @@ export class InvoicesService {
     newInvoice.usdInvoice = data.usdInvoice;
     newInvoice.comment = data.comment;
     newInvoice.paid = data.paid;
+    newInvoice.creditAmount = data.creditAmount;
+    newInvoice.bonusAmount = data.bonusAmount;
 
     const clientServicesArray: ClientService[] = [];
     for await (const clientService of data.clientsServices) {
@@ -242,7 +244,7 @@ export class InvoicesService {
       newInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
     }
 
-    this.calculateInvoiceAmount(newInvoice);
+    this.calculateInvoiceAmount(newInvoice, data);
 
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
@@ -278,6 +280,8 @@ export class InvoicesService {
     const preInvoice = this.invoiceRepo.create();
     const client = await this.clientsService.findOne(data.clientId);
     preInvoice.client = client;
+    preInvoice.creditAmount = data.creditAmount;
+    preInvoice.bonusAmount = data.bonusAmount;
 
     preInvoice.usdInvoice = data.usdInvoice;
 
@@ -314,7 +318,7 @@ export class InvoicesService {
       preInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
     }
 
-    this.calculateInvoiceAmount(preInvoice);
+    this.calculateInvoiceAmount(preInvoice, data);
     return preInvoice;
   }
 
@@ -358,7 +362,7 @@ export class InvoicesService {
     }
   }
 
-  async calculateInvoiceAmount(invoice: Invoice) {
+  async calculateInvoiceAmount(invoice: Invoice, data: CreateInvoiceDto) {
     let amount = 0;
     if (invoice.clientServices) {
       let index = 0;
@@ -378,22 +382,21 @@ export class InvoicesService {
       });
     }
 
-    invoice.subtotal = amount;
-    invoice.iva = amount * 0.16;
-    invoice.iva_r = amount * 0.16 * invoice.client.retention * 0.01;
+    invoice.subtotal =
+      amount + ((data.bonusAmount - data.creditAmount) * 100) / 116;
+    invoice.iva = invoice.subtotal * 0.16;
+    invoice.iva_r = invoice.iva * invoice.client.retention * 0.01;
     invoice.iva_p = invoice.iva - invoice.iva_r;
     invoice.islr = 0;
     invoice.igtf = 0;
-    invoice.totalAmount = 0;
 
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (invoice.client.hasIslr) {
       invoice.islr = invoice.totalAmount * invoice.client.amountIslr * 0.01;
-      invoice.totalAmount = invoice.totalAmount;
     }
 
-    if (invoice.paymentMethod.hasIgtf) {
+    if (invoice.paymentMethod.hasIgtf && invoice.usdInvoice) {
       if (invoice.client.retention === 0) {
         invoice.igtf = invoice.totalAmount * 0.03;
         invoice.totalAmount = invoice.totalAmount + invoice.igtf;
