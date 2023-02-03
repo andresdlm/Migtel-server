@@ -41,6 +41,16 @@ export class ServicePlansController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Get('orderByName')
+  getAllOrderByName(
+    @Query() params: FilterServicePlanDto,
+    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+  ) {
+    params.getArchive = getArchive;
+    return this.servicePlansService.findAllOrderByName(params);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
     return this.servicePlansService.getCount(getArchive);

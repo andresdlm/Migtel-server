@@ -32,6 +32,21 @@ export class ServicePlansService {
     });
   }
 
+  findAllOrderByName(params?: FilterServicePlanDto) {
+    if (params) {
+      const { limit, offset, getArchive } = params;
+      return this.servicePlanRepo.find({
+        order: { name: 'ASC' },
+        take: limit,
+        skip: offset,
+        where: { archived: getArchive },
+      });
+    }
+    return this.servicePlanRepo.find({
+      order: { id: 'DESC' },
+    });
+  }
+
   findOne(id: number) {
     const servicePlan = this.servicePlanRepo.findOne({
       where: {
