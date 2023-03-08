@@ -17,39 +17,11 @@ export class CreateClientDto {
   @IsNotEmpty()
   readonly id: number;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly phone: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly personType: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly document: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly address: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly city: string;
-
   @IsInt()
   @IsNotEmpty()
   @Min(0)
   @Max(100)
   readonly retention: number;
-
-  @IsBoolean()
-  @IsNotEmpty()
-  readonly hasIslr: boolean;
 
   @IsInt()
   @IsNotEmpty()

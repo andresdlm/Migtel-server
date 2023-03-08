@@ -1,10 +1,13 @@
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
-import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
+import { InvoiceConceptRelation } from '../../invoices/entities/invoice-concept-relation.entity';
 
-@Entity({ name: 'invoice_concepts' })
-export class InvoiceConcept {
+@Entity({ name: 'products' })
+export class Product {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
+
+  @Column({ name: 'name', type: 'varchar', length: 500 })
+  name: string;
 
   @Column({ name: 'invoice_description', type: 'varchar', length: 500 })
   invoiceDescription: string;

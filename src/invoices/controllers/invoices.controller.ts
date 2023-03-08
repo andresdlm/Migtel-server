@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dto';
+import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -104,12 +104,6 @@ export class InvoicesController {
     @Body() nextState: { paid: boolean },
   ) {
     return this.invoiceService.setPaid(invoiceId, nextState);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':invoiceNumber')
-  delete(@Param('invoiceNumber', ParseIntPipe) invoice_number: number) {
-    return this.invoiceService.delete(invoice_number);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

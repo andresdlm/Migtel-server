@@ -8,33 +8,23 @@ import { InvoicesService } from './services/invoices.service';
 import { Invoice } from './entities/invoice.entity';
 
 import { ClientsModule } from 'src/clients/clients.module';
-import { ServicePlansModule } from 'src/service-plans/service-plans.module';
+import { ProductsModule } from 'src/products/products.module';
 import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module';
-import { InvoiceConceptsController } from './controllers/invoice-concepts.controller';
-import { InvoiceConceptsService } from './services/invoice-concepts.service';
-import { InvoiceConcept } from './entities/invoice-concept.entity';
 import { InvoiceConceptRelation } from './entities/invoice-concept-relation.entity';
-import { InvoiceServices } from './entities/invoice-service-relation.entity';
-import { InvoiceServicesService } from './services/invoice-services.service';
 import { InvoicesService as InvoiceService } from './services/invoices.service';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([
-      Invoice,
-      InvoiceConcept,
-      InvoiceConceptRelation,
-      InvoiceServices,
-    ]),
+    TypeOrmModule.forFeature([Invoice, InvoiceConceptRelation]),
     ClientsModule,
-    ServicePlansModule,
+    ProductsModule,
     PaymentMethodsModule,
     UsersModule,
   ],
   exports: [InvoiceService],
-  controllers: [InvoicesController, InvoiceConceptsController],
+  controllers: [InvoicesController],
   providers: [
     InvoicesService,
     {
@@ -47,8 +37,6 @@ import { UsersModule } from 'src/users/users.module';
       },
       inject: [HttpService],
     },
-    InvoiceConceptsService,
-    InvoiceServicesService,
   ],
 })
 export class InvoicesModule {}

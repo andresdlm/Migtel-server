@@ -38,9 +38,6 @@ export class ClientsService {
       where: {
         id: id,
       },
-      relations: {
-        services: true,
-      },
     });
     if (!client) {
       throw new NotFoundException(`Client #${id} not found`);

@@ -16,7 +16,13 @@ export class User {
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string;
+  username: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 255 })
+  lastName: string;
 
   @Column({ type: 'varchar', length: 255 })
   email: string;
@@ -24,6 +30,18 @@ export class User {
   @Exclude()
   @Column({ type: 'varchar', length: 255 })
   password: string;
+
+  @Column({ type: 'varchar', length: 12 })
+  phone: string;
+
+  @Column({ type: 'varchar', length: 12 })
+  document: string;
+
+  @Column({ type: 'varchar', length: 30 })
+  city: string;
+
+  @Column({ type: 'timestamp' })
+  birthday: Date;
 
   @Column({ type: 'varchar', length: 100 })
   role: string;

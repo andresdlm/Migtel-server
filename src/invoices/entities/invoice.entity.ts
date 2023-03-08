@@ -12,9 +12,7 @@ import {
 import { Client } from 'src/clients/entities/client.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
-import { InvoiceConcept } from './invoice-concept.entity';
-import { InvoiceServices } from './invoice-service-relation.entity';
-import { ClientService } from 'src/clients/entities/client-service.entity';
+import { Product } from '../../products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'invoices' })
@@ -95,12 +93,6 @@ export class Invoice {
   paid: boolean;
 
   @OneToMany(
-    () => InvoiceServices,
-    (invoiceServices) => invoiceServices.invoice,
-  )
-  invoiceServices: InvoiceServices[];
-
-  @OneToMany(
     () => InvoiceConceptRelation,
     (invoiceConceptRelation) => invoiceConceptRelation.invoice,
   )
@@ -120,8 +112,6 @@ export class Invoice {
   })
   updateAt: Date;
 
-  invoiceConcepts?: InvoiceConcept[];
-  invoiceConceptCount?: number[];
-  clientServices?: ClientService[];
-  clientServicesCount?: number[];
+  products?: Product[];
+  productsCount?: number[];
 }

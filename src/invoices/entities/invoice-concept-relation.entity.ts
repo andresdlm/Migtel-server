@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
-import { InvoiceConcept } from './invoice-concept.entity';
+import { InvoiceConcept } from '../../products/entities/product.entity';
 import { Invoice } from './invoice.entity';
 
 @Entity({ name: 'invoice_concepts_relation' })

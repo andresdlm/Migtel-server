@@ -20,6 +20,9 @@ export class PaymentMethod {
   @Column({ type: 'int' })
   coc: number;
 
+  @Column({ type: 'varchar', length: 100 })
+  crmId: string;
+
   @Column({ name: 'has_igtf', type: 'boolean' })
   hasIgtf: boolean;
 

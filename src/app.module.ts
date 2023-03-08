@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
@@ -13,6 +11,7 @@ import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ProductsModule } from './products/products.module';
 import config from './config';
 
 @Module({
@@ -40,8 +39,9 @@ import config from './config';
     AuthModule,
     ReportsModule,
     DashboardModule,
+    ProductsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

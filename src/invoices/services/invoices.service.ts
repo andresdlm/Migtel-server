@@ -3,16 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 
-import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dto';
+import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
 
 import { ClientsService } from 'src/clients/services/clients.service';
-import { ClientServicesService } from 'src/clients/services/client-services.service';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
-import { InvoiceConceptsService } from './invoice-concepts.service';
-import { InvoiceConcept } from '../entities/invoice-concept.entity';
-import { ClientService } from 'src/clients/entities/client-service.entity';
-import { InvoiceServicesService } from './invoice-services.service';
+import { ProductsService } from '../../products/services/products.service';
+import { Product } from '../../products/entities/product.entity';
 import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
@@ -24,10 +21,8 @@ export class InvoicesService {
     private invoiceRepo: Repository<Invoice>,
     @Inject('DOLAR_API') private dolarApi: any[],
     private clientsService: ClientsService,
-    private clientServicesService: ClientServicesService,
     private paymentMethodService: PaymentMethodsService,
-    private invoiceConceptsService: InvoiceConceptsService,
-    private invoiceServicesService: InvoiceServicesService,
+    private productsService: ProductsService,
     private userService: UsersService,
   ) {}
 
@@ -56,11 +51,6 @@ export class InvoicesService {
       relations: {
         client: true,
         paymentMethod: true,
-        invoiceServices: {
-          clientService: {
-            servicePlan: true,
-          },
-        },
         invoiceConceptRelation: {
           invoiceConcept: true,
         },
@@ -122,11 +112,6 @@ export class InvoicesService {
       relations: {
         client: true,
         paymentMethod: true,
-        invoiceServices: {
-          clientService: {
-            servicePlan: true,
-          },
-        },
         invoiceConceptRelation: {
           invoiceConcept: true,
         },
@@ -158,7 +143,7 @@ export class InvoicesService {
     // const invoice = await this.findOne(id);
     // invoice.paid = !invoice.paid;
     // return this.invoiceRepo.save(invoice);
-    this.invoiceRepo
+    return this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -168,7 +153,6 @@ export class InvoicesService {
         id: id,
       })
       .execute();
-    return this.findOne(id);
   }
 
   async printCount(countToPrint: number) {
@@ -209,25 +193,14 @@ export class InvoicesService {
     newInvoice.creditAmount = data.creditAmount;
     newInvoice.bonusAmount = data.bonusAmount;
 
-    const clientServicesArray: ClientService[] = [];
-    for await (const clientService of data.clientsServices) {
-      await this.clientServicesService
-        .findOne(clientService)
-        .then((clientService) => {
-          clientServicesArray.push(clientService);
-          newInvoice.clientServices = clientServicesArray;
-          newInvoice.clientServicesCount = data.clientsServicesCount;
-        });
-    }
-
-    const invoiceConceptArray: InvoiceConcept[] = [];
+    const invoiceConceptArray: Product[] = [];
     for await (const invoiceConceptId of data.invoiceConcept) {
-      await this.invoiceConceptsService
+      await this.productsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {
           invoiceConceptArray.push(invoiceConcept);
-          newInvoice.invoiceConcepts = invoiceConceptArray;
-          newInvoice.invoiceConceptCount = data.invoiceConceptsCount;
+          newInvoice.products = invoiceConceptArray;
+          newInvoice.productsCount = data.invoiceConceptsCount;
         });
     }
 
@@ -250,28 +223,18 @@ export class InvoicesService {
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
 
     let index = 0;
-    for await (const serviceId of data.clientsServices) {
-      const service = await this.clientServicesService.findOne(serviceId);
-      await this.invoiceServicesService.createRelationInvoice({
-        invoiceId: newInvoice.id,
-        clientServiceId: serviceId,
-        count: data.clientsServicesCount[index],
-        price: service.servicePlan.price,
-      });
-      index++;
-    }
 
     index = 0;
-    for await (const conceptId of data.invoiceConcept) {
-      const concept = await this.invoiceConceptsService.findOne(conceptId);
-      await this.invoiceConceptsService.createRelationInvoice({
-        invoiceId: newInvoice.id,
-        invoiceConceptId: conceptId,
-        count: data.invoiceConceptsCount[index],
-        price: concept.price,
-      });
-      index++;
-    }
+    // for await (const conceptId of data.invoiceConcept) {
+    //   const concept = await this.productsService.findOne(conceptId);
+    //   await this.productsService.createRelationInvoice({
+    //     invoiceId: newInvoice.id,
+    //     invoiceConceptId: conceptId,
+    //     count: data.invoiceConceptsCount[index],
+    //     price: concept.price,
+    //   });
+    //   index++;
+    // }
 
     return this.invoiceRepo.save(newInvoice);
   }
@@ -285,25 +248,14 @@ export class InvoicesService {
 
     preInvoice.usdInvoice = data.usdInvoice;
 
-    const clientServicesArray: ClientService[] = [];
-    for await (const clientService of data.clientsServices) {
-      await this.clientServicesService
-        .findOne(clientService)
-        .then((clientService) => {
-          clientServicesArray.push(clientService);
-          preInvoice.clientServices = clientServicesArray;
-          preInvoice.clientServicesCount = data.clientsServicesCount;
-        });
-    }
-
-    const invoiceConceptArray: InvoiceConcept[] = [];
+    const invoiceConceptArray: Product[] = [];
     for await (const invoiceConceptId of data.invoiceConcept) {
-      await this.invoiceConceptsService
+      await this.productsService
         .findOne(invoiceConceptId)
         .then((invoiceConcept) => {
           invoiceConceptArray.push(invoiceConcept);
-          preInvoice.invoiceConcepts = invoiceConceptArray;
-          preInvoice.invoiceConceptCount = data.invoiceConceptsCount;
+          preInvoice.products = invoiceConceptArray;
+          preInvoice.productsCount = data.invoiceConceptsCount;
         });
     }
 
@@ -320,10 +272,6 @@ export class InvoicesService {
 
     this.calculateInvoiceAmount(preInvoice, data);
     return preInvoice;
-  }
-
-  delete(invoiceNumber: number) {
-    return this.invoiceRepo.delete(invoiceNumber);
   }
 
   async cancelInvoice(invoiceId: number) {
@@ -364,20 +312,10 @@ export class InvoicesService {
 
   async calculateInvoiceAmount(invoice: Invoice, data: CreateInvoiceDto) {
     let amount = 0;
-    if (invoice.clientServices) {
+    if (invoice.products) {
       let index = 0;
-      invoice.clientServices.forEach((clientService) => {
-        amount =
-          amount +
-          clientService.servicePlan.price * invoice.clientServicesCount[index];
-        index++;
-      });
-    }
-    if (invoice.invoiceConcepts) {
-      let index = 0;
-      invoice.invoiceConcepts.forEach((invoiceConcept) => {
-        amount =
-          amount + invoiceConcept.price * invoice.invoiceConceptCount[index];
+      invoice.products.forEach((product) => {
+        amount = amount + product.price * invoice.productsCount[index];
         index++;
       });
     }
@@ -392,7 +330,7 @@ export class InvoicesService {
 
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
-    if (invoice.client.hasIslr) {
+    if (invoice.client.amountIslr > 0) {
       invoice.islr = invoice.totalAmount * invoice.client.amountIslr * 0.01;
     }
 

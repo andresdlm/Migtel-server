@@ -3,10 +3,8 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ClientService } from 'src/clients/entities/client-service.entity';
 
 @Entity({ name: 'service_plans' })
 export class ServicePlan {
@@ -27,9 +25,6 @@ export class ServicePlan {
 
   @Column({ type: 'boolean', default: false })
   archived: boolean;
-
-  @OneToMany(() => ClientService, (clientService) => clientService.servicePlan)
-  clientServices: ClientService[];
 
   @CreateDateColumn({
     name: 'create_at',
