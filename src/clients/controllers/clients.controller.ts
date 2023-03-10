@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
-  ParseBoolPipe,
 } from '@nestjs/common';
 import {
   CreateClientDto,
@@ -31,27 +30,8 @@ export class ClientsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
-  getAll(
-    @Query() params: FilterClientDto,
-    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
-  ) {
-    params.getArchive = getArchive;
+  getAll(@Query() params: FilterClientDto) {
     return this.clientsService.findAll(params);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
-  @Get('count')
-  getCount(@Query('getArchive', ParseBoolPipe) getArchive: boolean) {
-    return this.clientsService.getCount(getArchive);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
-  @Get('search')
-  search(
-    @Query('searchParam') searchParam: string,
-    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
-  ) {
-    return this.clientsService.search(searchParam, getArchive);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
@@ -73,12 +53,6 @@ export class ClientsController {
     @Body() payload: UpdateClientDto,
   ) {
     return this.clientsService.update(id, payload);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @Delete('archive/:id')
-  archive(@Param('id', ParseIntPipe) id: number) {
-    return this.clientsService.archive(id);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

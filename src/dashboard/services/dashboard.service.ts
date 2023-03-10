@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Raw } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { Client } from 'src/clients/entities/client.entity';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
@@ -14,12 +14,10 @@ export class DashboardService {
   ) {}
 
   async generateDashboard() {
-    const todayDate = new Date();
     const dashboardData: Dashboard = {
       dailyIncome: 0,
       monthIncome: 0,
       taxesGeneratedByMonth: 0,
-      newClientsInMonth: 0,
       yearIncome: [],
       cities: [],
       plans: [],
@@ -72,14 +70,6 @@ export class DashboardService {
     );
     dashboardData.taxesGeneratedByMonth =
       taxesGeneratedByMonth[0]['taxesgeneratedbymonth'];
-
-    dashboardData.newClientsInMonth = await this.clientRepo.count({
-      where: {
-        createAt: Raw((createAt) => `${createAt} >= :date`, {
-          date: `${todayDate.getFullYear()}-${todayDate.getMonth() + 1}-1`,
-        }),
-      },
-    });
 
     const data = await this.invoiceRepo.query(
       `SELECT date_trunc('month', register_date) AS sale_month,

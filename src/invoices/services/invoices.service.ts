@@ -51,8 +51,8 @@ export class InvoicesService {
       relations: {
         client: true,
         paymentMethod: true,
-        invoiceConceptRelation: {
-          invoiceConcept: true,
+        invoiceProductRelation: {
+          product: true,
         },
         user: true,
       },
@@ -112,8 +112,8 @@ export class InvoicesService {
       relations: {
         client: true,
         paymentMethod: true,
-        invoiceConceptRelation: {
-          invoiceConcept: true,
+        invoiceProductRelation: {
+          product: true,
         },
       },
     });
@@ -140,9 +140,6 @@ export class InvoicesService {
   }
 
   async setPaid(id: number, nextState: { paid: boolean }) {
-    // const invoice = await this.findOne(id);
-    // invoice.paid = !invoice.paid;
-    // return this.invoiceRepo.save(invoice);
     return this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)

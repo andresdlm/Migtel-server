@@ -190,11 +190,13 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: ``, fontSize: this.tableFontSize },
             {
-              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+                .slice(0, 35)
+                .toUpperCase(),
               fontSize: this.tableFontSize,
             },
             {
-              text: `${invoice.client.personType}-${invoice.client.document}`,
+              text: `${invoice.clientDocument}`,
               fontSize: this.tableFontSize,
             },
             {
@@ -235,11 +237,13 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: ``, fontSize: this.tableFontSize },
             {
-              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+                .slice(0, 35)
+                .toUpperCase(),
               fontSize: this.tableFontSize,
             },
             {
-              text: `${invoice.client.personType}-${invoice.client.document}`,
+              text: `${invoice.clientDocument}`,
               fontSize: this.tableFontSize,
             },
             {
@@ -282,11 +286,13 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: `${invoice.comment}`, fontSize: this.tableFontSize },
             {
-              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+                .slice(0, 35)
+                .toUpperCase(),
               fontSize: this.tableFontSize,
             },
             {
-              text: `${invoice.client.personType}-${invoice.client.document}`,
+              text: `${invoice.clientDocument}`,
               fontSize: this.tableFontSize,
             },
             {
@@ -327,11 +333,13 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: `${invoice.comment}`, fontSize: this.tableFontSize },
             {
-              text: `${invoice.client.name.slice(0, 35).toUpperCase()}`,
+              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+                .slice(0, 35)
+                .toUpperCase(),
               fontSize: this.tableFontSize,
             },
             {
-              text: `${invoice.client.personType}-${invoice.client.document}`,
+              text: `${invoice.clientDocument}`,
               fontSize: this.tableFontSize,
             },
             {

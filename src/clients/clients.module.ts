@@ -5,12 +5,10 @@ import { ClientsController } from './controllers/clients.controller';
 import { ClientsService } from './services/clients.service';
 import { Client } from './entities/client.entity';
 
-import { ServicePlansModule } from 'src/service-plans/service-plans.module';
-
 @Module({
   controllers: [ClientsController],
   providers: [ClientsService],
-  imports: [TypeOrmModule.forFeature([Client]), ServicePlansModule],
+  imports: [TypeOrmModule.forFeature([Client])],
   exports: [ClientsService],
 })
 export class ClientsModule {}

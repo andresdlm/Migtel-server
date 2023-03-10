@@ -10,14 +10,14 @@ import { Invoice } from './entities/invoice.entity';
 import { ClientsModule } from 'src/clients/clients.module';
 import { ProductsModule } from 'src/products/products.module';
 import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module';
-import { InvoiceConceptRelation } from './entities/invoice-concept-relation.entity';
+import { InvoiceProductRelation } from './entities/invoice-product-relation.entity';
 import { InvoicesService as InvoiceService } from './services/invoices.service';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([Invoice, InvoiceConceptRelation]),
+    TypeOrmModule.forFeature([Invoice, InvoiceProductRelation]),
     ClientsModule,
     ProductsModule,
     PaymentMethodsModule,

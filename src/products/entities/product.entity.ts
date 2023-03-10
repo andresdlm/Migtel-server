@@ -1,5 +1,5 @@
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
-import { InvoiceConceptRelation } from '../../invoices/entities/invoice-concept-relation.entity';
+import { InvoiceProductRelation } from '../../invoices/entities/invoice-product-relation.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -19,8 +19,8 @@ export class Product {
   archive: boolean;
 
   @OneToMany(
-    () => InvoiceConceptRelation,
-    (invoiceConceptRelation) => invoiceConceptRelation.invoiceConcept,
+    () => InvoiceProductRelation,
+    (invoiceProductRelation) => invoiceProductRelation.product,
   )
-  invoiceConceptRelation: InvoiceConceptRelation[];
+  invoiceProductRelation: InvoiceProductRelation[];
 }

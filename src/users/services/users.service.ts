@@ -62,7 +62,11 @@ export class UsersService {
       return this.userRepo.find({
         where: [
           {
-            name: ILike(`%${searchInput}%`),
+            firstName: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            lastName: ILike(`%${searchInput}%`),
             active: getArchive,
           },
           {

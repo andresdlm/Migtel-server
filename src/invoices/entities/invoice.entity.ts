@@ -11,7 +11,7 @@ import {
 
 import { Client } from 'src/clients/entities/client.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
-import { InvoiceConceptRelation } from './invoice-concept-relation.entity';
+import { InvoiceProductRelation } from './invoice-product-relation.entity';
 import { Product } from '../../products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 
@@ -29,6 +29,18 @@ export class Invoice {
 
   @Column({ name: 'client_id' })
   clientId: number;
+
+  @Column({ name: 'client_firstname' })
+  clientFirstname: string;
+
+  @Column({ name: 'client_lastname' })
+  clientLastname: string;
+
+  @Column({ name: 'client_document' })
+  clientDocument: string;
+
+  @Column({ name: 'client_address' })
+  clientAddress: string;
 
   @CreateDateColumn({
     name: 'register_date',
@@ -93,10 +105,10 @@ export class Invoice {
   paid: boolean;
 
   @OneToMany(
-    () => InvoiceConceptRelation,
-    (invoiceConceptRelation) => invoiceConceptRelation.invoice,
+    () => InvoiceProductRelation,
+    (invoiceProductRelation) => invoiceProductRelation.invoice,
   )
-  invoiceConceptRelation: InvoiceConceptRelation[];
+  invoiceProductRelation: InvoiceProductRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)
   @JoinColumn({ name: 'user_id' })

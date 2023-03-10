@@ -6,7 +6,6 @@ import { UsersModule } from './users/users.module';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { DatabaseModule } from './database/database.module';
-import { ServicePlansModule } from './service-plans/service-plans.module';
 import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
@@ -34,7 +33,6 @@ import config from './config';
     ClientsModule,
     InvoicesModule,
     DatabaseModule,
-    ServicePlansModule,
     PaymentMethodsModule,
     AuthModule,
     ReportsModule,

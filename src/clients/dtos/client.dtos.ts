@@ -1,8 +1,6 @@
 import {
   IsInt,
-  IsString,
   IsNotEmpty,
-  IsBoolean,
   IsOptional,
   IsPositive,
   Min,
@@ -42,8 +40,4 @@ export class FilterClientDto {
   @IsOptional()
   @Min(0)
   offset: number;
-
-  @IsBoolean()
-  @IsOptional()
-  getArchive: boolean;
 }

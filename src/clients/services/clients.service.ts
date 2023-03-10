@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isNumber } from 'class-validator';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import {
   CreateClientDto,
@@ -18,13 +17,12 @@ export class ClientsService {
 
   findAll(params?: FilterClientDto) {
     if (params) {
-      const { limit, offset, getArchive } = params;
+      const { limit, offset } = params;
       return this.clientRepo.find({
         relations: ['services'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
-        where: { archived: getArchive },
       });
     }
     return this.clientRepo.find({
@@ -45,41 +43,6 @@ export class ClientsService {
     return client;
   }
 
-  async search(searchInput: string, getArchive: boolean) {
-    if (isNumber(Number(searchInput))) {
-      return this.clientRepo.find({
-        where: [
-          { id: Number(searchInput), archived: getArchive },
-          {
-            document: ILike(`%${searchInput}%`),
-            archived: getArchive,
-          },
-        ],
-        take: 20,
-      });
-    } else {
-      return this.clientRepo.find({
-        where: [
-          {
-            name: ILike(`%${searchInput}%`),
-            archived: getArchive,
-          },
-          {
-            city: ILike(`%${searchInput}%`),
-            archived: getArchive,
-          },
-        ],
-        take: 20,
-      });
-    }
-  }
-
-  getCount(getArchive: boolean) {
-    return this.clientRepo.count({
-      where: { archived: getArchive },
-    });
-  }
-
   create(data: CreateClientDto) {
     const newClient = this.clientRepo.create(data);
     return this.clientRepo.save(newClient);
@@ -88,12 +51,6 @@ export class ClientsService {
   async update(id: number, changes: UpdateClientDto) {
     const client = await this.findOne(id);
     this.clientRepo.merge(client, changes);
-    return this.clientRepo.save(client);
-  }
-
-  async archive(id: number) {
-    const client = await this.findOne(id);
-    client.archived = !client.archived;
     return this.clientRepo.save(client);
   }
 

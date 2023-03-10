@@ -2,7 +2,6 @@ export interface Dashboard {
   dailyIncome: number;
   monthIncome: number;
   taxesGeneratedByMonth: number;
-  newClientsInMonth: number;
   yearIncome: number[];
   cities: CityDashboard[];
   plans: PlansDashboard[];
