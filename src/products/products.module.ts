@@ -7,9 +7,12 @@ import { Product } from './entities/product.entity';
 import { ServicePlansController } from './controllers/service-plans.controller';
 import { ServicePlansService } from './services/service-plans.service';
 import { ServicePlan } from './entities/service-plan.entity';
+import { InvoiceProductRelation } from 'src/invoices/entities/invoice-product-relation.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, ServicePlan])],
+  imports: [
+    TypeOrmModule.forFeature([Product, ServicePlan, InvoiceProductRelation]),
+  ],
   controllers: [ProductsController, ServicePlansController],
   providers: [ServicePlansService, ProductsService],
   exports: [ServicePlansService, ProductsService],

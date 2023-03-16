@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HttpModule, HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { HttpModule } from '@nestjs/axios';
 
 import { InvoicesController } from './controllers/invoices.controller';
 import { InvoicesService } from './services/invoices.service';
@@ -25,18 +24,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   exports: [InvoiceService],
   controllers: [InvoicesController],
-  providers: [
-    InvoicesService,
-    {
-      provide: 'DOLAR_API',
-      useFactory: async (http: HttpService) => {
-        const dolarToday = await lastValueFrom(
-          http.get('https://s3.amazonaws.com/dolartoday/data.json'),
-        );
-        return dolarToday.data;
-      },
-      inject: [HttpService],
-    },
-  ],
+  providers: [InvoicesService],
 })
 export class InvoicesModule {}

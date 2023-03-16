@@ -4,8 +4,8 @@ import { Repository, Raw } from 'typeorm';
 
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
-import { SalesBookDto } from '../dtos/salesBook.dto';
-import { ReportDto } from '../dtos/reports.dto';
+import { SalesBookDto } from '../dtos/salesBook.dtos';
+import { ReportDto } from '../dtos/reports.dtos';
 
 @Injectable()
 export class ReportsLogicService {
@@ -26,9 +26,6 @@ export class ReportsLogicService {
             until: `${params.until.toISOString()}`,
           },
         ),
-      },
-      relations: {
-        client: true,
       },
       order: {
         invoiceNumber: 'ASC',

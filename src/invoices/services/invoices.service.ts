@@ -1,15 +1,13 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 
 import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
-
 import { ClientsService } from 'src/clients/services/clients.service';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
 import { ProductsService } from '../../products/services/products.service';
-import { Product } from '../../products/entities/product.entity';
 import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
@@ -19,7 +17,6 @@ export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
-    @Inject('DOLAR_API') private dolarApi: any[],
     private clientsService: ClientsService,
     private paymentMethodService: PaymentMethodsService,
     private productsService: ProductsService,
@@ -30,7 +27,7 @@ export class InvoicesService {
     if (params) {
       const { limit, offset, getCanceled } = params;
       return this.invoiceRepo.find({
-        relations: ['client', 'paymentMethod'],
+        relations: { paymentMethod: true },
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
@@ -49,7 +46,6 @@ export class InvoicesService {
         id: id,
       },
       relations: {
-        client: true,
         paymentMethod: true,
         invoiceProductRelation: {
           product: true,
@@ -92,9 +88,6 @@ export class InvoicesService {
     if (isNumber(Number(searchInput))) {
       return this.invoiceRepo.find({
         where: [{ invoiceNumber: Number(searchInput), canceled: getArchive }],
-        relations: {
-          client: true,
-        },
         take: 20,
       });
     }
@@ -110,7 +103,6 @@ export class InvoicesService {
         printed: false,
       },
       relations: {
-        client: true,
         paymentMethod: true,
         invoiceProductRelation: {
           product: true,
@@ -178,29 +170,10 @@ export class InvoicesService {
   }
 
   async create(data: CreateInvoiceDto) {
-    let newInvoice = this.invoiceRepo.create();
-    const client = await this.clientsService.findOne(data.clientId);
+    let newInvoice = this.invoiceRepo.create(data);
+
     const user = await this.userService.findOne(data.userId);
-
-    newInvoice.client = client;
     newInvoice.user = user;
-    newInvoice.usdInvoice = data.usdInvoice;
-    newInvoice.comment = data.comment;
-    newInvoice.paid = data.paid;
-    newInvoice.creditAmount = data.creditAmount;
-    newInvoice.bonusAmount = data.bonusAmount;
-
-    const invoiceConceptArray: Product[] = [];
-    for await (const invoiceConceptId of data.invoiceConcept) {
-      await this.productsService
-        .findOne(invoiceConceptId)
-        .then((invoiceConcept) => {
-          invoiceConceptArray.push(invoiceConcept);
-          newInvoice.products = invoiceConceptArray;
-          newInvoice.productsCount = data.invoiceConceptsCount;
-        });
-    }
-
     const paymentMethod = await this.paymentMethodService.findOne(
       data.paymentMethodId,
     );
@@ -208,64 +181,25 @@ export class InvoicesService {
 
     newInvoice.invoiceNumber = 0;
 
-    if (data.exhangeRate) {
-      newInvoice.exhangeRate = data.exhangeRate;
-    } else {
-      newInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
-    }
-
     this.calculateInvoiceAmount(newInvoice, data);
 
     newInvoice = await this.invoiceRepo.save(newInvoice);
-    newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber; // AQUI VA EL PUNTO DE INICIO DE LAS FACTURAS
+    newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
 
-    let index = 0;
-
-    index = 0;
-    // for await (const conceptId of data.invoiceConcept) {
-    //   const concept = await this.productsService.findOne(conceptId);
-    //   await this.productsService.createRelationInvoice({
-    //     invoiceId: newInvoice.id,
-    //     invoiceConceptId: conceptId,
-    //     count: data.invoiceConceptsCount[index],
-    //     price: concept.price,
-    //   });
-    //   index++;
-    // }
+    for await (const product of data.products) {
+      await this.productsService.createRelationInvoice(product);
+    }
 
     return this.invoiceRepo.save(newInvoice);
   }
 
   async getPreview(data: CreateInvoiceDto) {
-    const preInvoice = this.invoiceRepo.create();
-    const client = await this.clientsService.findOne(data.clientId);
-    preInvoice.client = client;
-    preInvoice.creditAmount = data.creditAmount;
-    preInvoice.bonusAmount = data.bonusAmount;
-
-    preInvoice.usdInvoice = data.usdInvoice;
-
-    const invoiceConceptArray: Product[] = [];
-    for await (const invoiceConceptId of data.invoiceConcept) {
-      await this.productsService
-        .findOne(invoiceConceptId)
-        .then((invoiceConcept) => {
-          invoiceConceptArray.push(invoiceConcept);
-          preInvoice.products = invoiceConceptArray;
-          preInvoice.productsCount = data.invoiceConceptsCount;
-        });
-    }
+    const preInvoice = this.invoiceRepo.create(data);
 
     const paymentMethod = await this.paymentMethodService.findOne(
       data.paymentMethodId,
     );
     preInvoice.paymentMethod = paymentMethod;
-
-    if (data.exhangeRate) {
-      preInvoice.exhangeRate = data.exhangeRate;
-    } else {
-      preInvoice.exhangeRate = this.dolarApi['USD']['sicad2'];
-    }
 
     this.calculateInvoiceAmount(preInvoice, data);
     return preInvoice;
@@ -283,22 +217,16 @@ export class InvoicesService {
         .where('id = :id', { id: invoiceId })
         .execute();
       const invoiceCanceled = await this.findOne(invoiceId);
-      let creditNote = this.invoiceRepo.create();
-      creditNote.client = invoiceCanceled.client;
-      creditNote.clientId = invoiceCanceled.clientId;
+      let creditNote = this.invoiceRepo.create(invoiceCanceled);
       creditNote.comment = invoice.invoiceNumber.toString();
-      creditNote.exhangeRate = invoiceCanceled.exhangeRate;
       creditNote.igtf = -invoiceCanceled.igtf;
       creditNote.islr = -invoiceCanceled.islr;
       creditNote.iva = -invoiceCanceled.iva;
       creditNote.iva_p = -invoiceCanceled.iva_p;
       creditNote.iva_r = -invoiceCanceled.iva_r;
-      creditNote.paymentMethod = invoiceCanceled.paymentMethod;
-      creditNote.paymentMethodId = invoiceCanceled.paymentMethodId;
       creditNote.subtotal = -invoiceCanceled.subtotal;
       creditNote.totalAmount = -invoiceCanceled.totalAmount;
       creditNote.type = 'N/C';
-      creditNote.usdInvoice = invoiceCanceled.usdInvoice;
       creditNote.invoiceNumber = 0;
 
       creditNote = await this.invoiceRepo.save(creditNote);
@@ -309,41 +237,44 @@ export class InvoicesService {
 
   async calculateInvoiceAmount(invoice: Invoice, data: CreateInvoiceDto) {
     let amount = 0;
-    if (invoice.products) {
-      let index = 0;
-      invoice.products.forEach((product) => {
-        amount = amount + product.price * invoice.productsCount[index];
-        index++;
-      });
-    }
+
+    const client = await this.clientsService.findOne(data.clientId);
+
+    data.products.forEach((product) => {
+      amount = amount + product.price * product.count;
+    });
 
     invoice.subtotal =
       amount + ((data.bonusAmount - data.creditAmount) * 100) / 116;
     invoice.iva = invoice.subtotal * 0.16;
-    invoice.iva_r = invoice.iva * invoice.client.retention * 0.01;
+    if (client) {
+      invoice.iva_r = invoice.iva * client.retention * 0.01;
+    } else {
+      invoice.iva_r = 0;
+    }
     invoice.iva_p = invoice.iva - invoice.iva_r;
     invoice.islr = 0;
     invoice.igtf = 0;
 
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
-    if (invoice.client.amountIslr > 0) {
-      invoice.islr = invoice.totalAmount * invoice.client.amountIslr * 0.01;
-    }
+    if (client && client.amountIslr > 0)
+      invoice.islr = invoice.totalAmount * client.amountIslr * 0.01;
+    else invoice.islr = 0;
 
-    if (invoice.paymentMethod.hasIgtf && invoice.usdInvoice) {
-      if (invoice.client.retention === 0) {
-        invoice.igtf = invoice.totalAmount * 0.03;
-        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
-      } else {
+    if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'USD') {
+      if (client && client.retention !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva + invoice.iva_p - invoice.islr) *
           0.03;
         invoice.totalAmount = invoice.totalAmount + invoice.igtf;
+      } else {
+        invoice.igtf = invoice.totalAmount * 0.03;
+        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       }
     }
 
-    if (!invoice.usdInvoice) {
+    if (invoice.currencyCode !== 'USD') {
       invoice.subtotal = invoice.subtotal * invoice.exhangeRate;
       invoice.iva = invoice.iva * invoice.exhangeRate;
       invoice.iva_r = invoice.iva_r * invoice.exhangeRate;

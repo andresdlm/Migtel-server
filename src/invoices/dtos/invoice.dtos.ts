@@ -6,56 +6,46 @@ import {
   IsPositive,
   IsOptional,
   Min,
-  IsArray,
   IsNumber,
+  Matches,
+  IsArray,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { CreateInvoiceProductRelationDto } from './invoice-concept-relation.dtos';
 
 export class CreateInvoiceDto {
   @IsInt()
   @IsNotEmpty()
   readonly clientId: number;
 
+  @IsString()
+  @IsOptional()
+  readonly clientFirstname: string;
+
+  @IsString()
+  @IsOptional()
+  readonly clientLastname: string;
+
+  @IsString()
+  @IsOptional()
+  readonly clientCompanyName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly clientDocument: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly clientAddress: string;
+
   @IsInt()
   @IsPositive()
   @IsNotEmpty()
   readonly paymentMethodId: number;
 
-  @IsArray()
-  @IsNotEmpty()
-  readonly clientsServices: number[];
-
-  @IsArray()
-  @IsNotEmpty()
-  readonly clientsServicesCount: number[];
-
-  @IsArray()
-  @IsNotEmpty()
-  readonly invoiceConcept: number[];
-
-  @IsArray()
-  @IsNotEmpty()
-  readonly invoiceConceptsCount: number[];
-
-  @IsString()
-  @IsNotEmpty()
-  readonly comment: string;
-
-  @IsBoolean()
-  @IsNotEmpty()
-  readonly usdInvoice: boolean;
-
   @IsNumber()
-  @IsOptional()
+  @IsNotEmpty()
   readonly exhangeRate: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  readonly userId: number;
-
-  @IsBoolean()
-  @IsOptional()
-  readonly paid: boolean;
 
   @IsNumber()
   @Min(0)
@@ -66,6 +56,25 @@ export class CreateInvoiceDto {
   @Min(0)
   @IsNotEmpty()
   readonly bonusAmount: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly comment: string;
+
+  @IsNotEmpty()
+  @Matches(RegExp('USD|EUR|BS'))
+  readonly currencyCode: string;
+
+  @IsBoolean()
+  @IsOptional()
+  readonly paid: boolean;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
+
+  @IsArray()
+  readonly products: CreateInvoiceProductRelationDto[];
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

@@ -4,12 +4,6 @@ import { Invoice } from './invoice.entity';
 
 @Entity({ name: 'invoice_product_relation' })
 export class InvoiceProductRelation {
-  @Column()
-  count: number;
-
-  @Column({ type: 'real' })
-  price: number;
-
   @ManyToOne(() => Invoice, (invoice) => invoice.invoiceProductRelation)
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice;
@@ -23,4 +17,13 @@ export class InvoiceProductRelation {
 
   @Column({ name: 'product_id', primary: true })
   productId: number;
+
+  @Column({ type: 'varchar' })
+  productName: string;
+
+  @Column()
+  count: number;
+
+  @Column({ type: 'real' })
+  price: number;
 }

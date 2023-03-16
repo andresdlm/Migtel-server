@@ -9,31 +9,35 @@ import {
   UpdateProductDto,
   FilterProductDto,
 } from '../dtos/product.dtos';
+import { CreateInvoiceProductRelationDto } from 'src/invoices/dtos/invoice-concept-relation.dtos';
+import { InvoiceProductRelation } from 'src/invoices/entities/invoice-product-relation.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productRepo: Repository<Product>,
+    @InjectRepository(InvoiceProductRelation)
+    private invoiceProductRelationRepo: Repository<InvoiceProductRelation>,
   ) {}
 
-  findAll(params?: FilterProductDto) {
+  async findAll(params?: FilterProductDto) {
     if (params) {
       const { limit, offset, getArchive } = params;
-      return this.productRepo.find({
+      return await this.productRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
         where: { archive: getArchive },
       });
     }
-    return this.productRepo.find({
+    return await this.productRepo.find({
       order: { id: 'DESC' },
     });
   }
 
-  findOne(productId: number) {
-    const product = this.productRepo.findOne({
+  async findOne(productId: number) {
+    const product = await this.productRepo.findOne({
       where: {
         id: productId,
       },
@@ -44,20 +48,20 @@ export class ProductsService {
     return product;
   }
 
-  getCount(getArchive: boolean) {
-    return this.productRepo.count({
+  async getCount(getArchive: boolean) {
+    return await this.productRepo.count({
       where: { archive: getArchive },
     });
   }
 
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
-      return this.productRepo.find({
+      return await this.productRepo.find({
         where: [{ id: Number(searchInput), archive: getArchive }],
         take: 10,
       });
     } else {
-      return this.productRepo.find({
+      return await this.productRepo.find({
         where: [
           {
             name: ILike(`%${searchInput}%`),
@@ -69,20 +73,25 @@ export class ProductsService {
     }
   }
 
-  create(data: CreateProductDto) {
+  async create(data: CreateProductDto) {
     const newProduct = this.productRepo.create(data);
-    return this.productRepo.save(newProduct);
+    return await this.productRepo.save(newProduct);
+  }
+
+  async createRelationInvoice(data: CreateInvoiceProductRelationDto) {
+    const newRelation = this.invoiceProductRelationRepo.create(data);
+    return await this.invoiceProductRelationRepo.save(newRelation);
   }
 
   async update(id: number, changes: UpdateProductDto) {
     const product = await this.findOne(id);
     this.productRepo.merge(product, changes);
-    return this.productRepo.save(product);
+    return await this.productRepo.save(product);
   }
 
   async archive(id: number) {
     const product = await this.findOne(id);
     product.archive = !product.archive;
-    return this.productRepo.save(product);
+    return await this.productRepo.save(product);
   }
 }

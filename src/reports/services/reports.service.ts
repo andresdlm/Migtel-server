@@ -4,9 +4,9 @@ import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 import { ReportsLogicService } from './reports-logic.service';
-import { SalesBookDto } from '../dtos/salesBook.dto';
+import { SalesBookDto } from '../dtos/salesBook.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
-import { AccountReport, ReportDto } from '../dtos/reports.dto';
+import { AccountReport, ReportDto } from '../dtos/reports.dtos';
 
 @Injectable()
 export class ReportsService {
@@ -183,14 +183,19 @@ export class ReportsService {
     ]);
     invoices.forEach((invoice) => {
       if (invoice.type === 'FACT') {
-        if (invoice.usdInvoice) {
+        if (invoice.currencyCode === 'USD') {
           content.push([
             { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
             { text: `${invoice.type}`, fontSize: this.tableFontSize },
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: ``, fontSize: this.tableFontSize },
             {
-              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+              text: (
+                invoice.clientCompanyName +
+                invoice.clientFirstname +
+                ' ' +
+                invoice.clientLastname
+              )
                 .slice(0, 35)
                 .toUpperCase(),
               fontSize: this.tableFontSize,
@@ -237,7 +242,12 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: ``, fontSize: this.tableFontSize },
             {
-              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+              text: (
+                invoice.clientCompanyName +
+                invoice.clientFirstname +
+                ' ' +
+                invoice.clientLastname
+              )
                 .slice(0, 35)
                 .toUpperCase(),
               fontSize: this.tableFontSize,
@@ -279,14 +289,19 @@ export class ReportsService {
           ]);
         }
       } else {
-        if (invoice.usdInvoice) {
+        if (invoice.currencyCode === 'USD') {
           content.push([
             { text: `${invoice.registerDate}`, fontSize: this.tableFontSize },
             { text: `${invoice.type}`, fontSize: this.tableFontSize },
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: `${invoice.comment}`, fontSize: this.tableFontSize },
             {
-              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+              text: (
+                invoice.clientCompanyName +
+                invoice.clientFirstname +
+                ' ' +
+                invoice.clientLastname
+              )
                 .slice(0, 35)
                 .toUpperCase(),
               fontSize: this.tableFontSize,
@@ -333,7 +348,12 @@ export class ReportsService {
             { text: `${invoice.invoiceNumber}`, fontSize: this.tableFontSize },
             { text: `${invoice.comment}`, fontSize: this.tableFontSize },
             {
-              text: (invoice.clientFirstname + ' ' + invoice.clientLastname)
+              text: (
+                invoice.clientCompanyName +
+                invoice.clientFirstname +
+                ' ' +
+                invoice.clientLastname
+              )
                 .slice(0, 35)
                 .toUpperCase(),
               fontSize: this.tableFontSize,
@@ -389,7 +409,7 @@ export class ReportsService {
     let totalCanceled = 0;
     let totalValid = 0;
     invoices.forEach((invoice) => {
-      if (invoice.usdInvoice) {
+      if (invoice.currencyCode === 'USD') {
         totalBaseImponible =
           totalBaseImponible + invoice.subtotal * invoice.exhangeRate;
         totalIva = totalIva + invoice.iva * invoice.exhangeRate;

@@ -9,10 +9,8 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Client } from 'src/clients/entities/client.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { InvoiceProductRelation } from './invoice-product-relation.entity';
-import { Product } from '../../products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'invoices' })
@@ -23,10 +21,6 @@ export class Invoice {
   @Column({ name: 'invoice_number', type: 'int' })
   invoiceNumber: number;
 
-  @ManyToOne(() => Client, (client) => client.invoices)
-  @JoinColumn({ name: 'client_id' })
-  client: Client;
-
   @Column({ name: 'client_id' })
   clientId: number;
 
@@ -35,6 +29,9 @@ export class Invoice {
 
   @Column({ name: 'client_lastname' })
   clientLastname: string;
+
+  @Column({ name: 'client_company_name' })
+  clientCompanyName: string;
 
   @Column({ name: 'client_document' })
   clientDocument: string;
@@ -89,8 +86,8 @@ export class Invoice {
   @Column({ type: 'varchar', length: 500 })
   comment: string;
 
-  @Column({ name: 'usd_invoice', type: 'boolean', default: false })
-  usdInvoice: boolean;
+  @Column({ name: 'currency_code', type: 'varchar' })
+  currencyCode: string;
 
   @Column({ type: 'boolean', default: false })
   canceled: boolean;
@@ -123,7 +120,4 @@ export class Invoice {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;
-
-  products?: Product[];
-  productsCount?: number[];
 }

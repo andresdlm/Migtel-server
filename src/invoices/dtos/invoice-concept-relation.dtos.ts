@@ -1,13 +1,17 @@
-import { IsNotEmpty, IsPositive } from 'class-validator';
+import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
 
-export class CreateInvoiceConceptRelationDto {
+export class CreateInvoiceProductRelationDto {
   @IsPositive()
   @IsNotEmpty()
   readonly invoiceId: number;
 
   @IsPositive()
   @IsNotEmpty()
-  readonly invoiceConceptId: number;
+  readonly productId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly productName: string;
 
   @IsPositive()
   @IsNotEmpty()

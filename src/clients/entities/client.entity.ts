@@ -1,5 +1,4 @@
-import { PrimaryColumn, Column, Entity, OneToMany } from 'typeorm';
-import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { PrimaryColumn, Column, Entity } from 'typeorm';
 
 @Entity({ name: 'clients' })
 export class Client {
@@ -11,7 +10,4 @@ export class Client {
 
   @Column({ name: 'amount_islr', type: 'int', default: 0 })
   amountIslr: number;
-
-  @OneToMany(() => Invoice, (invoice) => invoice.client)
-  invoices: Invoice[];
 }
