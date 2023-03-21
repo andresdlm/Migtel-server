@@ -182,9 +182,10 @@ export class InvoicesService {
 
     const user = await this.userService.findOne(data.userId);
     newInvoice.user = user;
-    const paymentMethod = await this.paymentMethodService.findOne(
-      data.paymentMethodId,
+    const paymentMethod = await this.paymentMethodService.findByCrmId(
+      data.paymentMethodCrmId,
     );
+    newInvoice.paymentMethodId = paymentMethod.id;
     newInvoice.paymentMethod = paymentMethod;
 
     newInvoice.invoiceNumber = 0;
@@ -207,8 +208,8 @@ export class InvoicesService {
   async getPreview(data: CreateInvoiceDto) {
     const preInvoice = this.invoiceRepo.create(data);
 
-    const paymentMethod = await this.paymentMethodService.findOne(
-      data.paymentMethodId,
+    const paymentMethod = await this.paymentMethodService.findByCrmId(
+      data.paymentMethodCrmId,
     );
     preInvoice.paymentMethod = paymentMethod;
 

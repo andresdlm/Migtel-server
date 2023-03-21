@@ -39,10 +39,9 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly clientAddress: string;
 
-  @IsInt()
-  @IsPositive()
+  @IsString()
   @IsNotEmpty()
-  readonly paymentMethodId: number;
+  readonly paymentMethodCrmId: string;
 
   @IsNumber()
   @IsNotEmpty()

@@ -21,6 +21,10 @@ export class CreatePaymentMethodDto {
   @IsBoolean()
   @IsNotEmpty()
   readonly hasIgtf: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly crmId: string;
 }
 
 export class UpdatePaymentMethodDto extends PartialType(

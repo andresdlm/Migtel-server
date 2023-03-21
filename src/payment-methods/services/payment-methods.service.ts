@@ -17,23 +17,23 @@ export class PaymentMethodsService {
     private paymentMethodRepo: Repository<PaymentMethod>,
   ) {}
 
-  findAll(params?: FilterPaymentMethodDto) {
+  async findAll(params?: FilterPaymentMethodDto) {
     if (params) {
       const { limit, offset, getArchive } = params;
-      return this.paymentMethodRepo.find({
+      return await this.paymentMethodRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
         where: { archived: getArchive },
       });
     }
-    return this.paymentMethodRepo.find({
+    return await this.paymentMethodRepo.find({
       order: { id: 'DESC' },
     });
   }
 
-  findOne(id: number) {
-    const paymentMethod = this.paymentMethodRepo.findOne({
+  async findOne(id: number) {
+    const paymentMethod = await this.paymentMethodRepo.findOne({
       where: {
         id: id,
       },
@@ -44,15 +44,27 @@ export class PaymentMethodsService {
     return paymentMethod;
   }
 
-  getCount(getArchive: boolean) {
-    return this.paymentMethodRepo.count({
+  async findByCrmId(crmId: string) {
+    const paymentMethod = await this.paymentMethodRepo.findOne({
+      where: {
+        crmId: crmId,
+      },
+    });
+    if (!paymentMethod) {
+      throw new NotFoundException(`Payment Method #${crmId} not found`);
+    }
+    return paymentMethod;
+  }
+
+  async getCount(getArchive: boolean) {
+    return await this.paymentMethodRepo.count({
       where: { archived: getArchive },
     });
   }
 
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
-      return this.paymentMethodRepo.find({
+      return await this.paymentMethodRepo.find({
         where: [
           { id: Number(searchInput), archived: getArchive },
           { coc: Number(searchInput), archived: getArchive },
@@ -60,7 +72,7 @@ export class PaymentMethodsService {
         take: 20,
       });
     } else {
-      return this.paymentMethodRepo.find({
+      return await this.paymentMethodRepo.find({
         where: {
           name: ILike(`%${searchInput}%`),
         },
@@ -69,24 +81,20 @@ export class PaymentMethodsService {
     }
   }
 
-  create(data: CreatePaymentMethodDto) {
+  async create(data: CreatePaymentMethodDto) {
     const newPaymentMethod = this.paymentMethodRepo.create(data);
-    return this.paymentMethodRepo.save(newPaymentMethod);
+    return await this.paymentMethodRepo.save(newPaymentMethod);
   }
 
   async update(id: number, changes: UpdatePaymentMethodDto) {
     const paymentMethod = await this.findOne(id);
     this.paymentMethodRepo.merge(paymentMethod, changes);
-    return this.paymentMethodRepo.save(paymentMethod);
+    return await this.paymentMethodRepo.save(paymentMethod);
   }
 
   async archive(id: number) {
     const paymentMethod = await this.findOne(id);
     paymentMethod.archived = !paymentMethod.archived;
-    return this.paymentMethodRepo.save(paymentMethod);
-  }
-
-  delete(id: number) {
-    return this.paymentMethodRepo.delete(id);
+    return await this.paymentMethodRepo.save(paymentMethod);
   }
 }

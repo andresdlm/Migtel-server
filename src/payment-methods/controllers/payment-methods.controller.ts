@@ -80,10 +80,4 @@ export class PaymentMethodsController {
   archive(@Param('id', ParseIntPipe) id: number) {
     return this.paymentMethodService.archive(id);
   }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentMethodService.delete(id);
-  }
 }
