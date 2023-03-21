@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateInvoiceProductRelationDto } from './invoice-concept-relation.dtos';
+import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
 
 export class CreateInvoiceDto {
   @IsInt()
@@ -75,6 +76,9 @@ export class CreateInvoiceDto {
 
   @IsArray()
   readonly products: CreateInvoiceProductRelationDto[];
+
+  @IsArray()
+  readonly services: CreateInvoiceServiceRelationDto[];
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

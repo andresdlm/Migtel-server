@@ -9,16 +9,12 @@ import {
   UpdateProductDto,
   FilterProductDto,
 } from '../dtos/product.dtos';
-import { CreateInvoiceProductRelationDto } from 'src/invoices/dtos/invoice-concept-relation.dtos';
-import { InvoiceProductRelation } from 'src/invoices/entities/invoice-product-relation.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productRepo: Repository<Product>,
-    @InjectRepository(InvoiceProductRelation)
-    private invoiceProductRelationRepo: Repository<InvoiceProductRelation>,
   ) {}
 
   async findAll(params?: FilterProductDto) {
@@ -76,11 +72,6 @@ export class ProductsService {
   async create(data: CreateProductDto) {
     const newProduct = this.productRepo.create(data);
     return await this.productRepo.save(newProduct);
-  }
-
-  async createRelationInvoice(data: CreateInvoiceProductRelationDto) {
-    const newRelation = this.invoiceProductRelationRepo.create(data);
-    return await this.invoiceProductRelationRepo.save(newRelation);
   }
 
   async update(id: number, changes: UpdateProductDto) {

@@ -12,6 +12,7 @@ import {
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { InvoiceProductRelation } from './invoice-product-relation.entity';
 import { User } from 'src/users/entities/user.entity';
+import { InvoiceServiceRelation } from './invoice-service-relation.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -106,6 +107,12 @@ export class Invoice {
     (invoiceProductRelation) => invoiceProductRelation.invoice,
   )
   invoiceProductRelation: InvoiceProductRelation[];
+
+  @OneToMany(
+    () => InvoiceServiceRelation,
+    (invoiceServiceRelation) => invoiceServiceRelation.invoice,
+  )
+  invoiceServiceRelation: InvoiceServiceRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)
   @JoinColumn({ name: 'user_id' })

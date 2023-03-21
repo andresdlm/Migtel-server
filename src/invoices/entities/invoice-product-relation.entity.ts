@@ -18,7 +18,7 @@ export class InvoiceProductRelation {
   @Column({ name: 'product_id', primary: true })
   productId: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ name: 'product_name', type: 'varchar' })
   productName: string;
 
   @Column()

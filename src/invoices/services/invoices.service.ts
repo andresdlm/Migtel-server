@@ -9,6 +9,8 @@ import { ClientsService } from 'src/clients/services/clients.service';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
 import { ProductsService } from '../../products/services/products.service';
 import { UsersService } from 'src/users/services/users.service';
+import { InvoiceServiceRelation } from '../entities/invoice-service-relation.entity';
+import { InvoiceProductRelation } from '../entities/invoice-product-relation.entity';
 
 @Injectable()
 export class InvoicesService {
@@ -17,6 +19,10 @@ export class InvoicesService {
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
+    @InjectRepository(InvoiceServiceRelation)
+    private invoiceServiceRelRepo: Repository<InvoiceServiceRelation>,
+    @InjectRepository(InvoiceProductRelation)
+    private invoiceProductRelRepo: Repository<InvoiceProductRelation>,
     private clientsService: ClientsService,
     private paymentMethodService: PaymentMethodsService,
     private productsService: ProductsService,
@@ -27,7 +33,6 @@ export class InvoicesService {
     if (params) {
       const { limit, offset, getCanceled } = params;
       return this.invoiceRepo.find({
-        relations: { paymentMethod: true },
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
@@ -35,7 +40,11 @@ export class InvoicesService {
       });
     }
     return this.invoiceRepo.find({
-      relations: ['client', 'paymentMethod'],
+      relations: {
+        paymentMethod: true,
+        invoiceServiceRelation: true,
+        invoiceProductRelation: true,
+      },
       order: { id: 'DESC' },
     });
   }
@@ -50,6 +59,7 @@ export class InvoicesService {
         invoiceProductRelation: {
           product: true,
         },
+        invoiceServiceRelation: true,
         user: true,
       },
     });
@@ -60,21 +70,18 @@ export class InvoicesService {
   }
 
   findByClientId(clientId: number, params?: FilterInvoiceDto) {
-    const { limit, offset, getCanceled } = params;
+    const { limit, offset } = params;
     const invoices = this.invoiceRepo.find({
       order: { id: 'DESC' },
       take: limit,
       skip: offset,
       where: {
         clientId: clientId,
-        canceled: getCanceled,
       },
-      relations: [],
     });
     if (!invoices) {
       throw new NotFoundException(`Client #${clientId} has any invoice`);
     }
-    // TODO:
     return invoices;
   }
 
@@ -107,6 +114,7 @@ export class InvoicesService {
         invoiceProductRelation: {
           product: true,
         },
+        invoiceServiceRelation: true,
       },
     });
     return invoices;
@@ -187,7 +195,10 @@ export class InvoicesService {
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
 
     for await (const product of data.products) {
-      await this.productsService.createRelationInvoice(product);
+      this.invoiceProductRelRepo.create(product);
+    }
+    for await (const service of data.services) {
+      this.invoiceServiceRelRepo.create(service);
     }
 
     return this.invoiceRepo.save(newInvoice);
@@ -243,6 +254,9 @@ export class InvoicesService {
     data.products.forEach((product) => {
       amount = amount + product.price * product.count;
     });
+    data.services.forEach((service) => {
+      amount = amount + service.price;
+    });
 
     invoice.subtotal =
       amount + ((data.bonusAmount - data.creditAmount) * 100) / 116;
@@ -285,3 +299,32 @@ export class InvoicesService {
     }
   }
 }
+
+// {
+//   "id": 46079,
+//   "clientId": 2142,
+//   "methodId": "c3504f71-3d51-472a-9c75-6f1bb0bb9f8e",
+//   "checkNumber": null,
+//   "createdDate": "2023-03-20T12:39:37-0400",
+//   "amount": 10.0,
+//   "currencyCode": "USD",
+//   "note": "Prueba para el desarrollo del sistema de facturacion. NO FACTURAR",
+//   "receiptSentDate": null,
+//   "providerName": null,
+//   "providerPaymentId": null,
+//   "providerPaymentTime": null,
+//   "paymentCovers": [],
+//   "creditAmount": 10.0,
+//   "userId": 1255,
+//   "attributes": [
+//       {
+//           "id": "aa901697-6c61-4319-ab50-840c3c98a660",
+//           "paymentId": 46079,
+//           "customAttributeId": 4,
+//           "name": "Periodo de pago",
+//           "key": "periodoDePago",
+//           "value": "02/2023",
+//           "clientZoneVisible": true
+//       }
+//   ]
+// }

@@ -19,14 +19,12 @@ export class ClientsService {
     if (params) {
       const { limit, offset } = params;
       return this.clientRepo.find({
-        relations: ['services'],
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
       });
     }
     return this.clientRepo.find({
-      relations: ['services'],
       order: { id: 'DESC' },
     });
   }
