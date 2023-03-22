@@ -8,8 +8,9 @@ import {
   Min,
   IsNumber,
   Matches,
-  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateInvoiceProductRelationDto } from './invoice-concept-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
@@ -73,10 +74,14 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly userId: number;
 
-  @IsArray()
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateInvoiceProductRelationDto)
   readonly products: CreateInvoiceProductRelationDto[];
 
-  @IsArray()
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateInvoiceServiceRelationDto)
   readonly services: CreateInvoiceServiceRelationDto[];
 }
 

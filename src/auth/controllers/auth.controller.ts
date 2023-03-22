@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from '../services/auth.service';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/employees/entities/user.entity';
 import { ApiKeyGuard } from '../guards/api-key.guard';
 
 @UseGuards(ApiKeyGuard)

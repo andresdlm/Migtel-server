@@ -9,11 +9,11 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import config from 'src/config';
 
-import { UsersModule } from 'src/users/users.module';
+import { EmployeesModule } from 'src/employees/employees.module';
 
 @Module({
   imports: [
-    UsersModule,
+    EmployeesModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [config.KEY],

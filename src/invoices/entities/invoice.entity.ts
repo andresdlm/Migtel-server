@@ -11,7 +11,7 @@ import {
 
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { InvoiceProductRelation } from './invoice-product-relation.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/employees/entities/user.entity';
 import { InvoiceServiceRelation } from './invoice-service-relation.entity';
 
 @Entity({ name: 'invoices' })
@@ -25,13 +25,13 @@ export class Invoice {
   @Column({ name: 'client_id' })
   clientId: number;
 
-  @Column({ name: 'client_firstname' })
+  @Column({ name: 'client_firstname', nullable: true })
   clientFirstname: string;
 
-  @Column({ name: 'client_lastname' })
+  @Column({ name: 'client_lastname', nullable: true })
   clientLastname: string;
 
-  @Column({ name: 'client_company_name' })
+  @Column({ name: 'client_company_name', nullable: true })
   clientCompanyName: string;
 
   @Column({ name: 'client_document' })

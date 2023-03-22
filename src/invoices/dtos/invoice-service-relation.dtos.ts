@@ -3,10 +3,6 @@ import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
 export class CreateInvoiceServiceRelationDto {
   @IsPositive()
   @IsNotEmpty()
-  readonly invoiceId: number;
-
-  @IsPositive()
-  @IsNotEmpty()
   readonly serviceId: number;
 
   @IsPositive()

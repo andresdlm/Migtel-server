@@ -7,8 +7,7 @@ import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
 import { ClientsService } from 'src/clients/services/clients.service';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
-import { ProductsService } from '../../products/services/products.service';
-import { UsersService } from 'src/users/services/users.service';
+import { UsersService } from 'src/employees/services/users.service';
 import { InvoiceServiceRelation } from '../entities/invoice-service-relation.entity';
 import { InvoiceProductRelation } from '../entities/invoice-product-relation.entity';
 
@@ -25,7 +24,6 @@ export class InvoicesService {
     private invoiceProductRelRepo: Repository<InvoiceProductRelation>,
     private clientsService: ClientsService,
     private paymentMethodService: PaymentMethodsService,
-    private productsService: ProductsService,
     private userService: UsersService,
   ) {}
 
@@ -190,16 +188,20 @@ export class InvoicesService {
 
     newInvoice.invoiceNumber = 0;
 
-    this.calculateInvoiceAmount(newInvoice, data);
+    newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
 
     for await (const product of data.products) {
-      this.invoiceProductRelRepo.create(product);
+      const invoiceProduct = this.invoiceProductRelRepo.create(product);
+      invoiceProduct.invoiceId = newInvoice.id;
+      await this.invoiceProductRelRepo.save(invoiceProduct);
     }
     for await (const service of data.services) {
-      this.invoiceServiceRelRepo.create(service);
+      const invoiceService = this.invoiceServiceRelRepo.create(service);
+      invoiceService.invoiceId = newInvoice.id;
+      await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
     return this.invoiceRepo.save(newInvoice);
@@ -256,7 +258,7 @@ export class InvoicesService {
       amount = amount + product.price * product.count;
     });
     data.services.forEach((service) => {
-      amount = amount + service.price;
+      amount = amount + service.price * service.count;
     });
 
     invoice.subtotal =
@@ -298,34 +300,7 @@ export class InvoicesService {
       invoice.igtf = invoice.igtf * invoice.exhangeRate;
       invoice.totalAmount = invoice.totalAmount * invoice.exhangeRate;
     }
+
+    return invoice;
   }
 }
-
-// {
-//   "id": 46079,
-//   "clientId": 2142,
-//   "methodId": "c3504f71-3d51-472a-9c75-6f1bb0bb9f8e",
-//   "checkNumber": null,
-//   "createdDate": "2023-03-20T12:39:37-0400",
-//   "amount": 10.0,
-//   "currencyCode": "USD",
-//   "note": "Prueba para el desarrollo del sistema de facturacion. NO FACTURAR",
-//   "receiptSentDate": null,
-//   "providerName": null,
-//   "providerPaymentId": null,
-//   "providerPaymentTime": null,
-//   "paymentCovers": [],
-//   "creditAmount": 10.0,
-//   "userId": 1255,
-//   "attributes": [
-//       {
-//           "id": "aa901697-6c61-4319-ab50-840c3c98a660",
-//           "paymentId": 46079,
-//           "customAttributeId": 4,
-//           "name": "Periodo de pago",
-//           "key": "periodoDePago",
-//           "value": "02/2023",
-//           "clientZoneVisible": true
-//       }
-//   ]
-// }

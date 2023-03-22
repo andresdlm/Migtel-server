@@ -4,19 +4,14 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  OneToOne,
 } from 'typeorm';
+import { User } from './user.entity';
 
-import { Exclude } from 'class-transformer';
-import { Invoice } from 'src/invoices/entities/invoice.entity';
-
-@Entity({ name: 'users' })
-export class User {
+@Entity({ name: 'employees' })
+export class Employee {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'varchar', length: 255 })
-  username: string;
 
   @Column({ type: 'varchar', length: 255 })
   firstName: string;
@@ -27,11 +22,7 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   email: string;
 
-  @Exclude()
-  @Column({ type: 'varchar', length: 255 })
-  password: string;
-
-  @Column({ type: 'varchar', length: 12 })
+  @Column({ type: 'varchar', length: 13 })
   phone: string;
 
   @Column({ type: 'varchar', length: 12 })
@@ -43,15 +34,11 @@ export class User {
   @Column({ type: 'timestamp' })
   birthday: Date;
 
-  @Column({ type: 'varchar', length: 100 })
-  role: string;
-
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
-  @Exclude()
-  @OneToMany(() => Invoice, (invoice) => invoice.user)
-  invoices: Invoice[];
+  @OneToOne(() => User, (user) => user.employee)
+  user: User;
 
   @CreateDateColumn({
     type: 'timestamp',

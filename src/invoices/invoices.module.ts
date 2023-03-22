@@ -11,7 +11,7 @@ import { ProductsModule } from 'src/products/products.module';
 import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module';
 import { InvoiceProductRelation } from './entities/invoice-product-relation.entity';
 import { InvoiceServiceRelation } from './entities/invoice-service-relation.entity';
-import { UsersModule } from 'src/users/users.module';
+import { EmployeesModule } from 'src/employees/employees.module';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { UsersModule } from 'src/users/users.module';
     ClientsModule,
     ProductsModule,
     PaymentMethodsModule,
-    UsersModule,
+    EmployeesModule,
   ],
   exports: [InvoicesService],
   controllers: [InvoicesController],

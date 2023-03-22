@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
-import { UsersModule } from './users/users.module';
+import { EmployeesModule } from './employees/employees.module';
 import { ClientsModule } from './clients/clients.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { DatabaseModule } from './database/database.module';
@@ -29,7 +29,7 @@ import config from './config';
         JWT_SECRET: Joi.string().required(),
       }),
     }),
-    UsersModule,
+    EmployeesModule,
     ClientsModule,
     InvoicesModule,
     DatabaseModule,

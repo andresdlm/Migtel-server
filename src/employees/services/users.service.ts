@@ -42,8 +42,8 @@ export class UsersService {
     return user;
   }
 
-  findByEmail(email: string) {
-    return this.userRepo.findOne({ where: { email } });
+  findByUsername(username: string) {
+    return this.userRepo.findOne({ where: { username } });
   }
 
   getCount(getActive: boolean) {
@@ -61,18 +61,6 @@ export class UsersService {
     } else {
       return this.userRepo.find({
         where: [
-          {
-            firstName: ILike(`%${searchInput}%`),
-            active: getArchive,
-          },
-          {
-            lastName: ILike(`%${searchInput}%`),
-            active: getArchive,
-          },
-          {
-            email: ILike(`%${searchInput}%`),
-            active: getArchive,
-          },
           {
             role: ILike(`%${searchInput}%`),
             active: getArchive,
