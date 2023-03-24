@@ -106,13 +106,13 @@ export class Invoice {
     () => InvoiceProductRelation,
     (invoiceProductRelation) => invoiceProductRelation.invoice,
   )
-  invoiceProductRelation: InvoiceProductRelation[];
+  products: InvoiceProductRelation[];
 
   @OneToMany(
     () => InvoiceServiceRelation,
     (invoiceServiceRelation) => invoiceServiceRelation.invoice,
   )
-  invoiceServiceRelation: InvoiceServiceRelation[];
+  services: InvoiceServiceRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)
   @JoinColumn({ name: 'user_id' })

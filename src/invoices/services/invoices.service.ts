@@ -40,8 +40,8 @@ export class InvoicesService {
     return this.invoiceRepo.find({
       relations: {
         paymentMethod: true,
-        invoiceServiceRelation: true,
-        invoiceProductRelation: true,
+        services: true,
+        products: true,
       },
       order: { id: 'DESC' },
     });
@@ -54,10 +54,10 @@ export class InvoicesService {
       },
       relations: {
         paymentMethod: true,
-        invoiceProductRelation: {
+        products: {
           product: true,
         },
-        invoiceServiceRelation: true,
+        services: true,
         user: true,
       },
     });
@@ -109,10 +109,10 @@ export class InvoicesService {
       },
       relations: {
         paymentMethod: true,
-        invoiceProductRelation: {
+        products: {
           product: true,
         },
-        invoiceServiceRelation: true,
+        services: true,
       },
     });
     return invoices;
