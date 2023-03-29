@@ -27,7 +27,7 @@ export class DashboardService {
     const dailyIncome = await this.invoiceRepo.query(
       `SELECT COALESCE(SUM(CAST(
         CASE
-            WHEN invoices.usd_invoice = false
+            WHEN invoices.currency_code = 'BS'
               THEN invoices.total_amount/invoices.exhange_rate
             ELSE invoices.total_amount
         END AS real
@@ -43,7 +43,7 @@ export class DashboardService {
     const monthIncome = await this.invoiceRepo.query(
       `SELECT COALESCE(SUM(CAST(
         CASE
-            WHEN invoices.usd_invoice = false
+            WHEN invoices.currency_code = 'BS'
               THEN invoices.total_amount/invoices.exhange_rate
             ELSE invoices.total_amount
         END AS real
@@ -58,7 +58,7 @@ export class DashboardService {
     const taxesGeneratedByMonth = await this.invoiceRepo.query(
       `SELECT COALESCE(SUM(CAST(
         CASE
-            WHEN invoices.usd_invoice = false
+            WHEN invoices.currency_code = 'BS'
               THEN invoices.iva/invoices.exhange_rate
             ELSE invoices.iva
         END AS real
@@ -75,7 +75,7 @@ export class DashboardService {
       `SELECT date_trunc('month', register_date) AS sale_month,
         COALESCE(SUM(CAST(
         CASE
-          WHEN invoices.usd_invoice = false
+          WHEN invoices.currency_code = 'BS'
             THEN invoices.total_amount/invoices.exhange_rate
           ELSE invoices.total_amount
         END AS real

@@ -54,7 +54,7 @@ export class EmployeesService {
     return await this.employeeRepo.save(employee);
   }
 
-  async archive(id: number) {
+  async deactivate(id: number) {
     const product = await this.findOne(id);
     product.active = !product.active;
     return await this.employeeRepo.save(product);
