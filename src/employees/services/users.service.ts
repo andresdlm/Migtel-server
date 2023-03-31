@@ -35,6 +35,9 @@ export class UsersService {
       where: {
         id: id,
       },
+      relations: {
+        employee: true,
+      },
     });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);

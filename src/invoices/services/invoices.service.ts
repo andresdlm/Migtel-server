@@ -58,7 +58,9 @@ export class InvoicesService {
           product: true,
         },
         services: true,
-        user: true,
+        user: {
+          employee: true,
+        },
       },
     });
     if (!invoice) {

@@ -19,8 +19,6 @@ export class DashboardService {
       monthIncome: 0,
       taxesGeneratedByMonth: 0,
       yearIncome: [],
-      cities: [],
-      plans: [],
       accountsBalance: [],
     };
 
@@ -89,45 +87,13 @@ export class DashboardService {
       dashboardData.yearIncome.push(month.month_total);
     });
 
-    dashboardData.cities = await this.clientRepo.query(
-      `SELECT clients.city as city, count(clients.id) as clients, SUM(
-        CAST(
-          CASE
-            WHEN invoices.usd_invoice = false
-              THEN invoices.total_amount/invoices.exhange_rate
-            ELSE invoices.total_amount
-            END AS real)) as raised FROM clients
-        LEFT JOIN invoices on clients.id = invoices.client_id
-        WHERE EXTRACT(MONTH FROM register_date) = EXTRACT(MONTH FROM now())
-        GROUP BY clients.city;`,
-    );
-
-    dashboardData.plans = await this.invoiceRepo.query(
-      `SELECT service_plans.name AS name, COUNT(invoices.id) AS count, SUM(
-      CAST(
-        CASE
-          WHEN invoices.usd_invoice = false
-            THEN invoices.total_amount/invoices.exhange_rate
-          ELSE invoices.total_amount
-          END AS real)) as raised  FROM invoices
-        LEFT JOIN invoice_services on invoices.id = invoice_services.invoice_id
-        LEFT JOIN client_services on invoice_services.client_service_id = client_services.id
-        LEFT JOIN service_plans on client_services.service_plan_id = service_plans.id
-      WHERE invoices.type = 'FACT'
-      AND invoices.canceled = false
-      AND EXTRACT(MONTH FROM invoices.register_date) = EXTRACT(MONTH FROM now())
-      GROUP BY service_plans.name
-      ORDER BY raised DESC
-      LIMIT 7;`,
-    );
-
     dashboardData.accountsBalance = await this.invoiceRepo.query(
       `SELECT payment_methods.id AS id,
         payment_methods.name AS name,
         COUNT(invoices)::INT AS count,
         COALESCE(SUM(CAST(
         CASE
-            WHEN invoices.usd_invoice = false
+            WHEN invoices.currency_code = 'BS'
               THEN invoices.total_amount/invoices.exhange_rate
             ELSE invoices.total_amount
         END AS real
