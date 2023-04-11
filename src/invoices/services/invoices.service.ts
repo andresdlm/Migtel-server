@@ -58,7 +58,9 @@ export class InvoicesService {
           product: true,
         },
         invoiceServiceRelation: true,
-        user: true,
+        user: {
+          employee: true,
+        },
       },
     });
     if (!invoice) {
@@ -186,10 +188,9 @@ export class InvoicesService {
     newInvoice.paymentMethodId = paymentMethod.id;
     newInvoice.paymentMethod = paymentMethod;
 
-    newInvoice.invoiceNumber = 0;
-
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
+    newInvoice.invoiceNumber = 0;
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
 

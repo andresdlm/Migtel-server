@@ -51,16 +51,20 @@ export class CreateInvoiceDto {
   @IsNumber()
   @Min(0)
   @IsNotEmpty()
-  readonly creditAmount: number;
+  readonly bonusAmount: number;
 
   @IsNumber()
   @Min(0)
   @IsNotEmpty()
-  readonly bonusAmount: number;
+  readonly creditAmount: number;
 
   @IsString()
   @IsNotEmpty()
   readonly comment: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly period: string;
 
   @IsNotEmpty()
   @Matches(RegExp('USD|EUR|BS'))

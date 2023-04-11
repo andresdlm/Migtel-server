@@ -11,7 +11,7 @@ export class CreateInvoiceServiceRelationDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly serviceName: string;
+  readonly servicePlanName: string;
 
   @IsPositive()
   @IsNotEmpty()

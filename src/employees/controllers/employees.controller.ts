@@ -63,7 +63,7 @@ export class EmployeesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id')
-  archive(@Param('id', ParseIntPipe) id: number) {
-    return this.employeesService.archive(id);
+  deactivate(@Param('id', ParseIntPipe) id: number) {
+    return this.employeesService.deactivate(id);
   }
 }

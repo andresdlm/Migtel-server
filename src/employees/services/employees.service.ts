@@ -36,6 +36,9 @@ export class EmployeesService {
       where: {
         id: id,
       },
+      relations: {
+        user: true,
+      },
     });
     if (!employee) {
       throw new NotFoundException(`Employee #${id} not found`);
@@ -54,7 +57,7 @@ export class EmployeesService {
     return await this.employeeRepo.save(employee);
   }
 
-  async archive(id: number) {
+  async deactivate(id: number) {
     const product = await this.findOne(id);
     product.active = !product.active;
     return await this.employeeRepo.save(product);
