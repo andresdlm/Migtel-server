@@ -16,7 +16,7 @@ export class InvoiceServiceRelation {
   @Column({ name: 'service_plan_id', type: 'int' })
   servicePlanId: number;
 
-  @Column({ name: 'service_name', type: 'varchar' })
+  @Column({ name: 'service_plan_name', type: 'varchar' })
   servicePlanName: string;
 
   @Column({ name: 'count', type: 'int' })
