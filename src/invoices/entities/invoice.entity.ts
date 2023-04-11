@@ -87,6 +87,9 @@ export class Invoice {
   @Column({ type: 'varchar', length: 500 })
   comment: string;
 
+  @Column({ type: 'varchar', length: 500 })
+  period: string;
+
   @Column({ name: 'currency_code', type: 'varchar' })
   currencyCode: string;
 
