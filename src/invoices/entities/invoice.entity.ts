@@ -105,17 +105,11 @@ export class Invoice {
   @Column({ type: 'boolean', default: true })
   paid: boolean;
 
-  @OneToMany(
-    () => InvoiceProductRelation,
-    (invoiceProductRelation) => invoiceProductRelation.invoice,
-  )
-  invoiceProductRelation: InvoiceProductRelation[];
+  @OneToMany(() => InvoiceProductRelation, (products) => products.invoice)
+  products: InvoiceProductRelation[];
 
-  @OneToMany(
-    () => InvoiceServiceRelation,
-    (invoiceServiceRelation) => invoiceServiceRelation.invoice,
-  )
-  invoiceServiceRelation: InvoiceServiceRelation[];
+  @OneToMany(() => InvoiceServiceRelation, (services) => services.invoice)
+  services: InvoiceServiceRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)
   @JoinColumn({ name: 'user_id' })

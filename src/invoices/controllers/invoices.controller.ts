@@ -99,11 +99,8 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put('setpaid/:invoiceId')
-  setPaid(
-    @Param('invoiceId', ParseIntPipe) invoiceId: number,
-    @Body() nextState: { paid: boolean },
-  ) {
-    return this.invoiceService.setPaid(invoiceId, nextState);
+  setPaid(@Param('invoiceId', ParseIntPipe) invoiceId: number) {
+    return this.invoiceService.setPaid(invoiceId);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

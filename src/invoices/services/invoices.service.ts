@@ -40,8 +40,8 @@ export class InvoicesService {
     return this.invoiceRepo.find({
       relations: {
         paymentMethod: true,
-        invoiceServiceRelation: true,
-        invoiceProductRelation: true,
+        services: true,
+        products: true,
       },
       order: { id: 'DESC' },
     });
@@ -54,10 +54,10 @@ export class InvoicesService {
       },
       relations: {
         paymentMethod: true,
-        invoiceProductRelation: {
+        products: {
           product: true,
         },
-        invoiceServiceRelation: true,
+        services: true,
         user: {
           employee: true,
         },
@@ -111,10 +111,10 @@ export class InvoicesService {
       },
       relations: {
         paymentMethod: true,
-        invoiceProductRelation: {
+        products: {
           product: true,
         },
-        invoiceServiceRelation: true,
+        services: true,
       },
     });
     return invoices;
@@ -139,17 +139,10 @@ export class InvoicesService {
       .execute();
   }
 
-  async setPaid(id: number, nextState: { paid: boolean }) {
-    return this.invoiceRepo
-      .createQueryBuilder()
-      .update(Invoice)
-      .set({
-        paid: nextState.paid,
-      })
-      .where('id = :id', {
-        id: id,
-      })
-      .execute();
+  async setPaid(id: number) {
+    const invoice = await this.findOne(id);
+    this.invoiceRepo.merge(invoice, { paid: !invoice.paid });
+    return await this.invoiceRepo.save(invoice);
   }
 
   async printCount(countToPrint: number) {
@@ -194,12 +187,12 @@ export class InvoicesService {
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
 
-    for await (const product of data.products) {
+    for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
       invoiceProduct.invoiceId = newInvoice.id;
       await this.invoiceProductRelRepo.save(invoiceProduct);
     }
-    for await (const service of data.services) {
+    for await (const service of data.servicesDtos) {
       const invoiceService = this.invoiceServiceRelRepo.create(service);
       invoiceService.invoiceId = newInvoice.id;
       await this.invoiceServiceRelRepo.save(invoiceService);
@@ -255,10 +248,10 @@ export class InvoicesService {
 
     const client = await this.clientsService.findOne(data.clientId);
 
-    data.products.forEach((product) => {
+    data.productsDtos.forEach((product) => {
       amount = amount + product.price * product.count;
     });
-    data.services.forEach((service) => {
+    data.servicesDtos.forEach((service) => {
       amount = amount + service.price * service.count;
     });
 

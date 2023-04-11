@@ -81,12 +81,12 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceProductRelationDto)
-  readonly products: CreateInvoiceProductRelationDto[];
+  readonly productsDtos: CreateInvoiceProductRelationDto[];
 
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceServiceRelationDto)
-  readonly services: CreateInvoiceServiceRelationDto[];
+  readonly servicesDtos: CreateInvoiceServiceRelationDto[];
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

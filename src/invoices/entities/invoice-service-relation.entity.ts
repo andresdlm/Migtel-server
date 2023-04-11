@@ -3,7 +3,7 @@ import { Invoice } from './invoice.entity';
 
 @Entity({ name: 'invoice_service_relation' })
 export class InvoiceServiceRelation {
-  @ManyToOne(() => Invoice, (invoice) => invoice.invoiceServiceRelation)
+  @ManyToOne(() => Invoice, (invoice) => invoice.services)
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice;
 
