@@ -209,8 +209,7 @@ export class InvoicesService {
     );
     preInvoice.paymentMethod = paymentMethod;
 
-    this.calculateInvoiceAmount(preInvoice, data);
-    return preInvoice;
+    return this.calculateInvoiceAmount(preInvoice, data);
   }
 
   async cancelInvoice(invoiceId: number) {

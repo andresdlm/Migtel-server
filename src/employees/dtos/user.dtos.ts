@@ -1,14 +1,11 @@
 import {
   IsString,
   IsNotEmpty,
-  IsEmail,
   IsInt,
   IsOptional,
   IsPositive,
   Min,
   IsBoolean,
-  IsPhoneNumber,
-  IsDateString,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -19,39 +16,15 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  readonly firstName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly lastName: string;
-
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty()
-  readonly email: string;
-
-  @IsString()
-  @IsNotEmpty()
   readonly password: string;
-
-  @IsPhoneNumber()
-  @IsNotEmpty()
-  readonly phone: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly document: string;
-
-  @IsString()
-  @IsNotEmpty()
-  readonly city: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  readonly birthday: string;
 
   @IsNotEmpty()
   readonly role: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  @IsPositive()
+  readonly crmId: number;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

@@ -42,7 +42,7 @@ export class Invoice {
 
   @CreateDateColumn({
     name: 'register_date',
-    type: 'date',
+    type: 'timestamp',
     default: () => 'CURRENT_DATE',
   })
   registerDate: Date;
