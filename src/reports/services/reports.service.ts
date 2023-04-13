@@ -13,6 +13,14 @@ export class ReportsService {
   tableFontSize = 8;
   constructor(private reportsLogicService: ReportsLogicService) {}
 
+  async getBookReports(params: SalesBookDto) {
+    return await this.reportsLogicService.generateSalesBook(params);
+  }
+
+  async getPaymentReport(params: ReportDto) {
+    return await this.reportsLogicService.paymentMethodReport(params);
+  }
+
   async generateSalesBookPDF(params: SalesBookDto): Promise<Buffer> {
     const invoices = await this.reportsLogicService.generateSalesBook(params);
     const content = await this.generateSalesBookTable(params, invoices);

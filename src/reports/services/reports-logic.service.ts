@@ -20,7 +20,7 @@ export class ReportsLogicService {
     return this.invoiceRepo.find({
       where: {
         registerDate: Raw(
-          (alias) => `${alias} >= :since AND ${alias} <= :until`,
+          (registerDate) => `${registerDate} >= :since AND ${registerDate} <= :until`,
           {
             since: `${params.since.toISOString()}`,
             until: `${params.until.toISOString()}`,

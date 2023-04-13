@@ -8,16 +8,16 @@ export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
   @Post('libroventas.pdf')
-  async getFile(@Body() payload: SalesBookDto): Promise<StreamableFile> {
-    const buffer = await this.reportsService.generateSalesBookPDF(payload);
-
-    return new StreamableFile(buffer);
+  async getAllSalesReport(@Body() payload: SalesBookDto) {
+    const data = await this.reportsService.getBookReports(payload);
+      
+    return data;
   }
 
   @Post('paymentReport.pdf')
-  async paymentReport(@Body() payload: ReportDto): Promise<StreamableFile> {
-    const buffer = await this.reportsService.generatePaymentReport(payload);
+  async getAllAccountReport(@Body() payload: ReportDto) {
+    const data = await this.reportsService.getPaymentReport(payload)
 
-    return new StreamableFile(buffer);
+    return data;
   }
 }
