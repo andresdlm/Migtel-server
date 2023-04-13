@@ -1,16 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import * as pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 import { ReportsLogicService } from './reports-logic.service';
-import { SalesBookDto } from '../dtos/salesBook.dtos';
-import { Invoice } from 'src/invoices/entities/invoice.entity';
-import { AccountReport, ReportDto } from '../dtos/reports.dtos';
 
 @Injectable()
 export class ReportsService {
-  tableFontSize = 8;
   constructor(private reportsLogicService: ReportsLogicService) {}
 
   async getBookReports(params: SalesBookDto) {

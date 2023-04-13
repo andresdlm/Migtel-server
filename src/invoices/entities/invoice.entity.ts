@@ -42,7 +42,7 @@ export class Invoice {
 
   @CreateDateColumn({
     name: 'register_date',
-    type: 'date',
+    type: 'timestamp',
     default: () => 'CURRENT_DATE',
   })
   registerDate: Date;
@@ -87,6 +87,9 @@ export class Invoice {
   @Column({ type: 'varchar', length: 500 })
   comment: string;
 
+  @Column({ type: 'varchar', length: 500 })
+  period: string;
+
   @Column({ name: 'currency_code', type: 'varchar' })
   currencyCode: string;
 
@@ -102,17 +105,11 @@ export class Invoice {
   @Column({ type: 'boolean', default: true })
   paid: boolean;
 
-  @OneToMany(
-    () => InvoiceProductRelation,
-    (invoiceProductRelation) => invoiceProductRelation.invoice,
-  )
-  invoiceProductRelation: InvoiceProductRelation[];
+  @OneToMany(() => InvoiceProductRelation, (products) => products.invoice)
+  products: InvoiceProductRelation[];
 
-  @OneToMany(
-    () => InvoiceServiceRelation,
-    (invoiceServiceRelation) => invoiceServiceRelation.invoice,
-  )
-  invoiceServiceRelation: InvoiceServiceRelation[];
+  @OneToMany(() => InvoiceServiceRelation, (services) => services.invoice)
+  services: InvoiceServiceRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)
   @JoinColumn({ name: 'user_id' })

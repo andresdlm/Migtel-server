@@ -3,7 +3,7 @@ import { Invoice } from './invoice.entity';
 
 @Entity({ name: 'invoice_service_relation' })
 export class InvoiceServiceRelation {
-  @ManyToOne(() => Invoice, (invoice) => invoice.invoiceServiceRelation)
+  @ManyToOne(() => Invoice, (invoice) => invoice.services)
   @JoinColumn({ name: 'invoice_id' })
   invoice: Invoice;
 
@@ -16,8 +16,8 @@ export class InvoiceServiceRelation {
   @Column({ name: 'service_plan_id', type: 'int' })
   servicePlanId: number;
 
-  @Column({ name: 'service_name', type: 'varchar' })
-  serviceName: string;
+  @Column({ name: 'service_plan_name', type: 'varchar' })
+  servicePlanName: string;
 
   @Column({ name: 'count', type: 'int' })
   count: number;

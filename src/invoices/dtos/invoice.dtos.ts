@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateInvoiceProductRelationDto } from './invoice-concept-relation.dtos';
+import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
 
 export class CreateInvoiceDto {
@@ -51,16 +51,20 @@ export class CreateInvoiceDto {
   @IsNumber()
   @Min(0)
   @IsNotEmpty()
-  readonly creditAmount: number;
+  readonly bonusAmount: number;
 
   @IsNumber()
   @Min(0)
   @IsNotEmpty()
-  readonly bonusAmount: number;
+  readonly creditAmount: number;
 
   @IsString()
   @IsNotEmpty()
   readonly comment: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly period: string;
 
   @IsNotEmpty()
   @Matches(RegExp('USD|EUR|BS'))
@@ -77,12 +81,12 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceProductRelationDto)
-  readonly products: CreateInvoiceProductRelationDto[];
+  readonly productsDtos: CreateInvoiceProductRelationDto[];
 
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceServiceRelationDto)
-  readonly services: CreateInvoiceServiceRelationDto[];
+  readonly servicesDtos: CreateInvoiceServiceRelationDto[];
 }
 
 export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}

@@ -40,7 +40,7 @@ export class ReportsLogicService {
       COUNT(invoices)::INT AS payments,
       COALESCE(SUM(CAST(
           CASE
-              WHEN invoices.usd_invoice = false
+              WHEN invoices.currency_code = 'BS'
                 THEN invoices.total_amount/invoices.exhange_rate
               ELSE invoices.total_amount
           END AS real
