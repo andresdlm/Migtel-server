@@ -14,10 +14,10 @@ export class Employee {
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  firstName: string;
+  firstname: string;
 
   @Column({ type: 'varchar', length: 255 })
-  lastName: string;
+  lastname: string;
 
   @Column({ type: 'varchar', length: 255 })
   email: string;
@@ -30,6 +30,12 @@ export class Employee {
 
   @Column({ type: 'varchar', length: 30 })
   city: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  departament: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  position: string;
 
   @Column({ type: 'timestamp' })
   birthday: Date;

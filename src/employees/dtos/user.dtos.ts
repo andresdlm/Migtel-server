@@ -8,6 +8,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { Employee } from '../entities/employee.entity';
 
 export class CreateUserDto {
   @IsString()
@@ -25,6 +26,9 @@ export class CreateUserDto {
   @IsInt()
   @IsPositive()
   readonly crmId: number;
+
+  @IsNotEmpty()
+  readonly employee: Employee;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

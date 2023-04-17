@@ -15,18 +15,17 @@ import { PartialType } from '@nestjs/mapped-types';
 export class CreateEmployeeDto {
   @IsString()
   @IsNotEmpty()
-  readonly firstName: string;
+  readonly firstname: string;
 
   @IsString()
   @IsNotEmpty()
-  readonly lastName: string;
+  readonly lastname: string;
 
   @IsString()
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @IsPhoneNumber()
   @IsNotEmpty()
   readonly phone: string;
 
@@ -37,6 +36,14 @@ export class CreateEmployeeDto {
   @IsString()
   @IsNotEmpty()
   readonly city: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly departament: string;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly position: string;
 
   @IsDateString()
   @IsNotEmpty()

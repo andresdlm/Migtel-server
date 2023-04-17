@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 import { Employee } from '../entities/employee.entity';
 import {
@@ -8,6 +8,7 @@ import {
   FilterEmployeeDto,
   UpdateEmployeeDto,
 } from '../dtos/employee.dtos';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class EmployeesService {
@@ -44,6 +45,59 @@ export class EmployeesService {
       throw new NotFoundException(`Employee #${id} not found`);
     }
     return employee;
+  }
+
+  async findEmployeesWithoutUser() {
+    return this.employeeRepo.query(`
+      SELECT employees.id, firstname, lastname, document
+      FROM employees
+      LEFT OUTER JOIN users e on employees.id = e.employee_id
+      WHERE e.id IS NULL`);
+  }
+
+  getCount(getActive: boolean) {
+    return this.employeeRepo.count({
+      where: { active: getActive },
+    });
+  }
+
+  async search(searchInput: string, getArchive: boolean) {
+    if (isNumber(Number(searchInput))) {
+      return this.employeeRepo.find({
+        where: [{ id: Number(searchInput), active: getArchive }],
+        take: 20,
+      });
+    } else {
+      return this.employeeRepo.find({
+        where: [
+          {
+            firstname: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            lastname: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            email: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            document: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            city: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+          {
+            position: ILike(`%${searchInput}%`),
+            active: getArchive,
+          },
+        ],
+        take: 20,
+      });
+    }
   }
 
   async create(data: CreateEmployeeDto) {
