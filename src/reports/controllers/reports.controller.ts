@@ -8,14 +8,14 @@ export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
   @Post('libroventas.pdf')
-  async getAllSalesReport(@Body() payload: SalesBookDto) {
-    const data = await this.reportsService.getBookReports(payload);
-    return data;
+  async getAllSales(@Body() payload: SalesBookDto) {
+    return await this.reportsService.getBookReports(payload);
   }
 
   @Post('paymentReport.pdf')
-  async getAllAccountReport(@Body() payload: ReportDto) {
-    const data = await this.reportsService.getPaymentReport(payload);
+  async getAllAccount(@Body() payload: ReportDto) {
+    const data = await this.reportsService.getPaymentReport(payload)
+
     return data;
   }
 }
