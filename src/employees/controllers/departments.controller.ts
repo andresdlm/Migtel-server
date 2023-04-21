@@ -24,8 +24,8 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
-@Controller('deparments')
-export class DeparmentsController {
+@Controller('departments')
+export class DepartmentsController {
   constructor(private departmentsService: DepartmentsService) {}
 
   @Roles(Role.SUPER_ADMIN, Role.SUPER_ADMIN)

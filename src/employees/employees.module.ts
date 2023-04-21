@@ -8,13 +8,13 @@ import { UsersController } from './controllers/users.controller';
 import { UsersService } from './services/users.service';
 import { User } from './entities/user.entity';
 import { DepartmentsService } from './services/departments.service';
-import { DeparmentsController } from './controllers/departments.controller';
+import { DepartmentsController } from './controllers/departments.controller';
 import { Department } from './entities/department.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Employee, User, Department])],
   providers: [EmployeesService, UsersService, DepartmentsService],
-  controllers: [EmployeesController, UsersController, DeparmentsController],
+  controllers: [EmployeesController, UsersController, DepartmentsController],
   exports: [UsersService],
 })
 export class EmployeesModule {}

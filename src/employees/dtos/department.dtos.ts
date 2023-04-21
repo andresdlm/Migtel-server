@@ -13,7 +13,7 @@ export class CreateDepartmentDto {
   @IsNumber()
   @IsPositive()
   @IsNotEmpty()
-  readonly deparmentId: number;
+  readonly departmentId: number;
 
   @IsString()
   @IsNotEmpty()
