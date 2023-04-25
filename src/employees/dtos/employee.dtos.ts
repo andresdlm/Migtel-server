@@ -7,7 +7,6 @@ import {
   IsPositive,
   Min,
   IsBoolean,
-  IsPhoneNumber,
   IsDateString,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
