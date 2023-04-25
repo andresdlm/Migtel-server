@@ -8,8 +8,10 @@ import {
   Min,
   IsBoolean,
   IsDateString,
+  IsNumber,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { IsNull } from 'typeorm';
 
 export class CreateEmployeeDto {
   @IsString()
@@ -47,6 +49,10 @@ export class CreateEmployeeDto {
   @IsDateString()
   @IsNotEmpty()
   readonly birthday: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly departmentId: number;
 }
 
 export class UpdateEmployeeDto extends PartialType(CreateEmployeeDto) {}
