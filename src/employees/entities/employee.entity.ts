@@ -35,9 +35,6 @@ export class Employee {
   city: string;
 
   @Column({ type: 'varchar', length: 100 })
-  departament: string;
-
-  @Column({ type: 'varchar', length: 100 })
   position: string;
 
   @Column({ type: 'timestamp' })

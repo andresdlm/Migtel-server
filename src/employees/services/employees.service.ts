@@ -24,6 +24,9 @@ export class EmployeesService {
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        relations: {
+          department: true,
+        },
         where: { active: getActive },
       });
     }
@@ -39,6 +42,7 @@ export class EmployeesService {
       },
       relations: {
         user: true,
+        department: true,
       },
     });
     if (!employee) {
