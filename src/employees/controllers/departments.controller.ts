@@ -25,7 +25,7 @@ import { Role } from 'src/auth/models/roles.model';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('departments')
-export class DeparmentsController {
+export class DepartmentsController {
   constructor(private departmentsService: DepartmentsService) {}
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR, Role.READER)

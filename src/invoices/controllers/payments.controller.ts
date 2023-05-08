@@ -23,43 +23,43 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
 import { Put } from '@nestjs/common/decorators';
 
-// @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
+@UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('payments')
 export class PaymentsController {
   constructor(private paymentService: PaymentsService) {}
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('')
   getAll(@Query() params: FilterPaymentDto) {
       return this.paymentService.findAll(params);
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
   getCount() {
     return this.paymentService.getCount();
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
   search(
     @Query('searchParam') searchParam: string) {
     return this.paymentService.search(searchParam);
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.findOne(id);
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreatePaymentDto) {
     return this.paymentService.create(payload);
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -68,7 +68,7 @@ export class PaymentsController {
     return this.paymentService.update(id, payload);
   }
 
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.delete(id);
