@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
-import { Payment } from 'src/invoices/entities/payment.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 import {
   Column,
   Entity,

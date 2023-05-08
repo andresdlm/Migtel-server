@@ -13,7 +13,7 @@ import {
   CreatePaymentDto,
   FilterPaymentDto,
   UpdatePaymentDTO,
-} from '../dtos/payment.dtos';
+} from '../../payments/dtos/payment.dtos';
 import { PaymentsService } from '../services/payments.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';

@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ProductsModule } from './products/products.module';
+import { PaymentsModule } from './payments/payments.module';
 import config from './config';
 
 @Module({
@@ -38,6 +39,7 @@ import config from './config';
     ReportsModule,
     DashboardModule,
     ProductsModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],

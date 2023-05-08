@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 
+import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
 import { Payment } from '../entities/payment.entity';
 import { CreatePaymentDto, FilterPaymentDto, UpdatePaymentDTO } from '../dtos/payment.dtos';
 
@@ -11,6 +12,7 @@ export class PaymentsService {
   constructor(
     @InjectRepository(Payment)
     private paymentRepo: Repository<Payment>,
+    private paymentMethodService: PaymentMethodsService,
   ) {}
 
   async findAll(params?: FilterPaymentDto) {
@@ -54,6 +56,12 @@ export class PaymentsService {
 
   async create(data: CreatePaymentDto) {
     const newPayment = this.paymentRepo.create(data);
+
+    const paymentMethod = await this.paymentMethodService.findByCrmId(
+      data.paymentMethodCrmId,
+    );
+    newPayment.paymentMethodId = paymentMethod.id;
+    newPayment.paymentMethod = paymentMethod;
     return await this.paymentRepo.save(newPayment);
   }
 

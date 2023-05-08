@@ -35,9 +35,9 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   readonly clientAddress: string;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly paymentMethodId: number;
+  readonly paymentMethodCrmId: string;
 
   @IsNumber()
   @IsNotEmpty()
