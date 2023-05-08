@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Department } from '../entities/department.entity';
 import {
   CreateDepartmentDto,
   FilterDepartmentDto,
   UpdateDepartmentDto,
 } from '../dtos/department.dtos';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class DepartmentsService {
@@ -39,6 +40,28 @@ export class DepartmentsService {
       throw new NotFoundException(`Department #${id} not found`);
     }
     return department;
+  }
+
+  getCount() {
+    return this.departmentRepo.count();
+  }
+
+  async search(searchInput: string) {
+    if (isNumber(Number(searchInput))) {
+      return this.departmentRepo.find({
+        where: [{ id: Number(searchInput) }],
+        take: 10,
+      });
+    } else {
+      return this.departmentRepo.find({
+        where: [
+          {
+            name: ILike(`%${searchInput}%`),
+          },
+        ],
+        take: 10,
+      });
+    }
   }
 
   async create(data: CreateDepartmentDto) {

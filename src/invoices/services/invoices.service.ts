@@ -215,6 +215,35 @@ export class InvoicesService {
   async cancelInvoice(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);
     if (invoice.type === 'FACT') {
+      const creditNote = this.invoiceRepo.create();
+      creditNote.clientId = invoice.clientId;
+      creditNote.clientFirstname = invoice.clientFirstname;
+      creditNote.clientLastname = invoice.clientLastname;
+      creditNote.clientCompanyName = invoice.clientCompanyName;
+      creditNote.clientDocument = invoice.clientDocument;
+      creditNote.clientAddress = invoice.clientAddress;
+      creditNote.paymentMethodId = invoice.paymentMethodId;
+      creditNote.subtotal = -invoice.subtotal;
+      creditNote.iva = -invoice.iva;
+      creditNote.iva_r = -invoice.iva_r;
+      creditNote.iva_p = -invoice.iva_p;
+      creditNote.islr = -invoice.islr;
+      creditNote.igtf = -invoice.igtf;
+      creditNote.totalAmount = -invoice.totalAmount;
+      creditNote.exhangeRate = invoice.exhangeRate;
+      creditNote.bonusAmount = -invoice.bonusAmount;
+      creditNote.creditAmount = -invoice.creditAmount;
+      creditNote.comment = invoice.invoiceNumber.toString();
+      creditNote.period = invoice.period;
+      creditNote.currencyCode = invoice.currencyCode;
+      creditNote.type = 'N/C';
+      creditNote.invoiceNumber = 0;
+      creditNote.userId = invoice.userId;
+
+      await this.invoiceRepo.save(creditNote);
+      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
+      await this.invoiceRepo.save(creditNote);
+
       await this.invoiceRepo
         .createQueryBuilder()
         .update(Invoice)
@@ -223,22 +252,6 @@ export class InvoicesService {
         })
         .where('id = :id', { id: invoiceId })
         .execute();
-      const invoiceCanceled = await this.findOne(invoiceId);
-      let creditNote = this.invoiceRepo.create(invoiceCanceled);
-      creditNote.comment = invoice.invoiceNumber.toString();
-      creditNote.igtf = -invoiceCanceled.igtf;
-      creditNote.islr = -invoiceCanceled.islr;
-      creditNote.iva = -invoiceCanceled.iva;
-      creditNote.iva_p = -invoiceCanceled.iva_p;
-      creditNote.iva_r = -invoiceCanceled.iva_r;
-      creditNote.subtotal = -invoiceCanceled.subtotal;
-      creditNote.totalAmount = -invoiceCanceled.totalAmount;
-      creditNote.type = 'N/C';
-      creditNote.invoiceNumber = 0;
-
-      creditNote = await this.invoiceRepo.save(creditNote);
-      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
-      creditNote = await this.invoiceRepo.save(creditNote);
     }
   }
 
@@ -272,7 +285,7 @@ export class InvoicesService {
       invoice.islr = invoice.totalAmount * client.amountIslr * 0.01;
     else invoice.islr = 0;
 
-    if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'USD') {
+    if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
       if (client && client.retention !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva + invoice.iva_p - invoice.islr) *

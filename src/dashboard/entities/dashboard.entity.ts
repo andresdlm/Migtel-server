@@ -6,12 +6,6 @@ export interface Dashboard {
   accountsBalance: PaymentMethodDashboard[];
 }
 
-export interface CityDashboard {
-  city: string;
-  clients: number;
-  raised: number;
-}
-
 export interface PaymentMethodDashboard {
   id: number;
   name: string;
