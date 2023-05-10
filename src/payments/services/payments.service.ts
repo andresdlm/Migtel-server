@@ -5,7 +5,11 @@ import { isNumber } from 'class-validator';
 
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
 import { Payment } from '../entities/payment.entity';
-import { CreatePaymentDto, FilterPaymentDto, UpdatePaymentDTO } from '../dtos/payment.dtos';
+import {
+  CreatePaymentDto,
+  FilterPaymentDto,
+  UpdatePaymentDTO,
+} from '../dtos/payment.dtos';
 
 @Injectable()
 export class PaymentsService {
@@ -22,6 +26,9 @@ export class PaymentsService {
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
+        relations: {
+          paymentMethod: true,
+        },
       });
     }
     return await this.paymentRepo.find({
@@ -33,7 +40,7 @@ export class PaymentsService {
     const payment = this.paymentRepo.findOne({
       where: {
         id: id,
-      }
+      },
     });
     if (!payment) {
       throw new NotFoundException(`Payment #${id} not found`);

@@ -1,14 +1,16 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
   Param,
-  ParseIntPipe,
+  Get,
   Post,
+  Put,
+  Delete,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
+
 import {
   CreatePaymentDto,
   FilterPaymentDto,
@@ -21,7 +23,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
-import { Put } from '@nestjs/common/decorators';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('payments')
@@ -31,7 +32,7 @@ export class PaymentsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('')
   getAll(@Query() params: FilterPaymentDto) {
-      return this.paymentService.findAll(params);
+    return this.paymentService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
@@ -42,8 +43,7 @@ export class PaymentsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
-  search(
-    @Query('searchParam') searchParam: string) {
+  search(@Query('searchParam') searchParam: string) {
     return this.paymentService.search(searchParam);
   }
 
