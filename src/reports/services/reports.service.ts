@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository } from 'typeorm';
 
-import { SalesBookDto } from '../dtos/salesBook.dtos';
 import { ReportDto } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 
 @Injectable()
@@ -14,9 +14,11 @@ export class ReportsService {
     private invoiceRepo: Repository<Invoice>,
     @InjectRepository(PaymentMethod)
     private paymentMethodRepo: Repository<PaymentMethod>,
+    @InjectRepository(Payment)
+    private paymentRepo: Repository<Payment>,
   ) {}
 
-  async getBookReports(params: SalesBookDto) {
+  async getBookReports(params: ReportDto) {
     return this.invoiceRepo.find({
       where: {
         registerDate: Raw(
@@ -32,6 +34,38 @@ export class ReportsService {
         invoiceNumber: 'ASC',
       },
     });
+  }
+
+  async getInvoiceReports(params: ReportDto) {
+    let listPayments = await this.paymentRepo.find({
+      where: {
+        registerDate: Raw(
+          (registerDate) =>
+            `${registerDate} >= :since AND ${registerDate} <= :until`,
+          {
+            since: `${params.since.toISOString()}`,
+            until: `${params.until.toISOString()}`,
+          },
+        ),
+      },
+      order: {
+        registerDate: 'ASC',
+      },
+      relations: {
+        paymentMethod: true,
+        user: true
+      }
+    });
+
+    let totalAmount = listPayments
+    .reduce((total, item) => {
+      return total + item.amount;
+    }, 0);
+
+    return [
+      listPayments,
+      totalAmount
+    ]
   }
 
   async getPaymentReport(params: ReportDto) {
