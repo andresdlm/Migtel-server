@@ -19,7 +19,7 @@ export class ReportsService {
   ) {}
 
   async getBookReports(params: ReportDto) {
-    return this.invoiceRepo.find({
+    let listReports = await this.invoiceRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
@@ -34,6 +34,10 @@ export class ReportsService {
         invoiceNumber: 'ASC',
       },
     });
+
+    let summary = this.getSummary(listReports)
+
+    return [listReports, summary]
   }
 
   async getInvoiceReports(params: ReportDto) {
@@ -89,5 +93,51 @@ export class ReportsService {
       GROUP BY payment_methods.id
       ORDER BY balance DESC, id ASC;`,
     );
+  }
+
+  getSummary(invoice: Invoice[]) {
+    let totalBaseImponible = 0;
+    let totalIva = 0;
+    let totalTotalAmount = 0;
+    let totalIvaRet = 0;
+    let totalIvaPer = 0;
+    let totalIgtf = 0;
+    let totalCanceled = 0;
+    let totalValid = 0;
+    invoice.forEach((invoice) => {
+      if (invoice.currencyCode === 'USD') {
+        totalBaseImponible =
+          totalBaseImponible + invoice.subtotal * invoice.exhangeRate;
+        totalIva = totalIva + invoice.iva * invoice.exhangeRate;
+        totalTotalAmount =
+          totalTotalAmount + invoice.totalAmount * invoice.exhangeRate;
+        totalIvaRet = totalIvaRet + invoice.iva_r * invoice.exhangeRate;
+        totalIvaPer = totalIvaPer + invoice.iva_p * invoice.exhangeRate;
+        totalIgtf = totalIgtf + invoice.igtf * invoice.exhangeRate;
+      } else {
+        totalBaseImponible = totalBaseImponible + invoice.subtotal;
+        totalIva = totalIva + invoice.iva;
+        totalTotalAmount = totalTotalAmount + invoice.totalAmount;
+        totalIvaRet = totalIvaRet + invoice.iva_r;
+        totalIvaPer = totalIvaPer + invoice.iva_p;
+        totalIgtf = totalIgtf + invoice.igtf;
+      }
+      if (invoice.canceled) {
+        totalCanceled++;
+      } else {
+        totalValid++;
+      }
+    });
+    return {
+      totalBaseImponible: totalBaseImponible,
+      totalIva: totalIva,
+      totalTotalAmount: totalTotalAmount,
+      totalIvaRet: totalIvaRet,
+      totalIvaPer: totalIvaPer,
+      totalIgtf: totalIgtf,
+      count: invoice.length,
+      totalCanceled: totalCanceled,
+      totalValid: totalValid,
+    };
   }
 }
