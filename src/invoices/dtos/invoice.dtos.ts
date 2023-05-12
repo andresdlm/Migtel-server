@@ -67,7 +67,7 @@ export class CreateInvoiceDto {
   readonly period: string;
 
   @IsNotEmpty()
-  @Matches(RegExp('USD|EUR|BS'))
+  @Matches(RegExp('USD|BS'))
   readonly currencyCode: string;
 
   @IsBoolean()

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository } from 'typeorm';
 
-import { ReportDto } from '../dtos/reports.dtos';
+import { ReportDto, PaymentReportDto } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
@@ -18,8 +18,8 @@ export class ReportsService {
     private paymentRepo: Repository<Payment>,
   ) {}
 
-  async getBookReports(params: ReportDto) {
-    let listReports = await this.invoiceRepo.find({
+  async getSalesBookReport(params: ReportDto) {
+    const listReports = await this.invoiceRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
@@ -35,13 +35,61 @@ export class ReportsService {
       },
     });
 
-    let summary = this.getSummary(listReports)
+    const summary = this.invoiceRepo.query(`
+    SELECT
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN invoices.currency_code != 'BS'
+                THEN invoices.subtotal*invoices.exhange_rate
+              ELSE invoices.subtotal
+          END AS real
+          )), 0) AS total_subtotal,
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN invoices.currency_code != 'BS'
+                THEN invoices.iva*invoices.exhange_rate
+              ELSE invoices.iva
+          END AS real
+          )), 0) AS total_iva,
+    COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.iva_r*invoices.exhange_rate
+                  ELSE invoices.iva_r
+              END AS real
+              )), 0) AS total_iva_r,
+    COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.iva_p*invoices.exhange_rate
+                  ELSE invoices.iva_p
+              END AS real
+              )), 0) AS total_iva_p,
+    COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.igtf*invoices.exhange_rate
+                  ELSE invoices.igtf
+              END AS real
+              )), 0) AS total_igtf,
+    COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.total_amount*invoices.exhange_rate
+                  ELSE invoices.total_amount
+              END AS real
+              )), 0) AS total_amount,
+    count(invoices) as totalInvoices,
+    count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
+    FROM invoices
+    WHERE invoices.register_date >= '${params.since.toDateString()}'
+    AND invoices.register_date <= '${params.until.toDateString()}';`);
 
-    return [listReports, summary]
+    return [listReports, summary];
   }
 
-  async getInvoiceReports(params: ReportDto) {
-    let listPayments = await this.paymentRepo.find({
+  async getPaymentReport(params: PaymentReportDto) {
+    const listPayments = await this.paymentRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
@@ -51,28 +99,25 @@ export class ReportsService {
             until: `${params.until.toISOString()}`,
           },
         ),
+        currencyCode: params.currencyCode,
       },
       order: {
         registerDate: 'ASC',
       },
       relations: {
         paymentMethod: true,
-        user: true
-      }
+        user: true,
+      },
     });
 
-    let totalAmount = listPayments
-    .reduce((total, item) => {
+    const totalAmount = listPayments.reduce((total, item) => {
       return total + item.amount;
     }, 0);
 
-    return [
-      listPayments,
-      totalAmount
-    ]
+    return [listPayments, totalAmount];
   }
 
-  async getPaymentReport(params: ReportDto) {
+  async getAccountReport(params: ReportDto) {
     return this.paymentMethodRepo.query(
       `SELECT payment_methods.id AS id,
       payment_methods.name AS name,
@@ -93,51 +138,5 @@ export class ReportsService {
       GROUP BY payment_methods.id
       ORDER BY balance DESC, id ASC;`,
     );
-  }
-
-  getSummary(invoice: Invoice[]) {
-    let totalBaseImponible = 0;
-    let totalIva = 0;
-    let totalTotalAmount = 0;
-    let totalIvaRet = 0;
-    let totalIvaPer = 0;
-    let totalIgtf = 0;
-    let totalCanceled = 0;
-    let totalValid = 0;
-    invoice.forEach((invoice) => {
-      if (invoice.currencyCode === 'USD') {
-        totalBaseImponible =
-          totalBaseImponible + invoice.subtotal * invoice.exhangeRate;
-        totalIva = totalIva + invoice.iva * invoice.exhangeRate;
-        totalTotalAmount =
-          totalTotalAmount + invoice.totalAmount * invoice.exhangeRate;
-        totalIvaRet = totalIvaRet + invoice.iva_r * invoice.exhangeRate;
-        totalIvaPer = totalIvaPer + invoice.iva_p * invoice.exhangeRate;
-        totalIgtf = totalIgtf + invoice.igtf * invoice.exhangeRate;
-      } else {
-        totalBaseImponible = totalBaseImponible + invoice.subtotal;
-        totalIva = totalIva + invoice.iva;
-        totalTotalAmount = totalTotalAmount + invoice.totalAmount;
-        totalIvaRet = totalIvaRet + invoice.iva_r;
-        totalIvaPer = totalIvaPer + invoice.iva_p;
-        totalIgtf = totalIgtf + invoice.igtf;
-      }
-      if (invoice.canceled) {
-        totalCanceled++;
-      } else {
-        totalValid++;
-      }
-    });
-    return {
-      totalBaseImponible: totalBaseImponible,
-      totalIva: totalIva,
-      totalTotalAmount: totalTotalAmount,
-      totalIvaRet: totalIvaRet,
-      totalIvaPer: totalIvaPer,
-      totalIgtf: totalIgtf,
-      count: invoice.length,
-      totalCanceled: totalCanceled,
-      totalValid: totalValid,
-    };
   }
 }
