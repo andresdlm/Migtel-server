@@ -35,7 +35,7 @@ export class ReportsService {
       },
     });
 
-    const summary = this.invoiceRepo.query(`
+    const summary = await this.invoiceRepo.query(`
     SELECT
     COALESCE(SUM(CAST(
           CASE
@@ -84,7 +84,6 @@ export class ReportsService {
     FROM invoices
     WHERE invoices.register_date >= '${params.since.toDateString()}'
     AND invoices.register_date <= '${params.until.toDateString()}';`);
-
     return [listReports, summary];
   }
 
