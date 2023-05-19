@@ -75,6 +75,13 @@ export class ReportsService {
     COALESCE(SUM(CAST(
               CASE
                   WHEN invoices.currency_code != 'BS'
+                    THEN invoices.islr*invoices.exhange_rate
+                  ELSE invoices.islr
+              END AS real
+              )), 0) AS total_islr,
+    COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
                     THEN invoices.total_amount*invoices.exhange_rate
                   ELSE invoices.total_amount
               END AS real
@@ -99,6 +106,7 @@ export class ReportsService {
           },
         ),
         currencyCode: params.currencyCode,
+        paymentMethodId: params.paymentMethod
       },
       order: {
         registerDate: 'ASC',

@@ -1,4 +1,10 @@
-import { IsDate, IsNotEmpty, Matches } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Matches,
+} from 'class-validator';
 
 export class ReportDto {
   @IsDate()
@@ -11,6 +17,10 @@ export class ReportDto {
 }
 
 export class PaymentReportDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly paymentMethod: number;
+
   @Matches(RegExp('USD|BS'))
   @IsNotEmpty()
   readonly currencyCode: string;
