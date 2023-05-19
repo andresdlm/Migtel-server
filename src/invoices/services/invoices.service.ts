@@ -13,7 +13,7 @@ import { InvoiceProductRelation } from '../entities/invoice-product-relation.ent
 
 @Injectable()
 export class InvoicesService {
-  initialInvoiceNumber = 38060; // NO CAMBIAR;
+  initialInvoiceNumber = 47487; // NO CAMBIAR;
 
   constructor(
     @InjectRepository(Invoice)
@@ -212,7 +212,37 @@ export class InvoicesService {
     return this.calculateInvoiceAmount(preInvoice, data);
   }
 
-  async cancelInvoice(invoiceId: number) {
+  // TODO
+  async cancelInvoice(id: number) {
+    const invoice: Invoice = await this.findOne(id);
+    invoice.clientId = 0;
+    invoice.clientFirstname = 'Anulada';
+    invoice.clientLastname = '';
+    invoice.clientCompanyName = '';
+    invoice.clientDocument = '';
+    invoice.clientAddress = '';
+    invoice.subtotal = 0;
+    invoice.iva = 0;
+    invoice.iva_p = 0;
+    invoice.iva_r = 0;
+    invoice.islr = 0;
+    invoice.igtf = 0;
+    invoice.totalAmount = 0;
+    invoice.bonusAmount = 0;
+    invoice.creditAmount = 0;
+    invoice.comment = '';
+    invoice.period = '';
+    invoice.canceled = true;
+    return await this.invoiceRepo.save(invoice);
+  }
+
+  // async update(id: number, changes: UpdatePaymentMethodDto) {
+  //   const paymentMethod = await this.findOne(id);
+  //   this.paymentMethodRepo.merge(paymentMethod, changes);
+  //   return await this.paymentMethodRepo.save(paymentMethod);
+  // }
+
+  async createCreditNote(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);
     if (invoice.type === 'FACT') {
       const creditNote = this.invoiceRepo.create();
@@ -282,7 +312,7 @@ export class InvoicesService {
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (client && client.amountIslr > 0)
-      invoice.islr = invoice.totalAmount * client.amountIslr * 0.01;
+      invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
     else invoice.islr = 0;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {

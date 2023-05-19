@@ -109,11 +109,27 @@ export class ReportsService {
       },
     });
 
-    const totalAmount = listPayments.reduce((total, item) => {
-      return total + item.amount;
-    }, 0);
+    const summary = await this.paymentRepo.query(`
+    SELECT
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code = 'BS'
+                THEN payments.amount / payments.exhange_rate
+              ELSE payments.amount
+          END AS real
+          )), 0) AS total_usd,
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code = 'USD'
+                THEN payments.amount * payments.exhange_rate
+              ELSE payments.amount
+          END AS real
+          )), 0) AS total_bs
+          FROM payments
+    WHERE payments.register_date >= '${params.since.toDateString()}'
+    AND payments.register_date <= '${params.until.toDateString()}';`);
 
-    return [listPayments, totalAmount];
+    return [listPayments, summary[0]];
   }
 
   async getAccountReport(params: ReportDto) {

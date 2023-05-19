@@ -106,7 +106,7 @@ export class InvoicesController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
-    return this.invoiceService.cancelInvoice(invoiceNumber);
+    return this.invoiceService.createCreditNote(invoiceNumber);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
