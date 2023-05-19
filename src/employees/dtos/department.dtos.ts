@@ -6,15 +6,9 @@ import {
   IsOptional,
   IsPositive,
   Min,
-  IsNumber,
 } from 'class-validator';
 
 export class CreateDepartmentDto {
-  @IsNumber()
-  @IsPositive()
-  @IsNotEmpty()
-  readonly departmentId: number;
-
   @IsString()
   @IsNotEmpty()
   readonly name: string;
