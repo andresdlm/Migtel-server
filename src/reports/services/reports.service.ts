@@ -106,7 +106,7 @@ export class ReportsService {
           },
         ),
         currencyCode: params.currencyCode,
-        paymentMethodId: params.paymentMethod
+        paymentMethodId: params.paymentMethod,
       },
       order: {
         registerDate: 'ASC',

@@ -27,17 +27,16 @@ export class InvoicesService {
     private userService: UsersService,
   ) {}
 
-  findAll(params?: FilterInvoiceDto) {
+  async findAll(params?: FilterInvoiceDto) {
     if (params) {
-      const { limit, offset, getCanceled } = params;
-      return this.invoiceRepo.find({
+      const { limit, offset } = params;
+      return await this.invoiceRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
-        where: { canceled: getCanceled },
       });
     }
-    return this.invoiceRepo.find({
+    return await this.invoiceRepo.find({
       relations: {
         paymentMethod: true,
         services: true,
@@ -47,8 +46,8 @@ export class InvoicesService {
     });
   }
 
-  findOne(id: number) {
-    const invoice = this.invoiceRepo.findOne({
+  async findOne(id: number) {
+    const invoice = await this.invoiceRepo.findOne({
       where: {
         id: id,
       },
@@ -69,9 +68,9 @@ export class InvoicesService {
     return invoice;
   }
 
-  findByClientId(clientId: number, params?: FilterInvoiceDto) {
+  async findByClientId(clientId: number, params?: FilterInvoiceDto) {
     const { limit, offset } = params;
-    const invoices = this.invoiceRepo.find({
+    const invoices = await this.invoiceRepo.find({
       order: { id: 'DESC' },
       take: limit,
       skip: offset,
@@ -85,16 +84,17 @@ export class InvoicesService {
     return invoices;
   }
 
-  getCount(getCanceled: boolean) {
-    return this.invoiceRepo.count({
-      where: { canceled: getCanceled },
-    });
+  async getCount() {
+    return await this.invoiceRepo.count();
   }
 
-  async search(searchInput: string, getArchive: boolean) {
+  async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
       return this.invoiceRepo.find({
-        where: [{ invoiceNumber: Number(searchInput), canceled: getArchive }],
+        where: [
+          { invoiceNumber: Number(searchInput) },
+          { clientId: Number(searchInput) },
+        ],
         take: 20,
       });
     }
@@ -120,14 +120,14 @@ export class InvoicesService {
     return invoices;
   }
 
-  getUnprintedCount() {
-    return this.invoiceRepo.count({
+  async getUnprintedCount() {
+    return await this.invoiceRepo.count({
       where: { printed: false },
     });
   }
 
-  print(invoiceNumber: number) {
-    return this.invoiceRepo
+  async print(invoiceNumber: number) {
+    return await this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -141,7 +141,7 @@ export class InvoicesService {
 
   async setPaid(id: number) {
     const invoice = await this.findOne(id);
-    this.invoiceRepo.merge(invoice, { paid: !invoice.paid });
+    this.invoiceRepo.merge(invoice, { paid: true });
     return await this.invoiceRepo.save(invoice);
   }
 
@@ -157,8 +157,8 @@ export class InvoicesService {
     }
   }
 
-  unprint(invoiceNumber: number) {
-    this.invoiceRepo
+  async unprint(invoiceNumber: number) {
+    await this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -198,7 +198,7 @@ export class InvoicesService {
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
-    return this.invoiceRepo.save(newInvoice);
+    return await this.invoiceRepo.save(newInvoice);
   }
 
   async getPreview(data: CreateInvoiceDto) {
@@ -212,11 +212,10 @@ export class InvoicesService {
     return this.calculateInvoiceAmount(preInvoice, data);
   }
 
-  // TODO
   async cancelInvoice(id: number) {
     const invoice: Invoice = await this.findOne(id);
     invoice.clientId = 0;
-    invoice.clientFirstname = 'Anulada';
+    invoice.clientFirstname = 'ANULADA';
     invoice.clientLastname = '';
     invoice.clientCompanyName = '';
     invoice.clientDocument = '';
@@ -233,14 +232,23 @@ export class InvoicesService {
     invoice.comment = '';
     invoice.period = '';
     invoice.canceled = true;
+
+    for await (const service of invoice.services) {
+      await this.invoiceServiceRelRepo.delete({
+        invoiceId: invoice.id,
+        serviceId: service.serviceId,
+      });
+    }
+
+    for await (const product of invoice.products) {
+      await this.invoiceProductRelRepo.delete({
+        invoiceId: invoice.id,
+        productId: product.productId,
+      });
+    }
+
     return await this.invoiceRepo.save(invoice);
   }
-
-  // async update(id: number, changes: UpdatePaymentMethodDto) {
-  //   const paymentMethod = await this.findOne(id);
-  //   this.paymentMethodRepo.merge(paymentMethod, changes);
-  //   return await this.paymentMethodRepo.save(paymentMethod);
-  // }
 
   async createCreditNote(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);

@@ -47,18 +47,15 @@ export class UsersController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  @Get('search')
+  search(@Query('searchParam') searchParam: string) {
+    return this.usersService.search(searchParam);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Get('search')
-  search(
-    @Query('searchParam') searchParam: string,
-    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
-  ) {
-    return this.usersService.search(searchParam, getArchive);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
   }
 
   @Roles(Role.SUPER_ADMIN)
