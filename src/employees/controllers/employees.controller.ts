@@ -41,6 +41,27 @@ export class EmployeesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('count')
+  getCount(@Query('getActive', ParseBoolPipe) getActive: boolean) {
+    return this.employeesService.getCount(getActive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('without-user')
+  findEmployeesWithoutUser() {
+    return this.employeesService.findEmployeesWithoutUser();
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('search')
+  search(
+    @Query('searchParam') searchParam: string,
+    @Query('getActive', ParseBoolPipe) getActive: boolean,
+  ) {
+    return this.employeesService.search(searchParam, getActive);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.employeesService.findOne(id);

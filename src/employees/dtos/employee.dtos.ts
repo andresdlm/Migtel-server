@@ -7,26 +7,25 @@ import {
   IsPositive,
   Min,
   IsBoolean,
-  IsPhoneNumber,
   IsDateString,
+  IsNumber,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateEmployeeDto {
   @IsString()
   @IsNotEmpty()
-  readonly firstName: string;
+  readonly firstname: string;
 
   @IsString()
   @IsNotEmpty()
-  readonly lastName: string;
+  readonly lastname: string;
 
   @IsString()
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
 
-  @IsPhoneNumber()
   @IsNotEmpty()
   readonly phone: string;
 
@@ -37,6 +36,14 @@ export class CreateEmployeeDto {
   @IsString()
   @IsNotEmpty()
   readonly city: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly departmentId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly position: string;
 
   @IsDateString()
   @IsNotEmpty()

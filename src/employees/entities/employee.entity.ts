@@ -5,8 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Department } from './department.entity';
 
 @Entity({ name: 'employees' })
 export class Employee {
@@ -14,10 +17,10 @@ export class Employee {
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  firstName: string;
+  firstname: string;
 
   @Column({ type: 'varchar', length: 255 })
-  lastName: string;
+  lastname: string;
 
   @Column({ type: 'varchar', length: 255 })
   email: string;
@@ -31,6 +34,9 @@ export class Employee {
   @Column({ type: 'varchar', length: 30 })
   city: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  position: string;
+
   @Column({ type: 'timestamp' })
   birthday: Date;
 
@@ -39,6 +45,13 @@ export class Employee {
 
   @OneToOne(() => User, (user) => user.employee)
   user: User;
+
+  @ManyToOne(() => Department, (department) => department.employees)
+  @JoinColumn({ name: 'department_id' })
+  department: Department;
+
+  @Column({ type: 'int', name: 'department_id' })
+  departmentId: number;
 
   @CreateDateColumn({
     type: 'timestamp',

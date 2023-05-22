@@ -42,8 +42,8 @@ export class Invoice {
 
   @CreateDateColumn({
     name: 'register_date',
-    type: 'date',
-    default: () => 'CURRENT_DATE',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   registerDate: Date;
 
@@ -105,16 +105,10 @@ export class Invoice {
   @Column({ type: 'boolean', default: true })
   paid: boolean;
 
-  @OneToMany(
-    () => InvoiceProductRelation,
-    (invoiceProductRelation) => invoiceProductRelation.invoice,
-  )
+  @OneToMany(() => InvoiceProductRelation, (products) => products.invoice)
   products: InvoiceProductRelation[];
 
-  @OneToMany(
-    () => InvoiceServiceRelation,
-    (invoiceServiceRelation) => invoiceServiceRelation.invoice,
-  )
+  @OneToMany(() => InvoiceServiceRelation, (services) => services.invoice)
   services: InvoiceServiceRelation[];
 
   @ManyToOne(() => User, (user) => user.invoices)

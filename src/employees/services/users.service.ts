@@ -55,18 +55,20 @@ export class UsersService {
     });
   }
 
-  async search(searchInput: string, getArchive: boolean) {
+  async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
       return this.userRepo.find({
-        where: [{ id: Number(searchInput), active: getArchive }],
+        where: [{ id: Number(searchInput) }],
         take: 20,
       });
     } else {
       return this.userRepo.find({
         where: [
           {
+            username: ILike(`%${searchInput}%`),
+          },
+          {
             role: ILike(`%${searchInput}%`),
-            active: getArchive,
           },
         ],
         take: 20,

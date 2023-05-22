@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 import {
   Column,
   Entity,
@@ -32,6 +33,10 @@ export class PaymentMethod {
   @Exclude()
   @OneToMany(() => Invoice, (invoice) => invoice.paymentMethod)
   invoices: Invoice[];
+
+  @Exclude()
+  @OneToMany(() => Payment, (payment) => payment.paymentMethod)
+  payments: Payment[];
 
   @CreateDateColumn({
     name: 'create_at',

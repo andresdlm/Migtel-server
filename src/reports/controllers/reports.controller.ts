@@ -1,23 +1,23 @@
-import { Body, Controller, Post, StreamableFile } from '@nestjs/common';
-import { ReportDto } from '../dtos/reports.dtos';
-import { SalesBookDto } from '../dtos/salesBook.dtos';
+import { Body, Controller, Post } from '@nestjs/common';
+import { PaymentReportDto, ReportDto } from '../dtos/reports.dtos';
 import { ReportsService } from '../services/reports.service';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
-  @Post('libroventas.pdf')
-  async getFile(@Body() payload: SalesBookDto): Promise<StreamableFile> {
-    const buffer = await this.reportsService.generateSalesBookPDF(payload);
-
-    return new StreamableFile(buffer);
+  @Post('salesBook')
+  async getSalesBookReport(@Body() payload: ReportDto) {
+    return await this.reportsService.getSalesBookReport(payload);
   }
 
-  @Post('paymentReport.pdf')
-  async paymentReport(@Body() payload: ReportDto): Promise<StreamableFile> {
-    const buffer = await this.reportsService.generatePaymentReport(payload);
+  @Post('accountReport')
+  async getAllAccount(@Body() payload: ReportDto) {
+    return await this.reportsService.getAccountReport(payload);
+  }
 
-    return new StreamableFile(buffer);
+  @Post('paymentReport')
+  async getPaymentReport(@Body() payload: PaymentReportDto) {
+    return await this.reportsService.getPaymentReport(payload);
   }
 }

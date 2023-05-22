@@ -26,8 +26,8 @@ export class DashboardService {
       `SELECT COALESCE(SUM(CAST(
         CASE
             WHEN invoices.currency_code = 'BS'
-              THEN invoices.total_amount/invoices.exhange_rate
-            ELSE invoices.total_amount
+              THEN invoices.subtotal/invoices.exhange_rate
+            ELSE invoices.subtotal
         END AS real
         )), 0) AS dailyIncome
         FROM invoices
@@ -42,8 +42,8 @@ export class DashboardService {
       `SELECT COALESCE(SUM(CAST(
         CASE
             WHEN invoices.currency_code = 'BS'
-              THEN invoices.total_amount/invoices.exhange_rate
-            ELSE invoices.total_amount
+              THEN invoices.subtotal/invoices.exhange_rate
+            ELSE invoices.subtotal
         END AS real
         )), 0) AS monthIncome
         FROM invoices
@@ -74,8 +74,8 @@ export class DashboardService {
         COALESCE(SUM(CAST(
         CASE
           WHEN invoices.currency_code = 'BS'
-            THEN invoices.total_amount/invoices.exhange_rate
-          ELSE invoices.total_amount
+            THEN invoices.subtotal/invoices.exhange_rate
+          ELSE invoices.subtotal
         END AS real
         )), 0) AS month_total
         FROM invoices
@@ -94,8 +94,8 @@ export class DashboardService {
         COALESCE(SUM(CAST(
         CASE
             WHEN invoices.currency_code = 'BS'
-              THEN invoices.total_amount/invoices.exhange_rate
-            ELSE invoices.total_amount
+              THEN invoices.subtotal/invoices.exhange_rate
+            ELSE invoices.subtotal
         END AS real
         )), 0) AS y
         FROM payment_methods

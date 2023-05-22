@@ -28,6 +28,9 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   role: string;
 
+  @Column({ type: 'int', name: 'crm_id', default: 1255 })
+  crmId: number;
+
   @Column({ type: 'boolean', default: true })
   active: boolean;
 

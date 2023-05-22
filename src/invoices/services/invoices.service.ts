@@ -13,7 +13,7 @@ import { InvoiceProductRelation } from '../entities/invoice-product-relation.ent
 
 @Injectable()
 export class InvoicesService {
-  initialInvoiceNumber = 38060; // NO CAMBIAR;
+  initialInvoiceNumber = 47487; // NO CAMBIAR;
 
   constructor(
     @InjectRepository(Invoice)
@@ -27,17 +27,16 @@ export class InvoicesService {
     private userService: UsersService,
   ) {}
 
-  findAll(params?: FilterInvoiceDto) {
+  async findAll(params?: FilterInvoiceDto) {
     if (params) {
-      const { limit, offset, getCanceled } = params;
-      return this.invoiceRepo.find({
+      const { limit, offset } = params;
+      return await this.invoiceRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
-        where: { canceled: getCanceled },
       });
     }
-    return this.invoiceRepo.find({
+    return await this.invoiceRepo.find({
       relations: {
         paymentMethod: true,
         services: true,
@@ -47,8 +46,8 @@ export class InvoicesService {
     });
   }
 
-  findOne(id: number) {
-    const invoice = this.invoiceRepo.findOne({
+  async findOne(id: number) {
+    const invoice = await this.invoiceRepo.findOne({
       where: {
         id: id,
       },
@@ -69,9 +68,9 @@ export class InvoicesService {
     return invoice;
   }
 
-  findByClientId(clientId: number, params?: FilterInvoiceDto) {
+  async findByClientId(clientId: number, params?: FilterInvoiceDto) {
     const { limit, offset } = params;
-    const invoices = this.invoiceRepo.find({
+    const invoices = await this.invoiceRepo.find({
       order: { id: 'DESC' },
       take: limit,
       skip: offset,
@@ -85,16 +84,17 @@ export class InvoicesService {
     return invoices;
   }
 
-  getCount(getCanceled: boolean) {
-    return this.invoiceRepo.count({
-      where: { canceled: getCanceled },
-    });
+  async getCount() {
+    return await this.invoiceRepo.count();
   }
 
-  async search(searchInput: string, getArchive: boolean) {
+  async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
       return this.invoiceRepo.find({
-        where: [{ invoiceNumber: Number(searchInput), canceled: getArchive }],
+        where: [
+          { invoiceNumber: Number(searchInput) },
+          { clientId: Number(searchInput) },
+        ],
         take: 20,
       });
     }
@@ -120,14 +120,14 @@ export class InvoicesService {
     return invoices;
   }
 
-  getUnprintedCount() {
-    return this.invoiceRepo.count({
+  async getUnprintedCount() {
+    return await this.invoiceRepo.count({
       where: { printed: false },
     });
   }
 
-  print(invoiceNumber: number) {
-    return this.invoiceRepo
+  async print(invoiceNumber: number) {
+    return await this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -139,17 +139,10 @@ export class InvoicesService {
       .execute();
   }
 
-  async setPaid(id: number, nextState: { paid: boolean }) {
-    return this.invoiceRepo
-      .createQueryBuilder()
-      .update(Invoice)
-      .set({
-        paid: nextState.paid,
-      })
-      .where('id = :id', {
-        id: id,
-      })
-      .execute();
+  async setPaid(id: number) {
+    const invoice = await this.findOne(id);
+    this.invoiceRepo.merge(invoice, { paid: true });
+    return await this.invoiceRepo.save(invoice);
   }
 
   async printCount(countToPrint: number) {
@@ -164,8 +157,8 @@ export class InvoicesService {
     }
   }
 
-  unprint(invoiceNumber: number) {
-    this.invoiceRepo
+  async unprint(invoiceNumber: number) {
+    await this.invoiceRepo
       .createQueryBuilder()
       .update(Invoice)
       .set({
@@ -195,20 +188,20 @@ export class InvoicesService {
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
     newInvoice = await this.invoiceRepo.save(newInvoice);
 
-    for await (const product of data.products) {
+    for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
       invoiceProduct.invoiceId = newInvoice.id;
       // BUG
       await this.invoiceProductRelRepo.save(invoiceProduct);
     }
-    for await (const service of data.services) {
+    for await (const service of data.servicesDtos) {
       const invoiceService = this.invoiceServiceRelRepo.create(service);
       invoiceService.invoiceId = newInvoice.id;
       // BUG
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
-    return this.invoiceRepo.save(newInvoice);
+    return await this.invoiceRepo.save(newInvoice);
   }
 
   async getPreview(data: CreateInvoiceDto) {
@@ -219,13 +212,79 @@ export class InvoicesService {
     );
     preInvoice.paymentMethod = paymentMethod;
 
-    this.calculateInvoiceAmount(preInvoice, data);
-    return preInvoice;
+    return this.calculateInvoiceAmount(preInvoice, data);
   }
 
-  async cancelInvoice(invoiceId: number) {
+  async cancelInvoice(id: number) {
+    const invoice: Invoice = await this.findOne(id);
+    invoice.clientId = 0;
+    invoice.clientFirstname = 'ANULADA';
+    invoice.clientLastname = '';
+    invoice.clientCompanyName = '';
+    invoice.clientDocument = '';
+    invoice.clientAddress = '';
+    invoice.subtotal = 0;
+    invoice.iva = 0;
+    invoice.iva_p = 0;
+    invoice.iva_r = 0;
+    invoice.islr = 0;
+    invoice.igtf = 0;
+    invoice.totalAmount = 0;
+    invoice.bonusAmount = 0;
+    invoice.creditAmount = 0;
+    invoice.comment = '';
+    invoice.period = '';
+    invoice.canceled = true;
+
+    for await (const service of invoice.services) {
+      await this.invoiceServiceRelRepo.delete({
+        invoiceId: invoice.id,
+        serviceId: service.serviceId,
+      });
+    }
+
+    for await (const product of invoice.products) {
+      await this.invoiceProductRelRepo.delete({
+        invoiceId: invoice.id,
+        productId: product.productId,
+      });
+    }
+
+    return await this.invoiceRepo.save(invoice);
+  }
+
+  async createCreditNote(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);
     if (invoice.type === 'FACT') {
+      const creditNote = this.invoiceRepo.create();
+      creditNote.clientId = invoice.clientId;
+      creditNote.clientFirstname = invoice.clientFirstname;
+      creditNote.clientLastname = invoice.clientLastname;
+      creditNote.clientCompanyName = invoice.clientCompanyName;
+      creditNote.clientDocument = invoice.clientDocument;
+      creditNote.clientAddress = invoice.clientAddress;
+      creditNote.paymentMethodId = invoice.paymentMethodId;
+      creditNote.subtotal = -invoice.subtotal;
+      creditNote.iva = -invoice.iva;
+      creditNote.iva_r = -invoice.iva_r;
+      creditNote.iva_p = -invoice.iva_p;
+      creditNote.islr = -invoice.islr;
+      creditNote.igtf = -invoice.igtf;
+      creditNote.totalAmount = -invoice.totalAmount;
+      creditNote.exhangeRate = invoice.exhangeRate;
+      creditNote.bonusAmount = -invoice.bonusAmount;
+      creditNote.creditAmount = -invoice.creditAmount;
+      creditNote.comment = invoice.invoiceNumber.toString();
+      creditNote.period = invoice.period;
+      creditNote.currencyCode = invoice.currencyCode;
+      creditNote.type = 'N/C';
+      creditNote.invoiceNumber = 0;
+      creditNote.userId = invoice.userId;
+
+      await this.invoiceRepo.save(creditNote);
+      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
+      await this.invoiceRepo.save(creditNote);
+
       await this.invoiceRepo
         .createQueryBuilder()
         .update(Invoice)
@@ -234,22 +293,6 @@ export class InvoicesService {
         })
         .where('id = :id', { id: invoiceId })
         .execute();
-      const invoiceCanceled = await this.findOne(invoiceId);
-      let creditNote = this.invoiceRepo.create(invoiceCanceled);
-      creditNote.comment = invoice.invoiceNumber.toString();
-      creditNote.igtf = -invoiceCanceled.igtf;
-      creditNote.islr = -invoiceCanceled.islr;
-      creditNote.iva = -invoiceCanceled.iva;
-      creditNote.iva_p = -invoiceCanceled.iva_p;
-      creditNote.iva_r = -invoiceCanceled.iva_r;
-      creditNote.subtotal = -invoiceCanceled.subtotal;
-      creditNote.totalAmount = -invoiceCanceled.totalAmount;
-      creditNote.type = 'N/C';
-      creditNote.invoiceNumber = 0;
-
-      creditNote = await this.invoiceRepo.save(creditNote);
-      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
-      creditNote = await this.invoiceRepo.save(creditNote);
     }
   }
 
@@ -258,10 +301,10 @@ export class InvoicesService {
 
     const client = await this.clientsService.findOne(data.clientId);
 
-    data.products.forEach((product) => {
+    data.productsDtos.forEach((product) => {
       amount = amount + product.price * product.count;
     });
-    data.services.forEach((service) => {
+    data.servicesDtos.forEach((service) => {
       amount = amount + service.price * service.count;
     });
 
@@ -280,10 +323,10 @@ export class InvoicesService {
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (client && client.amountIslr > 0)
-      invoice.islr = invoice.totalAmount * client.amountIslr * 0.01;
+      invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
     else invoice.islr = 0;
 
-    if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'USD') {
+    if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
       if (client && client.retention !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva + invoice.iva_p - invoice.islr) *

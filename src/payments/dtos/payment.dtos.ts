@@ -2,20 +2,15 @@ import {
   IsInt,
   IsString,
   IsNotEmpty,
-  IsBoolean,
   IsPositive,
   IsOptional,
   Min,
   IsNumber,
   Matches,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
-import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
 
-export class CreateInvoiceDto {
+export class CreatePaymentDto {
   @IsInt()
   @IsNotEmpty()
   readonly clientId: number;
@@ -46,17 +41,11 @@ export class CreateInvoiceDto {
 
   @IsNumber()
   @IsNotEmpty()
+  readonly amount: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   readonly exhangeRate: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsNotEmpty()
-  readonly bonusAmount: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsNotEmpty()
-  readonly creditAmount: number;
 
   @IsString()
   @IsNotEmpty()
@@ -67,31 +56,17 @@ export class CreateInvoiceDto {
   readonly period: string;
 
   @IsNotEmpty()
-  @Matches(RegExp('USD|BS'))
+  @Matches(RegExp('USD|EUR|BS'))
   readonly currencyCode: string;
-
-  @IsBoolean()
-  @IsOptional()
-  readonly paid: boolean;
 
   @IsNumber()
   @IsNotEmpty()
   readonly userId: number;
-
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => CreateInvoiceProductRelationDto)
-  readonly productsDtos: CreateInvoiceProductRelationDto[];
-
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => CreateInvoiceServiceRelationDto)
-  readonly servicesDtos: CreateInvoiceServiceRelationDto[];
 }
 
-export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}
+export class UpdatePaymentDTO extends PartialType(CreatePaymentDto) {}
 
-export class FilterInvoiceDto {
+export class FilterPaymentDto {
   @IsInt()
   @IsOptional()
   @IsPositive()
