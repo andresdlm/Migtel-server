@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 
-import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
+import {
+  CreateInvoiceDto,
+  FilterInvoiceDto,
+  UpdateInvoiceDto,
+} from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
 import { ClientsService } from 'src/clients/services/clients.service';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
@@ -212,6 +216,22 @@ export class InvoicesService {
     return this.calculateInvoiceAmount(preInvoice, data);
   }
 
+  async updateInvoice(id: number, changes: UpdateInvoiceDto) {
+    const invoice = await this.findOne(id);
+    if (changes.paymentMethodId) {
+      this.invoiceRepo.merge(invoice, changes);
+      invoice.paymentMethod = await this.paymentMethodService.findOne(
+        changes.paymentMethodId,
+      );
+    }
+
+    if (changes.retention !== undefined && invoice.igtf === 0) {
+      invoice.iva_r = invoice.iva * changes.retention * 0.01;
+      invoice.iva_p = invoice.iva - invoice.iva_r;
+    }
+    return await this.invoiceRepo.save(invoice);
+  }
+
   async cancelInvoice(id: number) {
     const invoice: Invoice = await this.findOne(id);
     invoice.clientId = 0;
@@ -321,13 +341,11 @@ export class InvoicesService {
 
     if (client && client.amountIslr > 0)
       invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
-    else invoice.islr = 0;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
       if (client && client.retention !== 0) {
         invoice.igtf =
-          (invoice.totalAmount - invoice.iva + invoice.iva_p - invoice.islr) *
-          0.03;
+          (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
         invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       } else {
         invoice.igtf = invoice.totalAmount * 0.03;

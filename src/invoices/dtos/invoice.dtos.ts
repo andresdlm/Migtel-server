@@ -9,9 +9,9 @@ import {
   IsNumber,
   Matches,
   ValidateNested,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
 
@@ -89,7 +89,17 @@ export class CreateInvoiceDto {
   readonly servicesDtos: CreateInvoiceServiceRelationDto[];
 }
 
-export class UpdateInvoiceDto extends PartialType(CreateInvoiceDto) {}
+export class UpdateInvoiceDto {
+  @IsOptional()
+  @IsNumber()
+  readonly paymentMethodId: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  readonly retention: number;
+}
 
 export class FilterInvoiceDto {
   @IsInt()

@@ -9,7 +9,11 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
+import {
+  CreateInvoiceDto,
+  FilterInvoiceDto,
+  UpdateInvoiceDto,
+} from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -91,6 +95,15 @@ export class InvoicesController {
   @Put('setpaid/:invoiceId')
   setPaid(@Param('invoiceId', ParseIntPipe) invoiceId: number) {
     return this.invoiceService.setPaid(invoiceId);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':id')
+  updateInvoice(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateInvoiceDto,
+  ) {
+    return this.invoiceService.updateInvoice(id, payload);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
