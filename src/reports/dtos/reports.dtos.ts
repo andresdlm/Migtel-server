@@ -6,6 +6,20 @@ import {
   Matches,
 } from 'class-validator';
 
+export class SalesBooks {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly paymentMethod: number;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly since: Date;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly until: Date;
+}
+
 export class ReportDto {
   @IsDate()
   @IsNotEmpty()
