@@ -70,6 +70,9 @@ export class EmployeesService {
       return this.employeeRepo.find({
         where: [{ id: Number(searchInput), active: getArchive }],
         take: 20,
+        relations: {
+          department: true,
+        },
       });
     } else {
       return this.employeeRepo.find({
@@ -100,6 +103,9 @@ export class EmployeesService {
           },
         ],
         take: 20,
+        relations: {
+          department: true,
+        },
       });
     }
   }

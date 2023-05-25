@@ -4,13 +4,16 @@ import {
   Delete,
   Get,
   Param,
-  ParseBoolPipe,
   ParseIntPipe,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CreateInvoiceDto, FilterInvoiceDto } from '../dtos/invoice.dtos';
+import {
+  CreateInvoiceDto,
+  FilterInvoiceDto,
+  UpdateInvoiceDto,
+} from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -27,11 +30,7 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get()
-  getAll(
-    @Query() params: FilterInvoiceDto,
-    @Query('getCanceled', ParseBoolPipe) getCanceled?: boolean,
-  ) {
-    if (params) params.getCanceled = getCanceled;
+  getAll(@Query() params: FilterInvoiceDto) {
     return this.invoiceService.findAll(params);
   }
 
@@ -49,17 +48,14 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('count')
-  getCount(@Query('getCanceled', ParseBoolPipe) getCanceled: boolean) {
-    return this.invoiceService.getCount(getCanceled);
+  getCount() {
+    return this.invoiceService.getCount();
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('search')
-  search(
-    @Query('searchParam') searchParam: string,
-    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
-  ) {
-    return this.invoiceService.search(searchParam, getArchive);
+  search(@Query('searchParam') searchParam: string) {
+    return this.invoiceService.search(searchParam);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
@@ -79,9 +75,7 @@ export class InvoicesController {
   getByClientId(
     @Param('clientId', ParseIntPipe) clientId: number,
     @Query() params: FilterInvoiceDto,
-    @Query('getCanceled', ParseBoolPipe) getCanceled?: boolean,
   ) {
-    if (params) params.getCanceled = getCanceled;
     return this.invoiceService.findByClientId(clientId, params);
   }
 
@@ -104,9 +98,18 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':id')
+  updateInvoice(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateInvoiceDto,
+  ) {
+    return this.invoiceService.updateInvoice(id, payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
-    return this.invoiceService.createCreditNote(invoiceNumber);
+    return this.invoiceService.cancelInvoice(invoiceNumber);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
