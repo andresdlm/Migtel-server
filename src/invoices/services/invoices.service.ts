@@ -346,14 +346,12 @@ export class InvoicesService {
       if (client && client.retention !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
-        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       } else {
         invoice.igtf = invoice.totalAmount * 0.03;
-        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       }
     }
 
-    if (invoice.currencyCode !== 'USD') {
+    if (invoice.currencyCode === 'BS') {
       invoice.subtotal = invoice.subtotal * invoice.exhangeRate;
       invoice.iva = invoice.iva * invoice.exhangeRate;
       invoice.iva_r = invoice.iva_r * invoice.exhangeRate;
