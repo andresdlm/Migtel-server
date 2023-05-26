@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Raw, Repository } from 'typeorm';
 
-import { ReportDto, PaymentReportDto, SalesBooks } from '../dtos/reports.dtos';
+import {
+  ReportDto,
+  PaymentReportDto,
+  SalesBookReportDto,
+} from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
-import { Account, Summary } from '../models/reports.model';
+import { Account, Summary, SummarySalesBook } from '../models/reports.model';
 
 @Injectable()
 export class ReportsService {
@@ -19,12 +23,12 @@ export class ReportsService {
     private paymentRepo: Repository<Payment>,
   ) {}
 
-  async getSalesBookReport(params: SalesBooks) {
-    let listReports = [];
-    let summary = [];
+  async getSalesBookReport(params: SalesBookReportDto) {
+    let report: Invoice[] = [];
+    let summary: SummarySalesBook;
 
     if (params.paymentMethod < 0) {
-      listReports = await this.invoiceRepo.find({
+      report = await this.invoiceRepo.find({
         where: {
           registerDate: Raw(
             (registerDate) =>
@@ -40,7 +44,7 @@ export class ReportsService {
         },
       });
     } else {
-      listReports = await this.invoiceRepo.find({
+      report = await this.invoiceRepo.find({
         where: {
           registerDate: Raw(
             (registerDate) =>
@@ -110,7 +114,7 @@ export class ReportsService {
                       ELSE invoices.total_amount
                   END AS real
                   )), 0) AS total_amount,
-        count(invoices) as totalInvoices,
+        count(invoices) as total_invoices,
         count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
@@ -167,14 +171,17 @@ export class ReportsService {
                       ELSE invoices.total_amount
                   END AS real
                   )), 0) AS total_amount,
-        count(invoices) as totalInvoices,
+        count(invoices) as total_invoices,
         count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}'
         AND invoices.payment_method_id = '${params.paymentMethod}';`);
     }
-    return [listReports, summary];
+    return {
+      report,
+      summary: summary[0],
+    };
   }
 
   async getAccountReport(params: ReportDto) {
@@ -331,7 +338,7 @@ export class ReportsService {
   }
 
   async getRetentionsReport(params: ReportDto) {
-    const listReports = await this.invoiceRepo.find({
+    const invoices = await this.invoiceRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
@@ -406,6 +413,6 @@ export class ReportsService {
         AND invoices.register_date <= '${params.until.toDateString()}'
         AND invoices.iva_r > '0';`);
 
-    return [listReports, summary];
+    return [invoices, summary];
   }
 }

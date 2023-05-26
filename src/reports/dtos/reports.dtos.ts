@@ -6,7 +6,7 @@ import {
   Matches,
 } from 'class-validator';
 
-export class SalesBooks {
+export class SalesBookReportDto {
   @IsNumber()
   @IsNotEmpty()
   readonly paymentMethod: number;
