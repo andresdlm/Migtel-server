@@ -6,11 +6,18 @@ import {
   ReportDto,
   PaymentReportDto,
   SalesBookReportDto,
+  ReferenceDto,
 } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
-import { Account, Summary, SummarySalesBook } from '../models/reports.model';
+import {
+  Account,
+  Summary,
+  SummaryReference,
+  SummaryRetentions,
+  SummarySalesBook,
+} from '../models/reports.model';
 
 @Injectable()
 export class ReportsService {
@@ -338,7 +345,7 @@ export class ReportsService {
   }
 
   async getRetentionsReport(params: ReportDto) {
-    const invoices = await this.invoiceRepo.find({
+    const report: Invoice[] = await this.invoiceRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
@@ -355,7 +362,7 @@ export class ReportsService {
       },
     });
 
-    const summary = await this.invoiceRepo.query(`
+    const summary: SummaryRetentions = await this.invoiceRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
               CASE
@@ -406,13 +413,121 @@ export class ReportsService {
                       ELSE invoices.total_amount
                   END AS real
                   )), 0) AS total_amount,
-        count(invoices) as totalInvoices,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN (invoices.total_amount - invoices.iva_r)*invoices.exhange_rate
+                      ELSE invoices.total_amount - invoices.iva_r
+                  END AS real
+                  )), 0) AS total_neto,
+        count(invoices) as total_invoices,
         count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}'
         AND invoices.iva_r > '0';`);
 
-    return [invoices, summary];
+    return {
+      report,
+      summary: summary[0],
+    };
+  }
+
+  async getReferenceInvoiceReport(params: ReferenceDto) {
+    const report: Invoice[] = await this.invoiceRepo.find({
+      where: {
+        registerDate: Raw(
+          (registerDate) =>
+            `${registerDate} >= :since AND ${registerDate} <= :until`,
+          {
+            since: `${params.since.toISOString()}`,
+            until: `${params.until.toISOString()}`,
+          },
+        ),
+        paymentMethodId: params.paymentMethod,
+        type: 'FACT',
+      },
+      order: {
+        invoiceNumber: 'ASC',
+      },
+      relations: {
+        paymentMethod: true,
+      },
+    });
+
+    const summary: SummaryReference = await this.invoiceRepo.query(`
+      SELECT
+      COALESCE(SUM(CAST(
+                CASE
+                    WHEN invoices.currency_code != 'BS'
+                      THEN invoices.total_amount
+                    ELSE invoices.total_amount/invoices.exhange_rate
+                END AS real
+                )), 0) AS total_amount_usd,
+      COALESCE(SUM(CAST(
+                CASE
+                    WHEN invoices.currency_code = 'BS'
+                      THEN invoices.total_amount
+                    ELSE invoices.total_amount*invoices.exhange_rate
+                END AS real
+                )), 0) AS total_amount_bs,
+      count(invoices) as total_references
+      FROM invoices
+      WHERE invoices.register_date >= '${params.since.toDateString()}'
+      AND invoices.register_date <= '${params.until.toDateString()}'
+      AND invoices.payment_method_id = '${params.paymentMethod}'`);
+
+    return {
+      report,
+      summary: summary[0],
+    };
+  }
+
+  async getReferencePaymentReport(params: ReferenceDto) {
+    const report: Payment[] = await this.paymentRepo.find({
+      where: {
+        registerDate: Raw(
+          (registerDate) =>
+            `${registerDate} >= :since AND ${registerDate} <= :until`,
+          {
+            since: `${params.since.toISOString()}`,
+            until: `${params.until.toISOString()}`,
+          },
+        ),
+      },
+      order: {
+        id: 'ASC',
+      },
+      relations: {
+        paymentMethod: true,
+      },
+    });
+
+    const summary: SummaryReference = await this.paymentRepo.query(`
+    SELECT
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code != 'BS'
+                THEN payments.amount
+              ELSE payments.amount/payments.exhange_rate
+          END AS real
+          )), 0) AS total_amount_usd,
+    COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code = 'BS'
+                THEN payments.amount
+              ELSE payments.amount*payments.exhange_rate
+          END AS real
+          )), 0) AS total_amount_bs,
+    count(payments) as total_references
+    FROM payments
+    WHERE payments.register_date >= '${params.since.toDateString()}'
+    AND payments.register_date <= '${params.until.toDateString()}'
+    AND payments.payment_method_id = '${params.paymentMethod}'`);
+
+    return {
+      report,
+      summary: summary[0]
+    };
   }
 }

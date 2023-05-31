@@ -23,3 +23,22 @@ export interface SummarySalesBook {
   total_invoices: number;
   total_invoices_canceled: number;
 }
+
+export interface SummaryRetentions {
+  total_subtotal: number;
+  total_iva: number;
+  total_iva_r: number;
+  total_iva_p: number;
+  total_igtf: number;
+  total_islr: number;
+  total_amount: number;
+  total_neto: number;
+  total_invoices: number;
+  total_invoices_canceled: number;
+}
+
+export interface SummaryReference {
+  total_amount_usd: number;
+  total_amount_bs: number;
+  total_references: number;
+}
