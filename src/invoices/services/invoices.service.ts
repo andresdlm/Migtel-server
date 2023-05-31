@@ -272,7 +272,7 @@ export class InvoicesService {
 
   async createCreditNote(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);
-    if (invoice.type === 'FACT') {
+    if (invoice.type === 'FACT' && !invoice.canceled) {
       const creditNote = this.invoiceRepo.create();
       creditNote.clientId = invoice.clientId;
       creditNote.clientFirstname = invoice.clientFirstname;
@@ -300,16 +300,7 @@ export class InvoicesService {
 
       await this.invoiceRepo.save(creditNote);
       creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
-      await this.invoiceRepo.save(creditNote);
-
-      await this.invoiceRepo
-        .createQueryBuilder()
-        .update(Invoice)
-        .set({
-          canceled: true,
-        })
-        .where('id = :id', { id: invoiceId })
-        .execute();
+      return await this.invoiceRepo.save(creditNote);
     }
   }
 

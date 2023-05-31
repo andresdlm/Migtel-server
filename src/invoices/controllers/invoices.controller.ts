@@ -107,6 +107,12 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':id/creditNote')
+  createCreditNote(@Param('id', ParseIntPipe) id: number) {
+    return this.invoiceService.createCreditNote(id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.cancelInvoice(invoiceNumber);
