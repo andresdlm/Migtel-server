@@ -272,7 +272,7 @@ export class InvoicesService {
 
   async createCreditNote(invoiceId: number) {
     const invoice = await this.findOne(invoiceId);
-    if (invoice.type === 'FACT') {
+    if (invoice.type === 'FACT' && !invoice.canceled) {
       const creditNote = this.invoiceRepo.create();
       creditNote.clientId = invoice.clientId;
       creditNote.clientFirstname = invoice.clientFirstname;
@@ -300,16 +300,7 @@ export class InvoicesService {
 
       await this.invoiceRepo.save(creditNote);
       creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
-      await this.invoiceRepo.save(creditNote);
-
-      await this.invoiceRepo
-        .createQueryBuilder()
-        .update(Invoice)
-        .set({
-          canceled: true,
-        })
-        .where('id = :id', { id: invoiceId })
-        .execute();
+      return await this.invoiceRepo.save(creditNote);
     }
   }
 
@@ -346,14 +337,12 @@ export class InvoicesService {
       if (client && client.retention !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
-        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       } else {
         invoice.igtf = invoice.totalAmount * 0.03;
-        invoice.totalAmount = invoice.totalAmount + invoice.igtf;
       }
     }
 
-    if (invoice.currencyCode !== 'USD') {
+    if (invoice.currencyCode === 'BS') {
       invoice.subtotal = invoice.subtotal * invoice.exhangeRate;
       invoice.iva = invoice.iva * invoice.exhangeRate;
       invoice.iva_r = invoice.iva_r * invoice.exhangeRate;
