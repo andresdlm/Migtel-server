@@ -190,15 +190,18 @@ export class InvoicesService {
     newInvoice.invoiceNumber = 0;
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
+    newInvoice = await this.invoiceRepo.save(newInvoice);
 
     for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
       invoiceProduct.invoiceId = newInvoice.id;
+      // BUG
       await this.invoiceProductRelRepo.save(invoiceProduct);
     }
     for await (const service of data.servicesDtos) {
       const invoiceService = this.invoiceServiceRelRepo.create(service);
       invoiceService.invoiceId = newInvoice.id;
+      // BUG
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
