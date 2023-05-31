@@ -54,3 +54,17 @@ export class AccountReport {
   readonly payments: number;
   readonly balance: number;
 }
+
+export class ReferenceDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly paymentMethod: number;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly since: Date;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly until: Date;
+}
