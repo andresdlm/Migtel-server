@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { PaymentReportDto, ReportDto, SalesBooks } from '../dtos/reports.dtos';
+import { PaymentReportDto, ReportDto, SalesBookReportDto } from '../dtos/reports.dtos';
 import { ReportsService } from '../services/reports.service';
 
 @Controller('reports')
@@ -7,7 +7,7 @@ export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
   @Post('salesBook')
-  async getSalesBookReport(@Body() payload: SalesBooks) {
+  async getSalesBookReport(@Body() payload: SalesBookReportDto) {
     return await this.reportsService.getSalesBookReport(payload);
   }
 
