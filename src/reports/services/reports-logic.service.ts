@@ -4,7 +4,7 @@ import { Repository, Raw } from 'typeorm';
 
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
-import { SalesBookDto } from '../dtos/salesBook.dtos';
+import { SalesBookReportDto } from '../dtos/reports.dtos';
 import { ReportDto } from '../dtos/reports.dtos';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class ReportsLogicService {
     private paymentMethodRepo: Repository<PaymentMethod>,
   ) {}
 
-  generateSalesBook(params: SalesBookDto) {
+  generateSalesBook(params: SalesBookReportDto) {
     return this.invoiceRepo.find({
       where: {
         registerDate: Raw(

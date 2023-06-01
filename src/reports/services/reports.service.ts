@@ -50,26 +50,6 @@ export class ReportsService {
           invoiceNumber: 'ASC',
         },
       });
-    } else {
-      report = await this.invoiceRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
-            {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
-            },
-          ),
-          paymentMethodId: params.paymentMethod,
-        },
-        order: {
-          invoiceNumber: 'ASC',
-        },
-      });
-    }
-
-    if (params.paymentMethod < 0) {
       summary = await this.invoiceRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
@@ -127,6 +107,22 @@ export class ReportsService {
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}';`);
     } else {
+      report = await this.invoiceRepo.find({
+        where: {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toISOString()}`,
+              until: `${params.until.toISOString()}`,
+            },
+          ),
+          paymentMethodId: params.paymentMethod,
+        },
+        order: {
+          invoiceNumber: 'ASC',
+        },
+      });
       summary = await this.invoiceRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
@@ -185,6 +181,7 @@ export class ReportsService {
         AND invoices.register_date <= '${params.until.toDateString()}'
         AND invoices.payment_method_id = '${params.paymentMethod}';`);
     }
+
     return {
       report,
       summary: summary[0],
@@ -272,6 +269,26 @@ export class ReportsService {
           user: true,
         },
       });
+      summary = await this.paymentRepo.query(`
+        SELECT
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN payments.currency_code = 'BS'
+                    THEN payments.amount / payments.exhange_rate
+                  ELSE payments.amount
+              END AS real
+              )), 0) AS total_usd,
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN payments.currency_code = 'USD'
+                    THEN payments.amount * payments.exhange_rate
+                  ELSE payments.amount
+              END AS real
+              )), 0) AS total_bs
+              FROM payments
+        WHERE payments.register_date >= '${params.since.toDateString()}'
+        AND payments.register_date <= '${params.until.toDateString()}'
+        AND payments.currency_code = '${params.currencyCode}';`);
     } else {
       listPayments = await this.paymentRepo.find({
         where: {
@@ -294,30 +311,6 @@ export class ReportsService {
           user: true,
         },
       });
-    }
-
-    if (params.paymentMethod < 0) {
-      summary = await this.paymentRepo.query(`
-        SELECT
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN payments.currency_code = 'BS'
-                    THEN payments.amount / payments.exhange_rate
-                  ELSE payments.amount
-              END AS real
-              )), 0) AS total_usd,
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN payments.currency_code = 'USD'
-                    THEN payments.amount * payments.exhange_rate
-                  ELSE payments.amount
-              END AS real
-              )), 0) AS total_bs
-              FROM payments
-        WHERE payments.register_date >= '${params.since.toDateString()}'
-        AND payments.register_date <= '${params.until.toDateString()}'
-        AND payments.currency_code = '${params.currencyCode}';`);
-    } else {
       summary = await this.paymentRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
@@ -355,7 +348,7 @@ export class ReportsService {
             until: `${params.until.toISOString()}`,
           },
         ),
-        iva_r: Raw((ivaR) => `${ivaR} > 0`),
+        iva_r: Raw((iva_r) => `${iva_r} != 0`),
       },
       order: {
         invoiceNumber: 'ASC',
@@ -416,8 +409,8 @@ export class ReportsService {
         COALESCE(SUM(CAST(
                   CASE
                       WHEN invoices.currency_code != 'BS'
-                        THEN (invoices.total_amount - invoices.iva_r)*invoices.exhange_rate
-                      ELSE invoices.total_amount - invoices.iva_r
+                        THEN (invoices.total_amount - invoices.iva_r - invoices.islr)*invoices.exhange_rate
+                      ELSE invoices.total_amount - invoices.iva_r - invoices.islr
                   END AS real
                   )), 0) AS total_neto,
         count(invoices) as total_invoices,
@@ -425,7 +418,7 @@ export class ReportsService {
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}'
-        AND invoices.iva_r > '0';`);
+        AND invoices.iva_r != 0;`);
 
     return {
       report,
@@ -527,7 +520,7 @@ export class ReportsService {
 
     return {
       report,
-      summary: summary[0]
+      summary: summary[0],
     };
   }
 }

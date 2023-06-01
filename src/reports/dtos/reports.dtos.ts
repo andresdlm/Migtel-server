@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Matches,
-} from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, Matches } from 'class-validator';
 
 export class SalesBookReportDto {
   @IsNumber()
