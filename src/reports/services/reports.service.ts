@@ -97,12 +97,19 @@ export class ReportsService {
         COALESCE(SUM(CAST(
                   CASE
                       WHEN invoices.currency_code != 'BS'
+                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
+                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
+                  END AS real
+                  )), 0) AS total_neto,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
                         THEN invoices.total_amount*invoices.exhange_rate
                       ELSE invoices.total_amount
                   END AS real
                   )), 0) AS total_amount,
-        count(invoices) as total_invoices,
-        count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
+        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
+        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}';`);
@@ -170,12 +177,19 @@ export class ReportsService {
         COALESCE(SUM(CAST(
                   CASE
                       WHEN invoices.currency_code != 'BS'
+                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
+                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
+                  END AS real
+                  )), 0) AS total_neto,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
                         THEN invoices.total_amount*invoices.exhange_rate
                       ELSE invoices.total_amount
                   END AS real
                   )), 0) AS total_amount,
-        count(invoices) as total_invoices,
-        count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
+        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
+        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
         FROM invoices
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}'
@@ -192,19 +206,19 @@ export class ReportsService {
     const report: Account[] = await this.paymentMethodRepo.query(
       `SELECT payment_methods.id AS id,
       payment_methods.name AS name,
-      COUNT(invoices)::INT AS payments,
+      COUNT(CASE invoices.canceled WHEN false THEN 1 END)::INT AS payments,
       COALESCE(SUM(CAST(
           CASE
               WHEN invoices.currency_code = 'BS'
-                THEN invoices.total_amount/invoices.exhange_rate
-              ELSE invoices.total_amount
+                THEN (invoices.total_amount-invoices.iva_r-invoices.islr)/invoices.exhange_rate
+              ELSE invoices.total_amount - invoices.iva_r - invoices.islr
           END AS real
           )), 0) AS usd_balance,
       COALESCE(SUM(CAST(
           CASE
               WHEN invoices.currency_code = 'USD'
-                THEN invoices.total_amount*invoices.exhange_rate
-              ELSE invoices.total_amount
+                THEN (invoices.total_amount - invoices.iva_r - invoices.islr)*invoices.exhange_rate
+              ELSE invoices.total_amount - invoices.iva_r - invoices.islr
           END AS real
           )), 0) AS bs_balance
       FROM payment_methods
@@ -217,19 +231,19 @@ export class ReportsService {
       ORDER BY usd_balance DESC, id ASC;`,
     );
     const summary: Summary = await this.paymentMethodRepo
-      .query(`SELECT COUNT(invoices)::INT AS payments,
+      .query(`SELECT COUNT(CASE invoices.canceled WHEN false THEN 1 END)::INT AS payments,
     COALESCE(SUM(CAST(
         CASE
             WHEN invoices.currency_code = 'BS'
-              THEN invoices.total_amount/invoices.exhange_rate
-            ELSE invoices.total_amount
+              THEN (invoices.total_amount - invoices.iva_r - invoices.islr)/invoices.exhange_rate
+            ELSE invoices.total_amount - invoices.iva_r - invoices.islr
         END AS real
         )), 0) AS total_usd_balance,
     COALESCE(SUM(CAST(
         CASE
             WHEN invoices.currency_code = 'USD'
-              THEN invoices.total_amount*invoices.exhange_rate
-            ELSE invoices.total_amount
+              THEN (invoices.total_amount - invoices.iva_r - invoices.islr)*invoices.exhange_rate
+            ELSE invoices.total_amount - invoices.iva_r - invoices.islr
         END AS real
         )), 0) AS total_bs_balance
     FROM invoices
