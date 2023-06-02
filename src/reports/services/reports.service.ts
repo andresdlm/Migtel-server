@@ -487,6 +487,7 @@ export class ReportsService {
             until: `${params.until.toISOString()}`,
           },
         ),
+        paymentMethodId: params.paymentMethod,
       },
       order: {
         id: 'ASC',
