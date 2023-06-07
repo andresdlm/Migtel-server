@@ -13,7 +13,9 @@ import { Payment } from 'src/payments/entities/payment.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import {
   Account,
+  Igtf,
   Summary,
+  SummaryIgtfBook,
   SummaryReference,
   SummaryRetentions,
   SummarySalesBook,
@@ -532,6 +534,63 @@ export class ReportsService {
     WHERE payments.register_date >= '${params.since.toDateString()}'
     AND payments.register_date <= '${params.until.toDateString()}'
     AND payments.payment_method_id = '${params.paymentMethod}'`);
+
+    return {
+      report,
+      summary: summary[0],
+    };
+  }
+
+  async getIgtfBookReport(params: ReportDto) {
+    let summary: SummaryIgtfBook;
+
+    const report: Igtf[] = await this.invoiceRepo.query(
+      `SELECT invoices.id,
+      invoices.client_firstname,
+      invoices.client_lastname,
+      invoices.client_company_name,
+      invoices.register_date,
+      invoices.invoice_number,
+      invoices.igtf,
+      invoices.exhange_rate,
+      invoices.currency_code,
+      payment_methods.name AS payment_method_name,
+      COALESCE(CAST(
+        CASE
+            WHEN invoices.currency_code != 'BS'
+              THEN (invoices.subtotal + invoices.iva_p - invoices.islr)*invoices.exhange_rate
+            ELSE invoices.subtotal + invoices.iva_p - invoices.islr
+        END AS real
+        ), 0) AS imponible
+      FROM invoices
+      INNER JOIN payment_methods ON invoices.payment_method_id = payment_methods.id
+      WHERE invoices.register_date >= '${params.since.toDateString()}'
+      AND invoices.register_date <= '${params.until.toDateString()}'
+      AND invoices.igtf != 0
+      ORDER BY invoices.id;`,
+    );
+    summary = await this.invoiceRepo.query(
+      `SELECT
+      COALESCE(SUM(CAST(
+                CASE
+                    WHEN invoices.currency_code != 'BS'
+                      THEN invoices.igtf*invoices.exhange_rate
+                    ELSE invoices.igtf
+                END AS real
+                )), 0) AS total_igtf,
+      COALESCE(SUM(CAST(
+                CASE
+                    WHEN invoices.currency_code != 'BS'
+                      THEN (invoices.subtotal + invoices.iva_p - invoices.islr)*invoices.exhange_rate
+                    ELSE invoices.subtotal + invoices.iva_p - invoices.islr
+                END AS real
+                )), 0) AS total_imponible,
+      COUNT(CASE invoices.canceled WHEN false THEN 1 END)::INT as total_invoices
+      FROM invoices
+      WHERE invoices.register_date >= '${params.since.toDateString()}'
+      AND invoices.register_date <= '${params.until.toDateString()}'
+      AND invoices.igtf != 0;`,
+    );
 
     return {
       report,
