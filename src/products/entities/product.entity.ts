@@ -12,7 +12,7 @@ export class Product {
   @Column({ name: 'invoice_description', type: 'varchar', length: 500 })
   invoiceDescription: string;
 
-  @Column({ name: 'price', type: 'real' })
+  @Column({ name: 'price', type: 'numeric' })
   price: number;
 
   @Column({ name: 'archive', type: 'boolean', default: false })

@@ -48,16 +48,6 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly exhangeRate: number;
 
-  @IsNumber()
-  @Min(0)
-  @IsNotEmpty()
-  readonly bonusAmount: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsNotEmpty()
-  readonly creditAmount: number;
-
   @IsString()
   @IsNotEmpty()
   readonly comment: string;

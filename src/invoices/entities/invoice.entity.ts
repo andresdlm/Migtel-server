@@ -54,35 +54,29 @@ export class Invoice {
   @Column({ name: 'payment_method_id', type: 'int' })
   paymentMethodId: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   subtotal: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   iva: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   iva_r: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   iva_p: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   islr: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   igtf: number;
 
-  @Column({ name: 'total_amount', type: 'real' })
+  @Column({ name: 'total_amount', type: 'numeric' })
   totalAmount: number;
 
-  @Column({ name: 'exhange_rate', type: 'real' })
+  @Column({ name: 'exhange_rate', type: 'numeric' })
   exhangeRate: number;
-
-  @Column({ name: 'bonus_amount', type: 'real' })
-  bonusAmount: number;
-
-  @Column({ name: 'credit_amount', type: 'real' })
-  creditAmount: number;
 
   @Column({ type: 'varchar', length: 500 })
   comment: string;

@@ -205,6 +205,8 @@ export class InvoicesService {
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
+    console.log(newInvoice.subtotal);
+
     return await this.invoiceRepo.save(newInvoice);
   }
 
@@ -215,8 +217,8 @@ export class InvoicesService {
       data.paymentMethodCrmId,
     );
     preInvoice.paymentMethod = paymentMethod;
-
-    return this.calculateInvoiceAmount(preInvoice, data);
+    console.log((await this.calculateInvoiceAmount(preInvoice, data)).subtotal);
+    return await this.calculateInvoiceAmount(preInvoice, data);
   }
 
   async updateInvoice(id: number, changes: UpdateInvoiceDto) {
@@ -250,8 +252,6 @@ export class InvoicesService {
     invoice.islr = 0;
     invoice.igtf = 0;
     invoice.totalAmount = 0;
-    invoice.bonusAmount = 0;
-    invoice.creditAmount = 0;
     invoice.comment = '';
     invoice.period = '';
     invoice.canceled = true;
@@ -292,8 +292,6 @@ export class InvoicesService {
       creditNote.igtf = -invoice.igtf;
       creditNote.totalAmount = -invoice.totalAmount;
       creditNote.exhangeRate = invoice.exhangeRate;
-      creditNote.bonusAmount = -invoice.bonusAmount;
-      creditNote.creditAmount = -invoice.creditAmount;
       creditNote.comment = invoice.invoiceNumber.toString();
       creditNote.period = invoice.period;
       creditNote.currencyCode = invoice.currencyCode;
@@ -319,8 +317,7 @@ export class InvoicesService {
       amount = amount + service.price * service.count;
     });
 
-    invoice.subtotal =
-      amount + ((data.bonusAmount - data.creditAmount) * 100) / 116;
+    invoice.subtotal = amount;
     invoice.iva = invoice.subtotal * 0.16;
     if (client) {
       invoice.iva_r = invoice.iva * client.retention * 0.01;

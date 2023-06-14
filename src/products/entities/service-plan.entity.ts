@@ -20,7 +20,7 @@ export class ServicePlan {
   @Column({ name: 'service_plan_type', type: 'varchar', length: 100 })
   servicePlanType: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'numeric' })
   price: number;
 
   @Column({ type: 'boolean', default: false })

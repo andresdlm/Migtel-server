@@ -47,10 +47,10 @@ export class Payment {
   @Column({ name: 'payment_method_id', type: 'int' })
   paymentMethodId: number;
 
-  @Column({ name: 'amount', type: 'real' })
+  @Column({ name: 'amount', type: 'numeric' })
   amount: number;
 
-  @Column({ name: 'exhange_rate', type: 'real' })
+  @Column({ name: 'exhange_rate', type: 'numeric' })
   exhangeRate: number;
 
   @Column({ type: 'varchar', length: 500 })

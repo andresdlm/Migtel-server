@@ -43,7 +43,7 @@ export class ReportsLogicService {
               WHEN invoices.currency_code = 'BS'
                 THEN invoices.total_amount/invoices.exhange_rate
               ELSE invoices.total_amount
-          END AS real
+          END AS float
           )), 0) AS balance
       FROM payment_methods
         LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id

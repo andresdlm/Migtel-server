@@ -24,6 +24,6 @@ export class InvoiceProductRelation {
   @Column()
   count: number;
 
-  @Column({ type: 'real' })
+  @Column({ type: 'numeric' })
   price: number;
 }

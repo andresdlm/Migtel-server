@@ -28,7 +28,7 @@ export class DashboardService {
             WHEN invoices.currency_code = 'BS'
               THEN invoices.subtotal/invoices.exhange_rate
             ELSE invoices.subtotal
-        END AS real
+        END AS float
         )), 0) AS dailyIncome
         FROM invoices
         WHERE invoices.type = 'FACT'
@@ -44,7 +44,7 @@ export class DashboardService {
             WHEN invoices.currency_code = 'BS'
               THEN invoices.subtotal/invoices.exhange_rate
             ELSE invoices.subtotal
-        END AS real
+        END AS float
         )), 0) AS monthIncome
         FROM invoices
         WHERE invoices.type = 'FACT'
@@ -59,7 +59,7 @@ export class DashboardService {
             WHEN invoices.currency_code = 'BS'
               THEN invoices.iva/invoices.exhange_rate
             ELSE invoices.iva
-        END AS real
+        END AS float
         )), 0) AS taxesGeneratedByMonth
         FROM invoices
         WHERE invoices.type = 'FACT'
@@ -76,7 +76,7 @@ export class DashboardService {
           WHEN invoices.currency_code = 'BS'
             THEN invoices.subtotal/invoices.exhange_rate
           ELSE invoices.subtotal
-        END AS real
+        END AS float
         )), 0) AS month_total
         FROM invoices
         GROUP BY 1
@@ -96,7 +96,7 @@ export class DashboardService {
             WHEN invoices.currency_code = 'BS'
               THEN invoices.subtotal/invoices.exhange_rate
             ELSE invoices.subtotal
-        END AS real
+        END AS float
         )), 0) AS y
         FROM payment_methods
         LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id

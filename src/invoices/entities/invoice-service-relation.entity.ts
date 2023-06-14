@@ -22,6 +22,6 @@ export class InvoiceServiceRelation {
   @Column({ name: 'count', type: 'int' })
   count: number;
 
-  @Column({ name: 'price', type: 'real' })
+  @Column({ name: 'price', type: 'numeric' })
   price: number;
 }
