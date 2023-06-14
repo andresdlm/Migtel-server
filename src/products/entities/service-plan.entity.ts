@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'service_plans' })
 export class ServicePlan {
@@ -20,7 +21,7 @@ export class ServicePlan {
   @Column({ name: 'service_plan_type', type: 'varchar', length: 100 })
   servicePlanType: string;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   price: number;
 
   @Column({ type: 'boolean', default: false })

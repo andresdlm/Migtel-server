@@ -1,5 +1,6 @@
 import { PrimaryGeneratedColumn, Column, Entity, OneToMany } from 'typeorm';
 import { InvoiceProductRelation } from '../../invoices/entities/invoice-product-relation.entity';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -12,7 +13,11 @@ export class Product {
   @Column({ name: 'invoice_description', type: 'varchar', length: 500 })
   invoiceDescription: string;
 
-  @Column({ name: 'price', type: 'numeric' })
+  @Column({
+    name: 'price',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   price: number;
 
   @Column({ name: 'archive', type: 'boolean', default: false })

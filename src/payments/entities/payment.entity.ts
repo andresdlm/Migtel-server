@@ -9,6 +9,7 @@ import {
 
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { User } from 'src/employees/entities/user.entity';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'payments' })
 export class Payment {
@@ -47,10 +48,18 @@ export class Payment {
   @Column({ name: 'payment_method_id', type: 'int' })
   paymentMethodId: number;
 
-  @Column({ name: 'amount', type: 'numeric' })
+  @Column({
+    name: 'amount',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   amount: number;
 
-  @Column({ name: 'exhange_rate', type: 'numeric' })
+  @Column({
+    name: 'exhange_rate',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   exhangeRate: number;
 
   @Column({ type: 'varchar', length: 500 })

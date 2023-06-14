@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import { Invoice } from './invoice.entity';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'invoice_service_relation' })
 export class InvoiceServiceRelation {
@@ -22,6 +23,10 @@ export class InvoiceServiceRelation {
   @Column({ name: 'count', type: 'int' })
   count: number;
 
-  @Column({ name: 'price', type: 'numeric' })
+  @Column({
+    name: 'price',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   price: number;
 }

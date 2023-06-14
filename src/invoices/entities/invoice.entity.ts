@@ -13,6 +13,7 @@ import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entit
 import { InvoiceProductRelation } from './invoice-product-relation.entity';
 import { User } from 'src/employees/entities/user.entity';
 import { InvoiceServiceRelation } from './invoice-service-relation.entity';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -54,28 +55,39 @@ export class Invoice {
   @Column({ name: 'payment_method_id', type: 'int' })
   paymentMethodId: number;
 
-  @Column({ type: 'numeric' })
+  @Column({
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   subtotal: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   iva: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   iva_r: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   iva_p: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   islr: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   igtf: number;
 
-  @Column({ name: 'total_amount', type: 'numeric' })
+  @Column({
+    name: 'total_amount',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   totalAmount: number;
 
-  @Column({ name: 'exhange_rate', type: 'numeric' })
+  @Column({
+    name: 'exhange_rate',
+    type: 'numeric',
+    transformer: new ColumnNumericTransformer(),
+  })
   exhangeRate: number;
 
   @Column({ type: 'varchar', length: 500 })

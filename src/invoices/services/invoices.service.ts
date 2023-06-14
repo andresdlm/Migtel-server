@@ -195,17 +195,13 @@ export class InvoicesService {
     for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
       invoiceProduct.invoiceId = newInvoice.id;
-      // BUG
       await this.invoiceProductRelRepo.save(invoiceProduct);
     }
     for await (const service of data.servicesDtos) {
       const invoiceService = this.invoiceServiceRelRepo.create(service);
       invoiceService.invoiceId = newInvoice.id;
-      // BUG
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
-
-    console.log(newInvoice.subtotal);
 
     return await this.invoiceRepo.save(newInvoice);
   }
@@ -217,7 +213,7 @@ export class InvoicesService {
       data.paymentMethodCrmId,
     );
     preInvoice.paymentMethod = paymentMethod;
-    console.log((await this.calculateInvoiceAmount(preInvoice, data)).subtotal);
+
     return await this.calculateInvoiceAmount(preInvoice, data);
   }
 

@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Invoice } from './invoice.entity';
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 
 @Entity({ name: 'invoice_product_relation' })
 export class InvoiceProductRelation {
@@ -24,6 +25,6 @@ export class InvoiceProductRelation {
   @Column()
   count: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'numeric', transformer: new ColumnNumericTransformer() })
   price: number;
 }

@@ -353,18 +353,30 @@ export class ReportsService {
 
   async getRetentionsReport(params: ReportDto) {
     const report: Invoice[] = await this.invoiceRepo.find({
-      where: {
-        registerDate: Raw(
-          (registerDate) =>
-            `${registerDate} >= :since AND ${registerDate} <= :until`,
-          {
-            since: `${params.since.toISOString()}`,
-            until: `${params.until.toISOString()}`,
-          },
-        ),
-        iva_r: Raw((iva_r) => `${iva_r} != 0`),
-        islr: Raw((islr) => `${islr} != 0`),
-      },
+      where: [
+        {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toISOString()}`,
+              until: `${params.until.toISOString()}`,
+            },
+          ),
+          iva_r: Raw((iva_r) => `${iva_r} != 0`),
+        },
+        {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toISOString()}`,
+              until: `${params.until.toISOString()}`,
+            },
+          ),
+          islr: Raw((islr) => `${islr} != 0`),
+        },
+      ],
       order: {
         invoiceNumber: 'ASC',
       },
@@ -541,16 +553,20 @@ export class ReportsService {
   }
 
   async getIgtfBookReport(params: ReportDto) {
-    let summary: SummaryIgtfBook;
-
     const report: Igtf[] = await this.invoiceRepo.query(
       `SELECT invoices.id,
+      invoices.invoice_number,
       invoices.client_firstname,
       invoices.client_lastname,
       invoices.client_company_name,
       invoices.register_date,
-      invoices.invoice_number,
-      invoices.igtf,
+      COALESCE(CAST(
+        CASE
+            WHEN invoices.currency_code != 'BS'
+              THEN invoices.igtf * invoices.exhange_rate
+            ELSE invoices.igtf
+        END AS numeric
+        ), 0) AS igtf,
       invoices.exhange_rate,
       invoices.currency_code,
       payment_methods.name AS payment_method_name,
@@ -559,7 +575,7 @@ export class ReportsService {
             WHEN invoices.currency_code != 'BS'
               THEN (invoices.subtotal + invoices.iva_p - invoices.islr)*invoices.exhange_rate
             ELSE invoices.subtotal + invoices.iva_p - invoices.islr
-        END AS real
+        END AS numeric
         ), 0) AS imponible
       FROM invoices
       INNER JOIN payment_methods ON invoices.payment_method_id = payment_methods.id
@@ -568,21 +584,22 @@ export class ReportsService {
       AND invoices.igtf != 0
       ORDER BY invoices.id;`,
     );
-    summary = await this.invoiceRepo.query(
+
+    const summary: SummaryIgtfBook = await this.invoiceRepo.query(
       `SELECT
       COALESCE(SUM(CAST(
                 CASE
                     WHEN invoices.currency_code != 'BS'
                       THEN invoices.igtf*invoices.exhange_rate
                     ELSE invoices.igtf
-                END AS real
+                END AS numeric
                 )), 0) AS total_igtf,
       COALESCE(SUM(CAST(
                 CASE
                     WHEN invoices.currency_code != 'BS'
                       THEN (invoices.subtotal + invoices.iva_p - invoices.islr)*invoices.exhange_rate
                     ELSE invoices.subtotal + invoices.iva_p - invoices.islr
-                END AS real
+                END AS numeric
                 )), 0) AS total_imponible,
       COUNT(CASE invoices.canceled WHEN false THEN 1 END)::INT as total_invoices
       FROM invoices
