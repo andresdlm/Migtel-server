@@ -6,6 +6,20 @@ export interface Account {
   bs_balance: number;
 }
 
+export interface Igtf {
+  id: number;
+  client_firstname: string;
+  client_lastname: string;
+  client_companyname: string;
+  register_date: Date;
+  invoice_number: number;
+  igtf: number;
+  exhange_rate: number;
+  currency_code: string;
+  payment_method_name: string;
+  imponible: number;
+}
+
 export interface Summary {
   payments: number;
   total_usd_balance: number;
@@ -41,4 +55,10 @@ export interface SummaryReference {
   total_amount_usd: number;
   total_amount_bs: number;
   total_references: number;
+}
+
+export interface SummaryIgtfBook {
+  total_igtf: number;
+  total_invoices: number;
+  total_imponible: number;
 }

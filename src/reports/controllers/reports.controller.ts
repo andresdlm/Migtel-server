@@ -35,4 +35,9 @@ export class ReportsController {
   async getReferenceInvoiceReport(@Body() payload: ReferenceDto) {
     return await this.reportsService.getReferencePaymentReport(payload);
   }
+
+  @Post('igtfBook')
+  async getIgtfBookReport(@Body() payload: ReportDto) {
+    return await this.reportsService.getIgtfBookReport(payload);
+  }
 }
