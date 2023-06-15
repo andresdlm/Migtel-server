@@ -258,6 +258,58 @@ export class ReportsService {
     };
   }
 
+  async getAccountPaymentReport(params: ReportDto) {
+    const report: Account[] = await this.paymentMethodRepo.query(
+      `SELECT payment_methods.id AS id,
+      payment_methods.name AS name,
+      COUNT(payments.id)::INT AS payments,
+      COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code = 'BS'
+                THEN amount/payments.exhange_rate
+              ELSE amount
+          END AS float
+          )), 0) AS usd_balance,
+      COALESCE(SUM(CAST(
+          CASE
+              WHEN payments.currency_code = 'USD'
+                THEN amount*payments.exhange_rate
+              ELSE amount
+          END AS float
+          )), 0) AS bs_balance
+      FROM payment_methods
+        LEFT JOIN payments ON payment_methods.id = payments.payment_method_id
+      WHERE payments.register_date >= '${params.since.toDateString()}'
+        AND payments.register_date <= '${params.until.toDateString()}'
+      GROUP BY payment_methods.id
+      ORDER BY id ASC;`,
+    );
+    const summary: Summary = await this.paymentMethodRepo
+      .query(`SELECT COUNT(payments.id)::INT AS payments,
+    COALESCE(SUM(CAST(
+        CASE
+            WHEN payments.currency_code = 'BS'
+              THEN amount/payments.exhange_rate
+            ELSE amount
+        END AS float
+        )), 0) AS total_usd_balance,
+    COALESCE(SUM(CAST(
+        CASE
+            WHEN payments.currency_code = 'USD'
+              THEN amount*payments.exhange_rate
+            ELSE amount
+        END AS float
+        )), 0) AS total_bs_balance
+    FROM payments
+    WHERE payments.register_date >= '${params.since.toDateString()}'
+      AND payments.register_date <= '${params.until.toDateString()}'
+    `);
+    return {
+      report: report,
+      summary: summary[0],
+    };
+  }
+
   async getPaymentReport(params: PaymentReportDto) {
     let listPayments = [];
     let summary = [];

@@ -16,6 +16,11 @@ export class ReportsController {
     return await this.reportsService.getAccountReport(payload);
   }
 
+  @Post('accountPaymentReport')
+  async getAccountPaymentReport(@Body() payload: ReportDto) {
+    return await this.reportsService.getAccountPaymentReport(payload);
+  }
+
   @Post('paymentReport')
   async getPaymentReport(@Body() payload: PaymentReportDto) {
     return await this.reportsService.getPaymentReport(payload);
