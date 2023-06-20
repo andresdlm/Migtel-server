@@ -290,6 +290,7 @@ export class InvoicesService {
       creditNote.exhangeRate = invoice.exhangeRate;
       creditNote.comment = invoice.invoiceNumber.toString();
       creditNote.period = invoice.period;
+      creditNote.organizationId = invoice.organizationId;
       creditNote.currencyCode = invoice.currencyCode;
       creditNote.type = 'N/C';
       creditNote.invoiceNumber = 0;

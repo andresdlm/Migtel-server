@@ -68,6 +68,12 @@ export class Payment {
   @Column({ type: 'varchar', length: 500 })
   period: string;
 
+  @Column({ type: 'int', default: 0 })
+  organizationId: number;
+
+  @Column({ name: 'bank_reference', type: 'varchar', default: '' })
+  bankReference: string;
+
   @Column({ name: 'currency_code', type: 'varchar' })
   currencyCode: string;
 

@@ -66,6 +66,15 @@ export class CreateInvoiceDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @IsPositive()
+  readonly organizationId: number;
+
+  @IsString()
+  @IsOptional()
+  readonly bankReference: string;
+
+  @IsNumber()
+  @IsNotEmpty()
   readonly userId: number;
 
   @IsNotEmpty()

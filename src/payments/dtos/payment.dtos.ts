@@ -55,6 +55,15 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   readonly period: string;
 
+  @IsNumber()
+  @IsNotEmpty()
+  @IsPositive()
+  readonly organizationId: number;
+
+  @IsString()
+  @IsOptional()
+  readonly bankReference: string;
+
   @IsNotEmpty()
   @Matches(RegExp('USD|EUR|BS'))
   readonly currencyCode: string;
