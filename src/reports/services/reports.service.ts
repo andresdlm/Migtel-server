@@ -7,6 +7,7 @@ import {
   PaymentReportDto,
   SalesBookReportDto,
   ReferenceDto,
+  SalesBookCityReportDto,
 } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
@@ -196,6 +197,182 @@ export class ReportsService {
         WHERE invoices.register_date >= '${params.since.toDateString()}'
         AND invoices.register_date <= '${params.until.toDateString()}'
         AND invoices.payment_method_id = '${params.paymentMethod}';`);
+    }
+
+    return {
+      report,
+      summary: summary[0],
+    };
+  }
+
+  async getSalesBookCityReport(params: SalesBookCityReportDto) {
+    let report: Invoice[] = [];
+    let summary: SummarySalesBook;
+
+    if (params.paymentMethod < 0) {
+      report = await this.invoiceRepo.find({
+        where: {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toISOString()}`,
+              until: `${params.until.toISOString()}`,
+            },
+          ),
+          organizationId: params.organizationId,
+        },
+        order: {
+          invoiceNumber: 'ASC',
+        },
+      });
+      summary = await this.invoiceRepo.query(`
+        SELECT
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.subtotal*invoices.exhange_rate
+                  ELSE invoices.subtotal
+              END AS float
+              )), 0) AS total_subtotal,
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.iva*invoices.exhange_rate
+                  ELSE invoices.iva
+              END AS float
+              )), 0) AS total_iva,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.iva_r*invoices.exhange_rate
+                      ELSE invoices.iva_r
+                  END AS float
+                  )), 0) AS total_iva_r,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.iva_p*invoices.exhange_rate
+                      ELSE invoices.iva_p
+                  END AS float
+                  )), 0) AS total_iva_p,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.igtf*invoices.exhange_rate
+                      ELSE invoices.igtf
+                  END AS float
+                  )), 0) AS total_igtf,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.islr*invoices.exhange_rate
+                      ELSE invoices.islr
+                  END AS float
+                  )), 0) AS total_islr,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
+                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
+                  END AS float
+                  )), 0) AS total_neto,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.total_amount*invoices.exhange_rate
+                      ELSE invoices.total_amount
+                  END AS float
+                  )), 0) AS total_amount,
+        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
+        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
+        FROM invoices
+        WHERE invoices.register_date >= '${params.since.toDateString()}'
+        AND invoices.register_date <= '${params.until.toDateString()}'
+        AND invoices.organization_id = ${params.organizationId};`);
+    } else {
+      report = await this.invoiceRepo.find({
+        where: {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toISOString()}`,
+              until: `${params.until.toISOString()}`,
+            },
+          ),
+          paymentMethodId: params.paymentMethod,
+          organizationId: params.organizationId,
+        },
+        order: {
+          invoiceNumber: 'ASC',
+        },
+      });
+      summary = await this.invoiceRepo.query(`
+        SELECT
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.subtotal*invoices.exhange_rate
+                  ELSE invoices.subtotal
+              END AS float
+              )), 0) AS total_subtotal,
+        COALESCE(SUM(CAST(
+              CASE
+                  WHEN invoices.currency_code != 'BS'
+                    THEN invoices.iva*invoices.exhange_rate
+                  ELSE invoices.iva
+              END AS float
+              )), 0) AS total_iva,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.iva_r*invoices.exhange_rate
+                      ELSE invoices.iva_r
+                  END AS float
+                  )), 0) AS total_iva_r,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.iva_p*invoices.exhange_rate
+                      ELSE invoices.iva_p
+                  END AS float
+                  )), 0) AS total_iva_p,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.igtf*invoices.exhange_rate
+                      ELSE invoices.igtf
+                  END AS float
+                  )), 0) AS total_igtf,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.islr*invoices.exhange_rate
+                      ELSE invoices.islr
+                  END AS float
+                  )), 0) AS total_islr,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
+                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
+                  END AS float
+                  )), 0) AS total_neto,
+        COALESCE(SUM(CAST(
+                  CASE
+                      WHEN invoices.currency_code != 'BS'
+                        THEN invoices.total_amount*invoices.exhange_rate
+                      ELSE invoices.total_amount
+                  END AS float
+                  )), 0) AS total_amount,
+        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
+        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
+        FROM invoices
+        WHERE invoices.register_date >= '${params.since.toDateString()}'
+        AND invoices.register_date <= '${params.until.toDateString()}'
+        AND invoices.payment_method_id = '${params.paymentMethod}'
+        AND invoices.organization_id = ${params.organizationId};`);
     }
 
     return {

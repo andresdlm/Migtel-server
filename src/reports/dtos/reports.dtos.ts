@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, Matches } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsString, Matches } from 'class-validator';
 
 export class SalesBookReportDto {
   @IsNumber()
@@ -12,6 +12,24 @@ export class SalesBookReportDto {
   @IsDate()
   @IsNotEmpty()
   readonly until: Date;
+}
+
+export class SalesBookCityReportDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly paymentMethod: number;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly since: Date;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly until: Date;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly organizationId: number;
 }
 
 export class ReportDto {

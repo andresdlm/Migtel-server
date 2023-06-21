@@ -111,7 +111,7 @@ export class Invoice {
   @Column({ type: 'boolean', default: true })
   paid: boolean;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ name: 'organization_id', type: 'int', default: 0 })
   organizationId: number;
 
   @Column({ name: 'bank_reference', type: 'varchar', default: '' })
