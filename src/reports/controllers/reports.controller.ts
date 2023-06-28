@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { PaymentReportDto, ReferenceDto, ReportDto, SalesBookCityReportDto, SalesBookReportDto } from '../dtos/reports.dtos';
 import { ReportsService } from '../services/reports.service';
 
@@ -49,5 +49,10 @@ export class ReportsController {
   @Post('igtfBook')
   async getIgtfBookReport(@Body() payload: ReportDto) {
     return await this.reportsService.getIgtfBookReport(payload);
+  }
+
+  @Get('paidInvoiceReport')
+  async getPaidInvoiceReport() {
+    return await this.reportsService.getPaidInvoiceReport();
   }
 }

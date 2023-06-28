@@ -62,3 +62,9 @@ export interface SummaryIgtfBook {
   total_invoices: number;
   total_imponible: number;
 }
+
+export interface SummaryPaidInvoice {
+  total_invoices: number;
+  total_usd: number;
+  total_bs: number;
+}
