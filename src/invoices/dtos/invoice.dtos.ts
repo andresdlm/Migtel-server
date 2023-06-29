@@ -66,6 +66,12 @@ export class CreateInvoiceDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(1)
+  @Max(2)
+  readonly clientType: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   @IsPositive()
   readonly organizationId: number;
 
@@ -98,6 +104,12 @@ export class UpdateInvoiceDto {
   @Min(0)
   @Max(100)
   readonly retention: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  readonly islr: number;
 }
 
 export class FilterInvoiceDto {

@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { Brackets, Raw, Repository } from 'typeorm';
 
 import {
   ReportDto,
   PaymentReportDto,
   SalesBookReportDto,
   ReferenceDto,
-  SalesBookCityReportDto,
 } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
@@ -34,26 +33,46 @@ export class ReportsService {
   ) {}
 
   async getSalesBookReport(params: SalesBookReportDto) {
-    let report: Invoice[] = [];
-    let summary: SummarySalesBook;
-
-    if (params.paymentMethod < 0) {
-      report = await this.invoiceRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
+    const report: Invoice[] = await this.invoiceRepo
+      .createQueryBuilder('invoices')
+      .where('invoices.register_date >= :since', { since: params.since })
+      .andWhere('invoices.register_date <= :until', { until: params.until })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            'invoices.payment_method_id = :paymentMethod AND :paymentMethod != 0',
             {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
+              paymentMethod: params.paymentMethod,
             },
-          ),
-        },
-        order: {
-          invoiceNumber: 'ASC',
-        },
-      });
-      summary = await this.invoiceRepo.query(`
+          ).orWhere(':paymentMethod = 0', {
+            paymentMethod: params.paymentMethod,
+          });
+        }),
+      )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            'invoices.organization_id = :organizationId AND :organizationId != 0',
+            {
+              organizationId: params.organizationId,
+            },
+          ).orWhere(':organizationId = 0', {
+            organizationId: params.organizationId,
+          });
+        }),
+      )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('invoices.client_type = :clientType AND :clientType != 0', {
+            clientType: params.clientType,
+          }).orWhere(':clientType = 0', {
+            clientType: params.clientType,
+          });
+        }),
+      )
+      .getMany();
+
+    const summary: SummarySalesBook = await this.invoiceRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
               CASE
@@ -114,266 +133,18 @@ export class ReportsService {
         count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
         count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
         FROM invoices
-        WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}';`);
-    } else {
-      report = await this.invoiceRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
-            {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
-            },
-          ),
-          paymentMethodId: params.paymentMethod,
-        },
-        order: {
-          invoiceNumber: 'ASC',
-        },
-      });
-      summary = await this.invoiceRepo.query(`
-        SELECT
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.subtotal*invoices.exhange_rate
-                  ELSE invoices.subtotal
-              END AS float
-              )), 0) AS total_subtotal,
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.iva*invoices.exhange_rate
-                  ELSE invoices.iva
-              END AS float
-              )), 0) AS total_iva,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_r*invoices.exhange_rate
-                      ELSE invoices.iva_r
-                  END AS float
-                  )), 0) AS total_iva_r,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_p*invoices.exhange_rate
-                      ELSE invoices.iva_p
-                  END AS float
-                  )), 0) AS total_iva_p,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.igtf*invoices.exhange_rate
-                      ELSE invoices.igtf
-                  END AS float
-                  )), 0) AS total_igtf,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.islr*invoices.exhange_rate
-                      ELSE invoices.islr
-                  END AS float
-                  )), 0) AS total_islr,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
-                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
-                  END AS float
-                  )), 0) AS total_neto,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.total_amount*invoices.exhange_rate
-                      ELSE invoices.total_amount
-                  END AS float
-                  )), 0) AS total_amount,
-        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
-        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
-        FROM invoices
-        WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}'
-        AND invoices.payment_method_id = '${params.paymentMethod}';`);
-    }
-
-    return {
-      report,
-      summary: summary[0],
-    };
-  }
-
-  async getSalesBookCityReport(params: SalesBookCityReportDto) {
-    let report: Invoice[] = [];
-    let summary: SummarySalesBook;
-
-    if (params.paymentMethod < 0) {
-      report = await this.invoiceRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
-            {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
-            },
-          ),
-          organizationId: params.organizationId,
-        },
-        order: {
-          invoiceNumber: 'ASC',
-        },
-      });
-      summary = await this.invoiceRepo.query(`
-        SELECT
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.subtotal*invoices.exhange_rate
-                  ELSE invoices.subtotal
-              END AS float
-              )), 0) AS total_subtotal,
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.iva*invoices.exhange_rate
-                  ELSE invoices.iva
-              END AS float
-              )), 0) AS total_iva,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_r*invoices.exhange_rate
-                      ELSE invoices.iva_r
-                  END AS float
-                  )), 0) AS total_iva_r,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_p*invoices.exhange_rate
-                      ELSE invoices.iva_p
-                  END AS float
-                  )), 0) AS total_iva_p,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.igtf*invoices.exhange_rate
-                      ELSE invoices.igtf
-                  END AS float
-                  )), 0) AS total_igtf,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.islr*invoices.exhange_rate
-                      ELSE invoices.islr
-                  END AS float
-                  )), 0) AS total_islr,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
-                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
-                  END AS float
-                  )), 0) AS total_neto,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.total_amount*invoices.exhange_rate
-                      ELSE invoices.total_amount
-                  END AS float
-                  )), 0) AS total_amount,
-        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
-        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
-        FROM invoices
-        WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}'
-        AND invoices.organization_id = ${params.organizationId};`);
-    } else {
-      report = await this.invoiceRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
-            {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
-            },
-          ),
-          paymentMethodId: params.paymentMethod,
-          organizationId: params.organizationId,
-        },
-        order: {
-          invoiceNumber: 'ASC',
-        },
-      });
-      summary = await this.invoiceRepo.query(`
-        SELECT
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.subtotal*invoices.exhange_rate
-                  ELSE invoices.subtotal
-              END AS float
-              )), 0) AS total_subtotal,
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN invoices.currency_code != 'BS'
-                    THEN invoices.iva*invoices.exhange_rate
-                  ELSE invoices.iva
-              END AS float
-              )), 0) AS total_iva,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_r*invoices.exhange_rate
-                      ELSE invoices.iva_r
-                  END AS float
-                  )), 0) AS total_iva_r,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.iva_p*invoices.exhange_rate
-                      ELSE invoices.iva_p
-                  END AS float
-                  )), 0) AS total_iva_p,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.igtf*invoices.exhange_rate
-                      ELSE invoices.igtf
-                  END AS float
-                  )), 0) AS total_igtf,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.islr*invoices.exhange_rate
-                      ELSE invoices.islr
-                  END AS float
-                  )), 0) AS total_islr,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN (invoices.total_amount-invoices.iva_r-invoices.islr)*invoices.exhange_rate
-                      ELSE invoices.total_amount-invoices.iva_r-invoices.islr
-                  END AS float
-                  )), 0) AS total_neto,
-        COALESCE(SUM(CAST(
-                  CASE
-                      WHEN invoices.currency_code != 'BS'
-                        THEN invoices.total_amount*invoices.exhange_rate
-                      ELSE invoices.total_amount
-                  END AS float
-                  )), 0) AS total_amount,
-        count(CASE invoices.canceled WHEN true  THEN 1 ELSE 1 END) as total_invoices,
-        count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
-        FROM invoices
-        WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}'
-        AND invoices.payment_method_id = '${params.paymentMethod}'
-        AND invoices.organization_id = ${params.organizationId};`);
-    }
+        WHERE
+          invoices.register_date >= '${params.since.toDateString()}'
+          AND invoices.register_date <= '${params.until.toDateString()}'
+          AND ((invoices.payment_method_id = '${params.paymentMethod}' AND
+              '${params.paymentMethod}' != 0) OR
+              ('${params.paymentMethod}' = 0))
+          AND ((invoices.organization_id = '${params.organizationId}' AND
+              '${params.organizationId}' != 0) OR
+              ('${params.organizationId}' = 0))
+          AND ((invoices.client_type = '${params.clientType}' AND
+              '${params.clientType}' != 0) OR
+              ('${params.clientType}' = 0));`);
 
     return {
       report,
@@ -488,31 +259,50 @@ export class ReportsService {
   }
 
   async getPaymentReport(params: PaymentReportDto) {
-    let listPayments = [];
-    let summary = [];
-
-    if (params.paymentMethod < 0) {
-      listPayments = await this.paymentRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
+    const report: Payment[] = await this.paymentRepo
+      .createQueryBuilder('payments')
+      .leftJoinAndSelect('payments.paymentMethod', 'payment_method')
+      .where('payments.register_date >= :since', { since: params.since })
+      .andWhere('payments.register_date <= :until', { until: params.until })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            'payments.payment_method_id = :paymentMethod AND :paymentMethod != 0',
             {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
+              paymentMethod: params.paymentMethod,
             },
-          ),
-          currencyCode: params.currencyCode,
-        },
-        order: {
-          registerDate: 'ASC',
-        },
-        relations: {
-          paymentMethod: true,
-          user: true,
-        },
-      });
-      summary = await this.paymentRepo.query(`
+          ).orWhere(':paymentMethod = 0', {
+            paymentMethod: params.paymentMethod,
+          });
+        }),
+      )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            `payments.currency_code = :currencyCode AND :currencyCode != 'ALL'`,
+            {
+              currencyCode: params.currencyCode,
+            },
+          ).orWhere(`:currencyCode = 'ALL'`, {
+            currencyCode: params.currencyCode,
+          });
+        }),
+      )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where(
+            'payments.organization_id = :organizationId AND :organizationId != 0',
+            {
+              organizationId: params.organizationId,
+            },
+          ).orWhere(':organizationId = 0', {
+            organizationId: params.organizationId,
+          });
+        }),
+      )
+      .getMany();
+
+    const summary = await this.paymentRepo.query(`
         SELECT
         COALESCE(SUM(CAST(
               CASE
@@ -531,53 +321,14 @@ export class ReportsService {
               FROM payments
         WHERE payments.register_date >= '${params.since.toDateString()}'
         AND payments.register_date <= '${params.until.toDateString()}'
-        AND payments.currency_code = '${params.currencyCode}';`);
-    } else {
-      listPayments = await this.paymentRepo.find({
-        where: {
-          registerDate: Raw(
-            (registerDate) =>
-              `${registerDate} >= :since AND ${registerDate} <= :until`,
-            {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
-            },
-          ),
-          currencyCode: params.currencyCode,
-          paymentMethodId: params.paymentMethod,
-        },
-        order: {
-          registerDate: 'ASC',
-        },
-        relations: {
-          paymentMethod: true,
-          user: true,
-        },
-      });
-      summary = await this.paymentRepo.query(`
-        SELECT
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN payments.currency_code = 'BS'
-                    THEN payments.amount / payments.exhange_rate
-                  ELSE payments.amount
-              END AS float
-              )), 0) AS total_usd,
-        COALESCE(SUM(CAST(
-              CASE
-                  WHEN payments.currency_code = 'USD'
-                    THEN payments.amount * payments.exhange_rate
-                  ELSE payments.amount
-              END AS float
-              )), 0) AS total_bs
-              FROM payments
-        WHERE payments.register_date >= '${params.since.toDateString()}'
-        AND payments.register_date <= '${params.until.toDateString()}'
-        AND payments.payment_method_id = '${params.paymentMethod}'
-        AND payments.currency_code = '${params.currencyCode}';`);
-    }
+        AND ((payments.currency_code = '${params.currencyCode}' AND '${
+      params.currencyCode
+    }' != 'ALL') OR '${params.currencyCode}' = 'ALL')
+        AND ((payments.payment_method_id = '${params.paymentMethod}' AND
+          '${params.paymentMethod}' != 0) OR
+          ('${params.paymentMethod}' = 0));`);
 
-    return [listPayments, summary[0]];
+    return [report, summary[0]];
   }
 
   async getRetentionsReport(params: ReportDto) {
@@ -754,26 +505,26 @@ export class ReportsService {
     });
 
     const summary: SummaryReference = await this.paymentRepo.query(`
-    SELECT
-    COALESCE(SUM(CAST(
+      SELECT
+        COALESCE(SUM(CAST(
           CASE
               WHEN payments.currency_code != 'BS'
                 THEN payments.amount
               ELSE payments.amount/payments.exhange_rate
           END AS float
           )), 0) AS total_amount_usd,
-    COALESCE(SUM(CAST(
+        COALESCE(SUM(CAST(
           CASE
               WHEN payments.currency_code = 'BS'
                 THEN payments.amount
               ELSE payments.amount*payments.exhange_rate
           END AS float
           )), 0) AS total_amount_bs,
-    count(payments) as total_references
-    FROM payments
-    WHERE payments.register_date >= '${params.since.toDateString()}'
-    AND payments.register_date <= '${params.until.toDateString()}'
-    AND payments.payment_method_id = '${params.paymentMethod}'`);
+      count(payments) as total_references
+      FROM payments
+      WHERE payments.register_date >= '${params.since.toDateString()}'
+      AND payments.register_date <= '${params.until.toDateString()}'
+      AND payments.payment_method_id = '${params.paymentMethod}'`);
 
     return {
       report,

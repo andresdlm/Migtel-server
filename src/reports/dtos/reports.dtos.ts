@@ -1,10 +1,13 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString, Matches } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class SalesBookReportDto {
-  @IsNumber()
-  @IsNotEmpty()
-  readonly paymentMethod: number;
-
   @IsDate()
   @IsNotEmpty()
   readonly since: Date;
@@ -12,24 +15,20 @@ export class SalesBookReportDto {
   @IsDate()
   @IsNotEmpty()
   readonly until: Date;
-}
 
-export class SalesBookCityReportDto {
   @IsNumber()
   @IsNotEmpty()
   readonly paymentMethod: number;
-
-  @IsDate()
-  @IsNotEmpty()
-  readonly since: Date;
-
-  @IsDate()
-  @IsNotEmpty()
-  readonly until: Date;
 
   @IsNumber()
   @IsNotEmpty()
   readonly organizationId: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(2)
+  @IsNotEmpty()
+  readonly clientType: number;
 }
 
 export class ReportDto {
@@ -45,9 +44,13 @@ export class ReportDto {
 export class PaymentReportDto {
   @IsNumber()
   @IsNotEmpty()
+  readonly organizationId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   readonly paymentMethod: number;
 
-  @Matches(RegExp('USD|BS'))
+  @Matches(RegExp('ALL|USD|BS'))
   @IsNotEmpty()
   readonly currencyCode: string;
 

@@ -144,9 +144,14 @@ export class InvoicesService {
   }
 
   async setPaid(id: number) {
-    const invoice = await this.findOne(id);
-    this.invoiceRepo.merge(invoice, { paid: true });
-    return await this.invoiceRepo.save(invoice);
+    const invoice = await this.invoiceRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
+    invoice.paid = true;
+    await this.invoiceRepo.save(invoice);
+    return await this.findOne(id);
   }
 
   async printCount(countToPrint: number) {
@@ -230,7 +235,12 @@ export class InvoicesService {
       invoice.iva_r = invoice.iva * changes.retention * 0.01;
       invoice.iva_p = invoice.iva - invoice.iva_r;
     }
-    return await this.invoiceRepo.save(invoice);
+
+    if (changes.islr !== undefined && invoice.igtf === 0) {
+      invoice.islr = invoice.subtotal * changes.islr * 0.01;
+    }
+    await this.invoiceRepo.save(invoice);
+    return this.findOne(invoice.id);
   }
 
   async cancelInvoice(id: number) {
@@ -291,6 +301,7 @@ export class InvoicesService {
       creditNote.comment = invoice.invoiceNumber.toString();
       creditNote.period = invoice.period;
       creditNote.organizationId = invoice.organizationId;
+      creditNote.clientType = invoice.clientType;
       creditNote.currencyCode = invoice.currencyCode;
       creditNote.type = 'N/C';
       creditNote.invoiceNumber = 0;
@@ -331,7 +342,7 @@ export class InvoicesService {
       invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
-      if (client && client.retention !== 0) {
+      if (invoice.iva_r !== 0 || invoice.islr !== 0) {
         invoice.igtf =
           (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
       } else {
