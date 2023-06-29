@@ -16,6 +16,7 @@ import {
   Igtf,
   Summary,
   SummaryIgtfBook,
+  SummaryPaidInvoice,
   SummaryReference,
   SummaryRetentions,
   SummarySalesBook,
@@ -586,6 +587,46 @@ export class ReportsService {
       WHERE invoices.register_date >= '${params.since.toDateString()}'
       AND invoices.register_date <= '${params.until.toDateString()}'
       AND invoices.igtf != 0;`,
+    );
+
+    return {
+      report,
+      summary: summary[0],
+    };
+  }
+
+  async getPaidInvoiceReport() {
+    const report: Invoice[] = await this.invoiceRepo.find({
+      where: {
+        paid: false,
+      },
+      relations: {
+        paymentMethod: true,
+      },
+      order: {
+        invoiceNumber: 'ASC',
+      },
+    });
+
+    const summary: SummaryPaidInvoice[] = await this.invoiceRepo.query(
+      `SELECT 
+      COUNT(invoices) as total_invoices,
+      COALESCE(SUM(CAST(
+                CASE 
+                    WHEN invoices.currency_code = 'USD'
+                      THEN invoices.total_amount
+                    ELSE invoices.total_amount / invoices.exhange_rate
+                END AS numeric
+      )), 0) AS total_usd,
+      COALESCE(SUM(CAST(
+                CASE 
+                    WHEN invoices.currency_code = 'BS'
+                      THEN invoices.total_amount
+                    ELSE invoices.total_amount * invoices.exhange_rate
+                END AS numeric
+      )), 0) AS total_bs
+      FROM invoices
+      WHERE invoices.paid = false;`,
     );
 
     return {
