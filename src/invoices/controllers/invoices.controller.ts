@@ -13,6 +13,8 @@ import {
   CreateInvoiceDto,
   FilterInvoiceDto,
   UpdateInvoiceDto,
+  UpdateInvoiceProductRelationDto,
+  UpdateInvoiceServiceRelationDto,
 } from '../dtos/invoice.dtos';
 import { InvoicesService } from '../services/invoices.service';
 
@@ -107,6 +109,15 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':id/updateReference')
+  updateReference(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() reference: { bankReference: string },
+  ) {
+    return this.invoiceService.updateReference(id, reference);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id/creditNote')
   createCreditNote(@Param('id', ParseIntPipe) id: number) {
     return this.invoiceService.createCreditNote(id);
@@ -122,5 +133,45 @@ export class InvoicesController {
   @Delete(':invoiceNumber/unprintInvoice')
   unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.unprint(invoiceNumber);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':invoiceId/updateInvoiceProduct/:productId')
+  updateInvoiceProduct(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() changes: UpdateInvoiceProductRelationDto,
+  ) {
+    return this.invoiceService.updateInvoiceProduct(
+      invoiceId,
+      productId,
+      changes,
+    );
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':invoiceId/updateInvoiceService/:serviceId')
+  updateInvoiceService(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Param('serviceId', ParseIntPipe) serviceId: number,
+    @Body() changes: UpdateInvoiceServiceRelationDto,
+  ) {
+    return this.invoiceService.updateInvoiceService(
+      invoiceId,
+      serviceId,
+      changes,
+    );
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':invoiceId/updateInvoiceComment')
+  updateInvoiceComment(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Body() changes: { comment: string },
+  ) {
+    return this.invoiceService.updateInvoiceComment(
+      invoiceId,
+      changes,
+    )
   }
 }

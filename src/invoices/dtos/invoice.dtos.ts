@@ -14,6 +14,7 @@ import {
 import { Type } from 'class-transformer';
 import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
+import { extend } from 'joi';
 
 export class CreateInvoiceDto {
   @IsInt()
@@ -123,3 +124,9 @@ export class FilterInvoiceDto {
   @Min(0)
   offset: number;
 }
+
+export interface UpdateInvoiceProductRelationDto
+  extends Partial<CreateInvoiceProductRelationDto> {}
+
+export interface UpdateInvoiceServiceRelationDto
+  extends Partial<CreateInvoiceServiceRelationDto> {}
