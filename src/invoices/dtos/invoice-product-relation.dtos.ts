@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 
 export class CreateInvoiceProductRelationDto {
   @IsPositive()
@@ -13,7 +13,7 @@ export class CreateInvoiceProductRelationDto {
   @IsNotEmpty()
   readonly count: number;
 
-  @IsPositive()
+  @IsNumber()
   @IsNotEmpty()
   readonly price: number;
 }

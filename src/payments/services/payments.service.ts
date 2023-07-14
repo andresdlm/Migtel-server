@@ -41,6 +41,12 @@ export class PaymentsService {
       where: {
         id: id,
       },
+      relations: {
+        user: {
+          employee: true,
+        },
+        paymentMethod: true,
+      },
     });
     if (!payment) {
       throw new NotFoundException(`Payment #${id} not found`);
@@ -57,6 +63,9 @@ export class PaymentsService {
       return this.paymentRepo.find({
         where: [{ clientId: Number(searchInput) }],
         take: 20,
+        relations: {
+          paymentMethod: true,
+        },
       });
     }
   }

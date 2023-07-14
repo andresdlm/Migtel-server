@@ -71,6 +71,7 @@ export class ReportsService {
           });
         }),
       )
+      .orderBy('invoice_number', 'ASC')
       .getMany();
 
     const summary: SummarySalesBook = await this.invoiceRepo.query(`
@@ -301,6 +302,7 @@ export class ReportsService {
           });
         }),
       )
+      .orderBy('register_date', 'ASC')
       .getMany();
 
     const summary = await this.paymentRepo.query(`
@@ -609,17 +611,17 @@ export class ReportsService {
     });
 
     const summary: SummaryPaidInvoice[] = await this.invoiceRepo.query(
-      `SELECT 
+      `SELECT
       COUNT(invoices) as total_invoices,
       COALESCE(SUM(CAST(
-                CASE 
+                CASE
                     WHEN invoices.currency_code = 'USD'
                       THEN invoices.total_amount
                     ELSE invoices.total_amount / invoices.exhange_rate
                 END AS numeric
       )), 0) AS total_usd,
       COALESCE(SUM(CAST(
-                CASE 
+                CASE
                     WHEN invoices.currency_code = 'BS'
                       THEN invoices.total_amount
                     ELSE invoices.total_amount * invoices.exhange_rate
