@@ -7,6 +7,8 @@ import {
   CreateInvoiceDto,
   FilterInvoiceDto,
   UpdateInvoiceDto,
+  UpdateInvoiceProductRelationDto,
+  UpdateInvoiceServiceRelationDto,
 } from '../dtos/invoice.dtos';
 import { Invoice } from '../entities/invoice.entity';
 import { ClientsService } from 'src/clients/services/clients.service';
@@ -243,6 +245,17 @@ export class InvoicesService {
     return this.findOne(invoice.id);
   }
 
+  async updateReference(id: number, changes: { bankReference: string }) {
+    const invoice: Invoice = await this.invoiceRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
+    invoice.bankReference = changes.bankReference;
+    await this.invoiceRepo.save(invoice);
+    return await this.findOne(invoice.id);
+  }
+
   async cancelInvoice(id: number) {
     const invoice: Invoice = await this.findOne(id);
     invoice.clientId = 0;
@@ -311,6 +324,59 @@ export class InvoicesService {
       creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
       return await this.invoiceRepo.save(creditNote);
     }
+  }
+
+  async updateInvoiceProduct(
+    invoiceId: number,
+    productId: number,
+    changes: UpdateInvoiceProductRelationDto,
+  ) {
+    const invoice = await this.findOne(invoiceId);
+    if (!invoice.printed) {
+      const invoiceProduct = await this.invoiceProductRelRepo.findOne({
+        where: {
+          invoiceId: invoiceId,
+          productId: productId,
+        },
+      });
+      invoiceProduct.productName = changes.productName;
+      await this.invoiceProductRelRepo.save(invoiceProduct);
+      return await this.findOne(invoiceId);
+    } else {
+      return invoice;
+    }
+  }
+
+  async updateInvoiceService(
+    invoiceId: number,
+    serviceId: number,
+    changes: UpdateInvoiceServiceRelationDto,
+  ) {
+    const invoice = await this.findOne(invoiceId);
+    if (!invoice.printed) {
+      const invoiceService = await this.invoiceServiceRelRepo.findOne({
+        where: {
+          invoiceId: invoiceId,
+          serviceId: serviceId,
+        },
+      });
+      invoiceService.servicePlanName = changes.servicePlanName;
+      await this.invoiceServiceRelRepo.save(invoiceService);
+      return await this.findOne(invoiceId);
+    } else {
+      return invoice;
+    }
+  }
+
+  async updateInvoiceComment(invoiceId: number, changes: { comment: string }) {
+    const invoice = await this.invoiceRepo.findOne({
+      where: {
+        id: invoiceId,
+      },
+    });
+    invoice.comment = changes.comment;
+    await this.invoiceRepo.save(invoice);
+    return await this.findOne(invoiceId);
   }
 
   async calculateInvoiceAmount(invoice: Invoice, data: CreateInvoiceDto) {
