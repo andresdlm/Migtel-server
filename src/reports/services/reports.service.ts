@@ -601,6 +601,8 @@ export class ReportsService {
     const report: Invoice[] = await this.invoiceRepo.find({
       where: {
         paid: false,
+        canceled: false,
+        type: 'FACT',
       },
       relations: {
         paymentMethod: true,
