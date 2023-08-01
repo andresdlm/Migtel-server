@@ -118,6 +118,15 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Put(':id/updatePeriod')
+  updatePeriod(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() period: { period: string },
+  ) {
+    return this.invoiceService.updatePeriod(id, period);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id/creditNote')
   createCreditNote(@Param('id', ParseIntPipe) id: number) {
     return this.invoiceService.createCreditNote(id);
@@ -169,9 +178,6 @@ export class InvoicesController {
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
     @Body() changes: { comment: string },
   ) {
-    return this.invoiceService.updateInvoiceComment(
-      invoiceId,
-      changes,
-    )
+    return this.invoiceService.updateInvoiceComment(invoiceId, changes);
   }
 }

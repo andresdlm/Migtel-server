@@ -256,6 +256,17 @@ export class InvoicesService {
     return await this.findOne(invoice.id);
   }
 
+  async updatePeriod(id: number, changes: { period: string }) {
+    const invoice: Invoice = await this.invoiceRepo.findOne({
+      where: {
+        id: id,
+      },
+    });
+    invoice.period = changes.period;
+    await this.invoiceRepo.save(invoice);
+    return await this.findOne(invoice.id);
+  }
+
   async cancelInvoice(id: number) {
     const invoice: Invoice = await this.findOne(id);
     invoice.clientId = 0;
