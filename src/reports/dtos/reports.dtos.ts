@@ -50,6 +50,10 @@ export class PaymentReportDto {
   @IsNotEmpty()
   readonly paymentMethod: number;
 
+  @IsNumber()
+  @IsNotEmpty()
+  readonly clientType: number;
+
   @Matches(RegExp('ALL|USD|BS'))
   @IsNotEmpty()
   readonly currencyCode: string;
@@ -61,13 +65,6 @@ export class PaymentReportDto {
   @IsDate()
   @IsNotEmpty()
   readonly until: Date;
-}
-
-export class AccountReport {
-  readonly id: number;
-  readonly name: string;
-  readonly payments: number;
-  readonly balance: number;
 }
 
 export class ReferenceDto {

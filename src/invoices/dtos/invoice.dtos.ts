@@ -14,7 +14,7 @@ import {
 import { Type } from 'class-transformer';
 import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
-import { extend } from 'joi';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateInvoiceDto {
   @IsInt()
@@ -125,8 +125,10 @@ export class FilterInvoiceDto {
   offset: number;
 }
 
-export interface UpdateInvoiceProductRelationDto
-  extends Partial<CreateInvoiceProductRelationDto> {}
+export class UpdateInvoiceProductRelationDto extends PartialType(
+  CreateInvoiceProductRelationDto,
+) {}
 
-export interface UpdateInvoiceServiceRelationDto
-  extends Partial<CreateInvoiceServiceRelationDto> {}
+export class UpdateInvoiceServiceRelationDto extends PartialType(
+  CreateInvoiceServiceRelationDto,
+) {}

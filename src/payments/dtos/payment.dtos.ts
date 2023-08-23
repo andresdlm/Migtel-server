@@ -7,6 +7,7 @@ import {
   Min,
   IsNumber,
   Matches,
+  Max,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
@@ -54,6 +55,12 @@ export class CreatePaymentDto {
   @IsString()
   @IsNotEmpty()
   readonly period: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(1)
+  @Max(2)
+  readonly clientType: number;
 
   @IsNumber()
   @IsNotEmpty()

@@ -34,6 +34,10 @@ export class ReportsService {
   ) {}
 
   async getSalesBookReport(params: SalesBookReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Invoice[] = await this.invoiceRepo
       .createQueryBuilder('invoices')
       .where('invoices.register_date >= :since', { since: params.since })
@@ -136,8 +140,12 @@ export class ReportsService {
         count(CASE invoices.canceled WHEN true THEN 1 END) as total_invoices_canceled
         FROM invoices
         WHERE
-          invoices.register_date >= '${params.since.toDateString()}'
-          AND invoices.register_date <= '${params.until.toDateString()}'
+          invoices.register_date >= '${params.since.toLocaleDateString(
+            'en-US',
+          )}'
+          AND invoices.register_date <= '${params.until.toLocaleDateString(
+            'en-US',
+          )}'
           AND ((invoices.payment_method_id = '${params.paymentMethod}' AND
               '${params.paymentMethod}' != 0) OR
               ('${params.paymentMethod}' = 0))
@@ -155,6 +163,10 @@ export class ReportsService {
   }
 
   async getAccountReport(params: ReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Account[] = await this.paymentMethodRepo.query(
       `SELECT payment_methods.id AS id,
       payment_methods.name AS name,
@@ -175,9 +187,13 @@ export class ReportsService {
           )), 0) AS bs_balance
       FROM payment_methods
         LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id
-      WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}'
-        AND invoices.canceled = false
+      WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+      AND invoices.register_date <= '${params.until.toLocaleDateString(
+        'en-US',
+      )}'
+      AND invoices.canceled = false
       GROUP BY payment_methods.id
       ORDER BY usd_balance DESC, id ASC;`,
     );
@@ -198,9 +214,11 @@ export class ReportsService {
         END AS float
         )), 0) AS total_bs_balance
     FROM invoices
-    WHERE invoices.register_date >= '${params.since.toDateString()}'
-      AND invoices.register_date <= '${params.until.toDateString()}'
-      AND invoices.canceled = false;
+    WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+      'en-US',
+    )}'
+    AND invoices.register_date <= '${params.until.toLocaleDateString('en-US')}'
+    AND invoices.canceled = false;
     `);
     return {
       report: report,
@@ -209,6 +227,10 @@ export class ReportsService {
   }
 
   async getAccountPaymentReport(params: ReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Account[] = await this.paymentMethodRepo.query(
       `SELECT payment_methods.id AS id,
       payment_methods.name AS name,
@@ -229,8 +251,12 @@ export class ReportsService {
           )), 0) AS bs_balance
       FROM payment_methods
         LEFT JOIN payments ON payment_methods.id = payments.payment_method_id
-      WHERE payments.register_date >= '${params.since.toDateString()}'
-        AND payments.register_date <= '${params.until.toDateString()}'
+      WHERE payments.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+        AND payments.register_date <= '${params.until.toLocaleDateString(
+          'en-US',
+        )}'
       GROUP BY payment_methods.id
       ORDER BY id ASC;`,
     );
@@ -251,8 +277,12 @@ export class ReportsService {
         END AS float
         )), 0) AS total_bs_balance
     FROM payments
-    WHERE payments.register_date >= '${params.since.toDateString()}'
-      AND payments.register_date <= '${params.until.toDateString()}'
+    WHERE payments.register_date >= '${params.since.toLocaleDateString(
+      'en-US',
+    )}'
+      AND payments.register_date <= '${params.until.toLocaleDateString(
+        'en-US',
+      )}'
     `);
     return {
       report: report,
@@ -261,6 +291,10 @@ export class ReportsService {
   }
 
   async getPaymentReport(params: PaymentReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Payment[] = await this.paymentRepo
       .createQueryBuilder('payments')
       .leftJoinAndSelect('payments.paymentMethod', 'payment_method')
@@ -302,6 +336,15 @@ export class ReportsService {
           });
         }),
       )
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('payments.client_type = :clientType AND :clientType != 0', {
+            clientType: params.clientType,
+          }).orWhere(':clientType = 0', {
+            clientType: params.clientType,
+          });
+        }),
+      )
       .orderBy('register_date', 'ASC')
       .getMany();
 
@@ -322,19 +365,33 @@ export class ReportsService {
               END AS float
               )), 0) AS total_bs
               FROM payments
-        WHERE payments.register_date >= '${params.since.toDateString()}'
-        AND payments.register_date <= '${params.until.toDateString()}'
-        AND ((payments.currency_code = '${params.currencyCode}' AND '${
-      params.currencyCode
-    }' != 'ALL') OR '${params.currencyCode}' = 'ALL')
+        WHERE payments.register_date >= '${params.since.toLocaleDateString(
+          'en-US',
+        )}'
+        AND payments.register_date <= '${params.until.toLocaleDateString(
+          'en-US',
+        )}'
+        AND ((payments.currency_code = '${params.currencyCode}' AND
+          '${params.currencyCode}' != 'ALL') OR
+          '${params.currencyCode}' = 'ALL')
         AND ((payments.payment_method_id = '${params.paymentMethod}' AND
           '${params.paymentMethod}' != 0) OR
-          ('${params.paymentMethod}' = 0));`);
+          ('${params.paymentMethod}' = 0))
+        AND ((payments.organization_id = '${params.organizationId}' AND
+          '${params.organizationId}' != 0) OR
+          ('${params.organizationId}' = 0))
+        AND ((payments.client_type = '${params.clientType}' AND
+          '${params.clientType}' != 0) OR
+          ('${params.clientType}' = 0));`);
 
     return [report, summary[0]];
   }
 
   async getRetentionsReport(params: ReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Invoice[] = await this.invoiceRepo.find({
       where: [
         {
@@ -342,8 +399,8 @@ export class ReportsService {
             (registerDate) =>
               `${registerDate} >= :since AND ${registerDate} <= :until`,
             {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
+              since: `${params.since.toLocaleDateString('en-US')}`,
+              until: `${params.until.toLocaleDateString('en-US')}`,
             },
           ),
           iva_r: Raw((iva_r) => `${iva_r} != 0`),
@@ -353,8 +410,8 @@ export class ReportsService {
             (registerDate) =>
               `${registerDate} >= :since AND ${registerDate} <= :until`,
             {
-              since: `${params.since.toISOString()}`,
-              until: `${params.until.toISOString()}`,
+              since: `${params.since.toLocaleDateString('en-US')}`,
+              until: `${params.until.toLocaleDateString('en-US')}`,
             },
           ),
           islr: Raw((islr) => `${islr} != 0`),
@@ -426,8 +483,12 @@ export class ReportsService {
         count(invoices) as total_invoices,
         count(DISTINCT invoices.type = 'FACT') as total_invoices_canceled
         FROM invoices
-        WHERE invoices.register_date >= '${params.since.toDateString()}'
-        AND invoices.register_date <= '${params.until.toDateString()}'
+        WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+          'en-US',
+        )}'
+        AND invoices.register_date <= '${params.since.toLocaleDateString(
+          'en-US',
+        )}'
         AND (invoices.iva_r != 0 OR invoices.islr != 0);`);
 
     return {
@@ -437,14 +498,18 @@ export class ReportsService {
   }
 
   async getReferenceInvoiceReport(params: ReferenceDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Invoice[] = await this.invoiceRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
             `${registerDate} >= :since AND ${registerDate} <= :until`,
           {
-            since: `${params.since.toISOString()}`,
-            until: `${params.until.toISOString()}`,
+            since: `${params.since.toLocaleDateString('en-US')}`,
+            until: `${params.until.toLocaleDateString('en-US')}`,
           },
         ),
         paymentMethodId: params.paymentMethod,
@@ -476,8 +541,12 @@ export class ReportsService {
                 )), 0) AS total_amount_bs,
       count(invoices) as total_references
       FROM invoices
-      WHERE invoices.register_date >= '${params.since.toDateString()}'
-      AND invoices.register_date <= '${params.until.toDateString()}'
+      WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+      AND invoices.register_date <= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
       AND invoices.payment_method_id = '${params.paymentMethod}'`);
 
     return {
@@ -487,14 +556,18 @@ export class ReportsService {
   }
 
   async getReferencePaymentReport(params: ReferenceDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Payment[] = await this.paymentRepo.find({
       where: {
         registerDate: Raw(
           (registerDate) =>
             `${registerDate} >= :since AND ${registerDate} <= :until`,
           {
-            since: `${params.since.toISOString()}`,
-            until: `${params.until.toISOString()}`,
+            since: `${params.since.toLocaleDateString('en-US')}`,
+            until: `${params.until.toLocaleDateString('en-US')}`,
           },
         ),
         paymentMethodId: params.paymentMethod,
@@ -525,8 +598,12 @@ export class ReportsService {
           )), 0) AS total_amount_bs,
       count(payments) as total_references
       FROM payments
-      WHERE payments.register_date >= '${params.since.toDateString()}'
-      AND payments.register_date <= '${params.until.toDateString()}'
+      WHERE payments.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+      AND payments.register_date <= '${params.until.toLocaleDateString(
+        'en-US',
+      )}'
       AND payments.payment_method_id = '${params.paymentMethod}'`);
 
     return {
@@ -536,6 +613,10 @@ export class ReportsService {
   }
 
   async getIgtfBookReport(params: ReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
     const report: Igtf[] = await this.invoiceRepo.query(
       `SELECT invoices.id,
       invoices.invoice_number,
@@ -562,8 +643,12 @@ export class ReportsService {
         ), 0) AS imponible
       FROM invoices
       INNER JOIN payment_methods ON invoices.payment_method_id = payment_methods.id
-      WHERE invoices.register_date >= '${params.since.toDateString()}'
-      AND invoices.register_date <= '${params.until.toDateString()}'
+      WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+      AND invoices.register_date <= '${params.until.toLocaleDateString(
+        'en-US',
+      )}'
       AND invoices.igtf != 0
       ORDER BY invoices.id;`,
     );
@@ -586,8 +671,12 @@ export class ReportsService {
                 )), 0) AS total_imponible,
       COUNT(CASE invoices.canceled WHEN false THEN 1 END)::INT as total_invoices
       FROM invoices
-      WHERE invoices.register_date >= '${params.since.toDateString()}'
-      AND invoices.register_date <= '${params.until.toDateString()}'
+      WHERE invoices.register_date >= '${params.since.toLocaleDateString(
+        'en-US',
+      )}'
+      AND invoices.register_date <= '${params.until.toLocaleDateString(
+        'en-US',
+      )}'
       AND invoices.igtf != 0;`,
     );
 
