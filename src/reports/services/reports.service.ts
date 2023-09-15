@@ -486,7 +486,7 @@ export class ReportsService {
         WHERE invoices.register_date >= '${params.since.toLocaleDateString(
           'en-US',
         )}'
-        AND invoices.register_date <= '${params.since.toLocaleDateString(
+        AND invoices.register_date <= '${params.until.toLocaleDateString(
           'en-US',
         )}'
         AND (invoices.iva_r != 0 OR invoices.islr != 0);`);
@@ -544,7 +544,7 @@ export class ReportsService {
       WHERE invoices.register_date >= '${params.since.toLocaleDateString(
         'en-US',
       )}'
-      AND invoices.register_date <= '${params.since.toLocaleDateString(
+      AND invoices.register_date <= '${params.until.toLocaleDateString(
         'en-US',
       )}'
       AND invoices.payment_method_id = '${params.paymentMethod}'`);
