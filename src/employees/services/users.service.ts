@@ -15,17 +15,17 @@ import {
 export class UsersService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
-  findAll(params?: FilterUsersDto) {
+  async findAll(params?: FilterUsersDto) {
     if (params) {
       const { limit, offset, getActive } = params;
-      return this.userRepo.find({
+      return await this.userRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
         where: { active: getActive },
       });
     }
-    return this.userRepo.find({
+    return await this.userRepo.find({
       order: { id: 'DESC' },
     });
   }
@@ -45,24 +45,24 @@ export class UsersService {
     return user;
   }
 
-  findByUsername(username: string) {
-    return this.userRepo.findOne({ where: { username } });
+  async findByUsername(username: string) {
+    return await this.userRepo.findOneBy({ username: username });
   }
 
-  getCount(getActive: boolean) {
-    return this.userRepo.count({
+  async getCount(getActive: boolean) {
+    return await this.userRepo.count({
       where: { active: getActive },
     });
   }
 
   async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
-      return this.userRepo.find({
+      return await this.userRepo.find({
         where: [{ id: Number(searchInput) }],
         take: 20,
       });
     } else {
-      return this.userRepo.find({
+      return await this.userRepo.find({
         where: [
           {
             username: ILike(`%${searchInput}%`),
@@ -80,11 +80,14 @@ export class UsersService {
     const newUser = this.userRepo.create(data);
     const hashPassword = await bcrypt.hash(newUser.password, 10);
     newUser.password = hashPassword;
-    return this.userRepo.save(newUser);
+    return await this.userRepo.save(newUser);
   }
 
   async update(id: number, changes: UpdateUserDto) {
-    const user = await this.findOne(id);
+    const user = await this.userRepo.findOneBy({ id: id });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
     const hashPassword = await bcrypt.hash(changes.password, 10);
     this.userRepo.merge(user, changes);
     user.password = hashPassword;
@@ -92,12 +95,15 @@ export class UsersService {
   }
 
   async activate(id: number) {
-    const user = await this.findOne(id);
+    const user = await this.userRepo.findOneBy({ id: id });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
     user.active = !user.active;
-    return this.userRepo.save(user);
+    return await this.userRepo.save(user);
   }
 
-  remove(id: number) {
-    return this.userRepo.delete(id);
+  async remove(id: number) {
+    return await this.userRepo.delete(id);
   }
 }

@@ -17,10 +17,10 @@ export class ServicePlansService {
     private servicePlanRepo: Repository<ServicePlan>,
   ) {}
 
-  findAll(params?: FilterServicePlanDto) {
+  async findAll(params?: FilterServicePlanDto) {
     if (params) {
       const { limit, offset, getArchive } = params;
-      return this.servicePlanRepo.find({
+      return await this.servicePlanRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
@@ -32,10 +32,10 @@ export class ServicePlansService {
     });
   }
 
-  findAllOrderByName(params?: FilterServicePlanDto) {
+  async findAllOrderByName(params?: FilterServicePlanDto) {
     if (params) {
       const { limit, offset, getArchive } = params;
-      return this.servicePlanRepo.find({
+      return await this.servicePlanRepo.find({
         order: { name: 'ASC' },
         take: limit,
         skip: offset,
@@ -47,20 +47,16 @@ export class ServicePlansService {
     });
   }
 
-  findOne(id: number) {
-    const servicePlan = this.servicePlanRepo.findOne({
-      where: {
-        id: id,
-      },
-    });
+  async findOne(id: number) {
+    const servicePlan = await this.servicePlanRepo.findOneBy({ id: id });
     if (!servicePlan) {
       throw new NotFoundException(`Service Plan #${id} not found`);
     }
     return servicePlan;
   }
 
-  getCount(getArchive: boolean) {
-    return this.servicePlanRepo.count({
+  async getCount(getArchive: boolean) {
+    return await this.servicePlanRepo.count({
       where: { archived: getArchive },
     });
   }
@@ -95,24 +91,30 @@ export class ServicePlansService {
     }
   }
 
-  create(data: CreateServicePlanDto) {
+  async create(data: CreateServicePlanDto) {
     const newServicePlan = this.servicePlanRepo.create(data);
-    return this.servicePlanRepo.save(newServicePlan);
+    return await this.servicePlanRepo.save(newServicePlan);
   }
 
   async update(id: number, changes: UpdateServicePlanDto) {
     const servicePlan = await this.findOne(id);
+    if (!servicePlan) {
+      throw new NotFoundException(`Service plan #${id} not found`);
+    }
     this.servicePlanRepo.merge(servicePlan, changes);
     return this.servicePlanRepo.save(servicePlan);
   }
 
   async archive(id: number) {
     const servicePlan = await this.findOne(id);
+    if (!servicePlan) {
+      throw new NotFoundException(`Service plan #${id} not found`);
+    }
     servicePlan.archived = !servicePlan.archived;
     return this.servicePlanRepo.save(servicePlan);
   }
 
-  delete(id: number) {
-    return this.servicePlanRepo.delete(id);
+  async delete(id: number) {
+    return await this.servicePlanRepo.delete(id);
   }
 }

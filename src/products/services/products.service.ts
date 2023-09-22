@@ -33,11 +33,7 @@ export class ProductsService {
   }
 
   async findOne(productId: number) {
-    const product = await this.productRepo.findOne({
-      where: {
-        id: productId,
-      },
-    });
+    const product = await this.productRepo.findOneBy({ id: productId });
     if (!product) {
       throw new NotFoundException(`Product #${productId} not found`);
     }
@@ -76,12 +72,18 @@ export class ProductsService {
 
   async update(id: number, changes: UpdateProductDto) {
     const product = await this.findOne(id);
+    if (!product) {
+      throw new NotFoundException(`Product #${id} not found`);
+    }
     this.productRepo.merge(product, changes);
     return await this.productRepo.save(product);
   }
 
   async archive(id: number) {
     const product = await this.findOne(id);
+    if (!product) {
+      throw new NotFoundException(`Product #${id} not found`);
+    }
     product.archive = !product.archive;
     return await this.productRepo.save(product);
   }

@@ -52,22 +52,22 @@ export class EmployeesService {
   }
 
   async findEmployeesWithoutUser() {
-    return this.employeeRepo.query(`
+    return await this.employeeRepo.query(`
       SELECT employees.id, firstname, lastname, document
       FROM employees
       LEFT OUTER JOIN users e on employees.id = e.employee_id
       WHERE e.id IS NULL`);
   }
 
-  getCount(getActive: boolean) {
-    return this.employeeRepo.count({
+  async getCount(getActive: boolean) {
+    return await this.employeeRepo.count({
       where: { active: getActive },
     });
   }
 
   async search(searchInput: string, getArchive: boolean) {
     if (isNumber(Number(searchInput))) {
-      return this.employeeRepo.find({
+      return await this.employeeRepo.find({
         where: [{ id: Number(searchInput), active: getArchive }],
         take: 20,
         relations: {
@@ -75,7 +75,7 @@ export class EmployeesService {
         },
       });
     } else {
-      return this.employeeRepo.find({
+      return await this.employeeRepo.find({
         where: [
           {
             firstname: ILike(`%${searchInput}%`),
@@ -116,14 +116,17 @@ export class EmployeesService {
   }
 
   async update(id: number, changes: UpdateEmployeeDto) {
-    const employee = await this.findOne(id);
+    const employee = await this.employeeRepo.findOneBy({ id: id });
+    if (!employee) {
+      throw new NotFoundException(`Employee #${id} not found`);
+    }
     this.employeeRepo.merge(employee, changes);
     return await this.employeeRepo.save(employee);
   }
 
   async deactivate(id: number) {
-    const product = await this.findOne(id);
-    product.active = !product.active;
-    return await this.employeeRepo.save(product);
+    const employee = await this.findOne(id);
+    employee.active = !employee.active;
+    return await this.employeeRepo.save(employee);
   }
 }

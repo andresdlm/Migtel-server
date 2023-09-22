@@ -33,11 +33,7 @@ export class PaymentMethodsService {
   }
 
   async findOne(id: number) {
-    const paymentMethod = await this.paymentMethodRepo.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const paymentMethod = await this.paymentMethodRepo.findOneBy({ id: id });
     if (!paymentMethod) {
       throw new NotFoundException(`Payment Method #${id} not found`);
     }
@@ -45,10 +41,8 @@ export class PaymentMethodsService {
   }
 
   async findByCrmId(crmId: string) {
-    const paymentMethod = await this.paymentMethodRepo.findOne({
-      where: {
-        crmId: crmId,
-      },
+    const paymentMethod = await this.paymentMethodRepo.findOneBy({
+      crmId: crmId,
     });
     if (!paymentMethod) {
       throw new NotFoundException(`Payment Method #${crmId} not found`);
@@ -88,12 +82,18 @@ export class PaymentMethodsService {
 
   async update(id: number, changes: UpdatePaymentMethodDto) {
     const paymentMethod = await this.findOne(id);
+    if (!paymentMethod) {
+      throw new NotFoundException(`Payment Method #${id} not found`);
+    }
     this.paymentMethodRepo.merge(paymentMethod, changes);
     return await this.paymentMethodRepo.save(paymentMethod);
   }
 
   async archive(id: number) {
     const paymentMethod = await this.findOne(id);
+    if (!paymentMethod) {
+      throw new NotFoundException(`Payment Method #${id} not found`);
+    }
     paymentMethod.archived = !paymentMethod.archived;
     return await this.paymentMethodRepo.save(paymentMethod);
   }

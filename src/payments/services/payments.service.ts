@@ -36,8 +36,8 @@ export class PaymentsService {
     });
   }
 
-  findOne(id: number) {
-    const payment = this.paymentRepo.findOne({
+  async findOne(id: number) {
+    const payment = await this.paymentRepo.findOne({
       where: {
         id: id,
       },
@@ -54,13 +54,13 @@ export class PaymentsService {
     return payment;
   }
 
-  getCount() {
-    return this.paymentRepo.count();
+  async getCount() {
+    return await this.paymentRepo.count();
   }
 
   async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
-      return this.paymentRepo.find({
+      return await this.paymentRepo.find({
         where: [{ clientId: Number(searchInput) }],
         take: 20,
         relations: {
@@ -83,6 +83,9 @@ export class PaymentsService {
 
   async update(id: number, changes: UpdatePaymentDTO) {
     const payment = await this.findOne(id);
+    if (!payment) {
+      throw new NotFoundException(`Payment #${id} not found`);
+    }
     this.paymentRepo.merge(payment, changes);
     return await this.paymentRepo.save(payment);
   }

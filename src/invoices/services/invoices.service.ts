@@ -96,7 +96,7 @@ export class InvoicesService {
 
   async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
-      return this.invoiceRepo.find({
+      return await this.invoiceRepo.find({
         where: [
           { invoiceNumber: Number(searchInput) },
           { clientId: Number(searchInput) },
@@ -225,7 +225,11 @@ export class InvoicesService {
   }
 
   async updateInvoice(id: number, changes: UpdateInvoiceDto) {
-    const invoice = await this.findOne(id);
+    const invoice = await this.invoiceRepo.findOneBy({ id: id });
+    if (!invoice) {
+      throw new NotFoundException(`Invoice #${id} not found`);
+    }
+
     if (changes.paymentMethodId) {
       this.invoiceRepo.merge(invoice, changes);
       invoice.paymentMethod = await this.paymentMethodService.findOne(
@@ -242,26 +246,26 @@ export class InvoicesService {
       invoice.islr = invoice.subtotal * changes.islr * 0.01;
     }
     await this.invoiceRepo.save(invoice);
-    return this.findOne(invoice.id);
+    return await this.findOne(invoice.id);
   }
 
   async updateReference(id: number, changes: { bankReference: string }) {
-    const invoice: Invoice = await this.invoiceRepo.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const invoice = await this.invoiceRepo.findOneBy({ id: id });
+    if (!invoice) {
+      throw new NotFoundException(`Invoice #${id} not found`);
+    }
+
     invoice.bankReference = changes.bankReference;
     await this.invoiceRepo.save(invoice);
     return await this.findOne(invoice.id);
   }
 
   async updatePeriod(id: number, changes: { period: string }) {
-    const invoice: Invoice = await this.invoiceRepo.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const invoice = await this.invoiceRepo.findOneBy({ id: id });
+    if (!invoice) {
+      throw new NotFoundException(`Invoice #${id} not found`);
+    }
+
     invoice.period = changes.period;
     await this.invoiceRepo.save(invoice);
     return await this.findOne(invoice.id);
@@ -342,7 +346,11 @@ export class InvoicesService {
     productId: number,
     changes: UpdateInvoiceProductRelationDto,
   ) {
-    const invoice = await this.findOne(invoiceId);
+    const invoice = await this.invoiceRepo.findOneBy({ id: invoiceId });
+    if (!invoice) {
+      throw new NotFoundException(`Invoice #${invoiceId} not found`);
+    }
+
     if (!invoice.printed) {
       const invoiceProduct = await this.invoiceProductRelRepo.findOne({
         where: {
@@ -353,9 +361,7 @@ export class InvoicesService {
       invoiceProduct.productName = changes.productName;
       await this.invoiceProductRelRepo.save(invoiceProduct);
       return await this.findOne(invoiceId);
-    } else {
-      return invoice;
-    }
+    } else return invoice;
   }
 
   async updateInvoiceService(

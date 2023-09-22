@@ -15,22 +15,22 @@ export class ClientsService {
     @InjectRepository(Client) private clientRepo: Repository<Client>,
   ) {}
 
-  findAll(params?: FilterClientDto) {
+  async findAll(params?: FilterClientDto) {
     if (params) {
       const { limit, offset } = params;
-      return this.clientRepo.find({
+      return await this.clientRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
       });
     }
-    return this.clientRepo.find({
+    return await this.clientRepo.find({
       order: { id: 'DESC' },
     });
   }
 
-  findOne(id: number) {
-    const client = this.clientRepo.findOne({
+  async findOne(id: number) {
+    const client = await this.clientRepo.findOne({
       where: {
         id: id,
       },
@@ -41,18 +41,21 @@ export class ClientsService {
     return client;
   }
 
-  create(data: CreateClientDto) {
+  async create(data: CreateClientDto) {
     const newClient = this.clientRepo.create(data);
-    return this.clientRepo.save(newClient);
+    return await this.clientRepo.save(newClient);
   }
 
   async update(id: number, changes: UpdateClientDto) {
-    const client = await this.findOne(id);
+    const client = await this.clientRepo.findOneBy({ id: id });
+    if (!client) {
+      throw new NotFoundException(`Client #${id} not found`);
+    }
     this.clientRepo.merge(client, changes);
-    return this.clientRepo.save(client);
+    return await this.clientRepo.save(client);
   }
 
-  delete(id: number) {
-    return this.clientRepo.delete(id);
+  async delete(id: number) {
+    return await this.clientRepo.delete(id);
   }
 }

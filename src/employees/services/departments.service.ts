@@ -42,18 +42,18 @@ export class DepartmentsService {
     return department;
   }
 
-  getCount() {
-    return this.departmentRepo.count();
+  async getCount() {
+    return await this.departmentRepo.count();
   }
 
   async search(searchInput: string) {
     if (isNumber(Number(searchInput))) {
-      return this.departmentRepo.find({
+      return await this.departmentRepo.find({
         where: [{ id: Number(searchInput) }],
         take: 10,
       });
     } else {
-      return this.departmentRepo.find({
+      return await this.departmentRepo.find({
         where: [
           {
             name: ILike(`%${searchInput}%`),
@@ -70,7 +70,10 @@ export class DepartmentsService {
   }
 
   async update(id: number, changes: UpdateDepartmentDto) {
-    const department = await this.findOne(id);
+    const department = await this.departmentRepo.findOneBy({ id: id });
+    if (!department) {
+      throw new NotFoundException(`Department #${id} not found`);
+    }
     this.departmentRepo.merge(department, changes);
     return await this.departmentRepo.save(department);
   }

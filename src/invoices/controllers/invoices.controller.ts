@@ -127,24 +127,6 @@ export class InvoicesController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':id/creditNote')
-  createCreditNote(@Param('id', ParseIntPipe) id: number) {
-    return this.invoiceService.createCreditNote(id);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':invoiceNumber/cancelInvoice')
-  cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
-    return this.invoiceService.cancelInvoice(invoiceNumber);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @Delete(':invoiceNumber/unprintInvoice')
-  unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
-    return this.invoiceService.unprint(invoiceNumber);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':invoiceId/updateInvoiceProduct/:productId')
   updateInvoiceProduct(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -179,5 +161,23 @@ export class InvoicesController {
     @Body() changes: { comment: string },
   ) {
     return this.invoiceService.updateInvoiceComment(invoiceId, changes);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':id/creditNote')
+  createCreditNote(@Param('id', ParseIntPipe) id: number) {
+    return this.invoiceService.createCreditNote(id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':invoiceNumber/cancelInvoice')
+  cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.cancelInvoice(invoiceNumber);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Delete(':invoiceNumber/unprintInvoice')
+  unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
+    return this.invoiceService.unprint(invoiceNumber);
   }
 }
