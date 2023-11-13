@@ -59,6 +59,12 @@ export class PaymentsController {
     return this.paymentService.create(payload);
   }
 
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Post('createCrmPayment')
+  createCrmPayment(@Body() payload: any) {
+    return this.paymentService.createCrmPayment(payload);
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(

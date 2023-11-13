@@ -48,6 +48,13 @@ export class Invoice {
   })
   registerDate: Date;
 
+  @CreateDateColumn({
+    name: 'payment_date',
+    type: 'date',
+    default: () => 'CURRENT_DATE',
+  })
+  paymentDate: Date;
+
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.invoices)
   @JoinColumn({ name: 'payment_method_id' })
   paymentMethod: PaymentMethod;

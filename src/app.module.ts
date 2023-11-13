@@ -12,6 +12,7 @@ import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ProductsModule } from './products/products.module';
 import { PaymentsModule } from './payments/payments.module';
+import { CurrencyRateModule } from './currency-rate/currency-rate.module';
 import config from './config';
 
 @Module({
@@ -28,6 +29,8 @@ import config from './config';
         PORT: Joi.number().required(),
         API_KEY: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
+        CRM_URL: Joi.string().required(),
+        CRM_API_KEY: Joi.string().required(),
       }),
     }),
     EmployeesModule,
@@ -40,6 +43,7 @@ import config from './config';
     DashboardModule,
     ProductsModule,
     PaymentsModule,
+    CurrencyRateModule,
   ],
   controllers: [],
   providers: [],

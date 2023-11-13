@@ -10,6 +10,7 @@ import {
   Matches,
   ValidateNested,
   Max,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
@@ -40,6 +41,10 @@ export class CreateInvoiceDto {
   @IsString()
   @IsNotEmpty()
   readonly clientAddress: string;
+
+  @IsDate()
+  @IsOptional()
+  readonly paymentDate: Date;
 
   @IsString()
   @IsNotEmpty()

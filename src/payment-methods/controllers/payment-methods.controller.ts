@@ -33,7 +33,7 @@ export class PaymentMethodsController {
   @Get()
   getAll(
     @Query() params: FilterPaymentMethodDto,
-    @Query('getArchive', ParseBoolPipe) getArchive: boolean,
+    @Query('getArchive') getArchive: boolean = false,
   ) {
     params.getArchive = getArchive;
     return this.paymentMethodService.findAll(params);

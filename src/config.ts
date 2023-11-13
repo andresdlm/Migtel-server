@@ -11,5 +11,7 @@ export default registerAs('config', () => {
     },
     apiKey: process.env.API_KEY,
     jwtSecret: process.env.JWT_SECRET,
+    crmUrl: process.env.CRM_URL,
+    crmApikey: process.env.CRM_API_KEY,
   };
 });

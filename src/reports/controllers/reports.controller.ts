@@ -55,4 +55,9 @@ export class ReportsController {
   async getPaidInvoiceReport() {
     return await this.reportsService.getPaidInvoiceReport();
   }
+
+  @Post('conciliationInvoice')
+  async getConciliationInvoice(@Body() payload: SalesBookReportDto) {
+    return await this.reportsService.getConciliationReport(payload);
+  }
 }

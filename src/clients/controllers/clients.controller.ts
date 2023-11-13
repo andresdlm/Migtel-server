@@ -35,6 +35,18 @@ export class ClientsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Get('searchCrmClients')
+  searchCrmClients(@Query('query') query: string) {
+    return this.clientsService.searchCRMClients(query);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Get('services')
+  getCrmClientsServices(@Query('clientId') clientId: string) {
+    return this.clientsService.getCRMClientsServices(clientId);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.findOne(id);

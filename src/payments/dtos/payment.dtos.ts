@@ -80,7 +80,11 @@ export class CreatePaymentDto {
   readonly userId: number;
 }
 
-export class UpdatePaymentDTO extends PartialType(CreatePaymentDto) {}
+export class UpdatePaymentDTO extends PartialType(CreatePaymentDto) {
+  @IsNumber()
+  @IsOptional()
+  readonly paymentMethodId: number;
+}
 
 export class FilterPaymentDto {
   @IsInt()

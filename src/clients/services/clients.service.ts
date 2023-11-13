@@ -1,5 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ConfigType } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
 import { Repository } from 'typeorm';
 
 import {
@@ -8,11 +10,17 @@ import {
   FilterClientDto,
 } from '../dtos/client.dtos';
 import { Client } from '../entities/client.entity';
+import config from 'src/config';
+import { Observable, map } from 'rxjs';
+import { AxiosResponse } from 'axios';
+import * as https from 'https';
 
 @Injectable()
 export class ClientsService {
   constructor(
+    @Inject(config.KEY) private configService: ConfigType<typeof config>,
     @InjectRepository(Client) private clientRepo: Repository<Client>,
+    private httpService: HttpService,
   ) {}
 
   async findAll(params?: FilterClientDto) {
@@ -39,6 +47,36 @@ export class ClientsService {
       throw new NotFoundException(`Client #${id} not found`);
     }
     return client;
+  }
+
+  searchCRMClients(query: string): Observable<AxiosResponse<any>> {
+    const url = new URL(
+      `clients?query=${query}&limit=10`,
+      this.configService.crmUrl,
+    );
+    const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  getCRMClientsServices(clientId: string): Observable<AxiosResponse<any>> {
+    const url = new URL(
+      `clients/services?clientId=${clientId}`,
+      this.configService.crmUrl,
+    );
+    const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
   }
 
   async create(data: CreateClientDto) {
