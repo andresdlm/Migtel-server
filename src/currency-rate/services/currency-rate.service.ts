@@ -44,7 +44,7 @@ export class CurrencyRateService {
     );
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_DAY_AT_4AM) // UTC-4:00 Caracas
   async handleCron() {
     const usdPrice = await this.getUsd();
 

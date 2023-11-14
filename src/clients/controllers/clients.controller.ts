@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Param,
   Body,
@@ -10,11 +9,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import {
-  CreateClientDto,
-  UpdateClientDto,
-  FilterClientDto,
-} from '../dtos/client.dtos';
+import { CreateClientDto, FilterClientDto } from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
 
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -55,16 +50,7 @@ export class ClientsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreateClientDto) {
-    return this.clientsService.create(payload);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() payload: UpdateClientDto,
-  ) {
-    return this.clientsService.update(id, payload);
+    return this.clientsService.createOrUpdate(payload);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)

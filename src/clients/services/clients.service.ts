@@ -1,14 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigType } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { Repository } from 'typeorm';
 
-import {
-  CreateClientDto,
-  UpdateClientDto,
-  FilterClientDto,
-} from '../dtos/client.dtos';
+import { CreateClientDto, FilterClientDto } from '../dtos/client.dtos';
 import { Client } from '../entities/client.entity';
 import config from 'src/config';
 import { Observable, map } from 'rxjs';
@@ -44,7 +40,7 @@ export class ClientsService {
       },
     });
     if (!client) {
-      throw new NotFoundException(`Client #${id} not found`);
+      return this.clientRepo.create({ id: id, retention: 0, amountIslr: 0 });
     }
     return client;
   }
@@ -79,18 +75,20 @@ export class ClientsService {
       .pipe(map((res) => res.data));
   }
 
-  async create(data: CreateClientDto) {
-    const newClient = this.clientRepo.create(data);
-    return await this.clientRepo.save(newClient);
-  }
-
-  async update(id: number, changes: UpdateClientDto) {
-    const client = await this.clientRepo.findOneBy({ id: id });
-    if (!client) {
-      throw new NotFoundException(`Client #${id} not found`);
+  async createOrUpdate(data: CreateClientDto) {
+    const client = await this.clientRepo.findOne({
+      where: {
+        id: data.id,
+      },
+    });
+    if (client) {
+      const client = await this.findOne(data.id);
+      this.clientRepo.merge(client, data);
+      return await this.clientRepo.save(client);
+    } else {
+      const newClient = this.clientRepo.create(data);
+      return await this.clientRepo.save(newClient);
     }
-    this.clientRepo.merge(client, changes);
-    return await this.clientRepo.save(client);
   }
 
   async delete(id: number) {

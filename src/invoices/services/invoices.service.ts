@@ -414,19 +414,12 @@ export class InvoicesService {
 
     invoice.subtotal = amount;
     invoice.iva = invoice.subtotal * 0.16;
-    if (client) {
-      invoice.iva_r = invoice.iva * client.retention * 0.01;
-    } else {
-      invoice.iva_r = 0;
-    }
+    invoice.iva_r = invoice.iva * client.retention * 0.01;
     invoice.iva_p = invoice.iva - invoice.iva_r;
-    invoice.islr = 0;
+    invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
     invoice.igtf = 0;
 
     invoice.totalAmount = invoice.subtotal + invoice.iva;
-
-    if (client && client.amountIslr > 0)
-      invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
       if (invoice.iva_r !== 0 || invoice.islr !== 0) {

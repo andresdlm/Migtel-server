@@ -3,11 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DashboardService } from './services/dashboard.service';
 import { DashboardController } from './controllers/dashboard.controller';
-import { Invoice } from 'src/invoices/entities/invoice.entity';
-import { Client } from 'src/clients/entities/client.entity';
+import { DailyIncomeView } from './entities/dailyIncomeView.entity';
+import { MonthlyAccountIncomeView } from './entities/monthlyAccountIncomeView.entity';
+import { MonthlyIncomeView } from './entities/monthlyIncomeView.entity';
+import { MonthlySalesView } from './entities/monthlySalesView.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invoice, Client])],
+  imports: [
+    TypeOrmModule.forFeature([
+      DailyIncomeView,
+      MonthlyAccountIncomeView,
+      MonthlyIncomeView,
+      MonthlySalesView,
+    ]),
+  ],
   providers: [DashboardService],
   controllers: [DashboardController],
 })
