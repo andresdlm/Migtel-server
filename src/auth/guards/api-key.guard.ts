@@ -33,7 +33,7 @@ export class ApiKeyGuard implements CanActivate {
     const isAuth = authHeader === this.configService.apiKey;
 
     if (!isAuth) {
-      throw new UnauthorizedException('Not Allow');
+      throw new UnauthorizedException('Invalid parameters.');
     }
     return isAuth;
   }

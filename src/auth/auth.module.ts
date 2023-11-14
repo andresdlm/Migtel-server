@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import config from 'src/config';
 
 import { EmployeesModule } from 'src/employees/employees.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -24,6 +25,12 @@ import { EmployeesModule } from 'src/employees/employees.module';
         };
       },
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 3000,
+        limit: 2,
+      },
+    ]),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
