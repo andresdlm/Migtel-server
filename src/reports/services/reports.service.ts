@@ -38,54 +38,27 @@ export class ReportsService {
     params.until.setUTCMinutes(params.until.getTimezoneOffset());
     params.until.setDate(params.until.getDate() + 1);
 
-    const report: Invoice[] = await this.invoiceRepo
-      .createQueryBuilder('invoices')
-      .where('invoices.register_date >= :since', { since: params.since })
-      .andWhere('invoices.register_date <= :until', { until: params.until })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where(
-            'invoices.payment_method_id = :paymentMethod AND :paymentMethod != 0',
-            {
-              paymentMethod: params.paymentMethod,
-            },
-          ).orWhere(':paymentMethod = 0', {
-            paymentMethod: params.paymentMethod,
-          });
-        }),
-      )
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where(
-            'invoices.organization_id = :organizationId AND :organizationId != 0',
-            {
-              organizationId: params.organizationId,
-            },
-          ).orWhere(':organizationId = 0', {
-            organizationId: params.organizationId,
-          });
-        }),
-      )
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('invoices.client_type = :clientType AND :clientType != 0', {
-            clientType: params.clientType,
-          }).orWhere(':clientType = 0', {
-            clientType: params.clientType,
-          });
-        }),
-      )
-      .orderBy('invoice_number', 'ASC')
-      .getMany();
-
-    const summary: SummarySalesBook = await this.invoiceRepo.query(
-      `SELECT * FROM public.get_sales_book_summary($1, $2, $3, $4, $5);`,
+    const report: Invoice[] = await this.invoiceRepo.query(
+      `SELECT * FROM get_sales_book_report($1, $2, $3, $4, $5, $6)`,
       [
         params.since.toLocaleDateString('en-US'),
         params.until.toLocaleDateString('en-US'),
         params.paymentMethod,
         params.organizationId,
         params.clientType,
+        params.currencyReport,
+      ],
+    );
+
+    const summary: SummarySalesBook = await this.invoiceRepo.query(
+      `SELECT * FROM public.get_sales_book_summary($1, $2, $3, $4, $5, $6);`,
+      [
+        params.since.toLocaleDateString('en-US'),
+        params.until.toLocaleDateString('en-US'),
+        params.paymentMethod,
+        params.organizationId,
+        params.clientType,
+        params.currencyReport,
       ],
     );
 

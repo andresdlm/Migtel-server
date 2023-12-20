@@ -20,6 +20,12 @@ import config from 'src/config';
           database: name,
           synchronize: true,
           autoLoadEntities: true,
+          logging: false,
+          migrations: ['src/database/migrations/*.ts'],
+          cli: {
+            migrationsDir: 'src/database/migrations',
+            migrationsTableName: 'migrations',
+          },
         };
       },
     }),

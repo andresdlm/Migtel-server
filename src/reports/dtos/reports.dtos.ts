@@ -2,6 +2,7 @@ import {
   IsDate,
   IsNotEmpty,
   IsNumber,
+  IsString,
   Matches,
   Max,
   Min,
@@ -29,6 +30,10 @@ export class SalesBookReportDto {
   @Max(2)
   @IsNotEmpty()
   readonly clientType: number;
+
+  @IsString()
+  @IsNotEmpty()
+  readonly currencyReport: string;
 }
 
 export class ReportDto {
