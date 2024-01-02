@@ -3,11 +3,11 @@ import { registerAs } from '@nestjs/config';
 export default registerAs('config', () => {
   return {
     database: {
-      name: process.env.DATABASE_NAME,
-      host: process.env.HOST,
-      user: process.env.USER,
-      password: process.env.PASSWORD,
-      port: parseInt(process.env.DATABASE_PORT, 10),
+      name: process.env.DB_NAME,
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      port: parseInt(process.env.DB_PORT, 10),
     },
     apiKey: process.env.API_KEY,
     jwtSecret: process.env.JWT_SECRET,
