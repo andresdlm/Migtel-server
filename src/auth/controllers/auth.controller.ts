@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(AuthGuard('local'), ThrottlerGuard)
+  @UseGuards(ThrottlerGuard, AuthGuard('local'))
   @Post('login')
   login(@Req() req: Request) {
     const user = req.user as User;
