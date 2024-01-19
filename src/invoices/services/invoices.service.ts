@@ -194,9 +194,9 @@ export class InvoicesService {
 
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
-    newInvoice.paymentDate.setUTCMinutes(
-      newInvoice.paymentDate.getTimezoneOffset(),
-    );
+    // newInvoice.paymentDate.setUTCMinutes(
+    //   newInvoice.paymentDate.getTimezoneOffset(),
+    // );
 
     newInvoice.invoiceNumber = 0;
     newInvoice = await this.invoiceRepo.save(newInvoice);

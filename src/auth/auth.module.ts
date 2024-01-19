@@ -6,19 +6,27 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EmployeesModule } from 'src/employees/employees.module';
+import { InvoicesModule } from 'src/invoices/invoices.module';
+import { ClientsModule } from 'src/clients/clients.module';
+import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
 import { AppKey } from './entities/app-key.entity';
 import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AppKeyStrategy } from './strategies/app-key.strategy';
 import { AppKeyService } from './services/app-key.service';
 import { AppKeyController } from './controllers/app-key.controller';
+import { AppKeyServicesController } from './controllers/app-key-services.controller';
 import config from 'src/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AppKey]),
     EmployeesModule,
+    InvoicesModule,
+    ClientsModule,
+    CurrencyRateModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [config.KEY],
@@ -36,7 +44,13 @@ import config from 'src/config';
       },
     ]),
   ],
-  providers: [AuthService, AppKeyService, LocalStrategy, JwtStrategy],
-  controllers: [AuthController, AppKeyController],
+  providers: [
+    AuthService,
+    AppKeyService,
+    LocalStrategy,
+    JwtStrategy,
+    AppKeyStrategy,
+  ],
+  controllers: [AuthController, AppKeyController, AppKeyServicesController],
 })
 export class AuthModule {}

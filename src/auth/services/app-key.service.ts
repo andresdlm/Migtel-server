@@ -19,10 +19,13 @@ export class AppKeyService {
     });
   }
 
-  async validateAppKey(appkey: string) {
+  async validateAppKey(appkey: string): Promise<boolean> {
     const appkeyEntity = await this.appKeyRepo.findOne({
       where: { key: appkey },
     });
+    if (!appkeyEntity) {
+      return false;
+    }
     return appkey === appkeyEntity.key;
   }
 
