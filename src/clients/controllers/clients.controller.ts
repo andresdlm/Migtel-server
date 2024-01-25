@@ -17,9 +17,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
-import { AppKeyGuard } from 'src/auth/guards/app-key.guard';
 
-@UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard, AppKeyGuard)
+@UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('clients')
 export class ClientsController {
   constructor(private clientsService: ClientsService) {}

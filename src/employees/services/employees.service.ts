@@ -21,7 +21,7 @@ export class EmployeesService {
     if (params) {
       const { limit, offset, getActive } = params;
       return await this.employeeRepo.find({
-        order: { id: 'DESC' },
+        order: { firstname: 'ASC' },
         take: limit,
         skip: offset,
         relations: {

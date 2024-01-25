@@ -3,18 +3,18 @@ import { ViewEntity, ViewColumn } from 'typeorm';
 @ViewEntity({
   expression: `
     SELECT
-      COALESCE(sum(
+      ROUND(SUM(
         CASE
           WHEN invoices.currency_code::text = 'BS'::text
             THEN invoices.iva / invoices.exhange_rate
           ELSE invoices.iva
-        END::double precision), 0::double precision) AS monthly_taxes,
-      COALESCE(sum(
+        END), 2)::double precision AS monthly_taxes,
+      ROUND(SUM(
         CASE
           WHEN invoices.currency_code::text = 'BS'::text
             THEN invoices.subtotal / invoices.exhange_rate
           ELSE invoices.subtotal
-        END::double precision), 0::double precision) AS monthly_income
+        END), 2)::double precision AS monthly_income
     FROM invoices
     WHERE invoices.type::text = 'FACT'::text
       AND invoices.canceled = false

@@ -422,12 +422,8 @@ export class InvoicesService {
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
-      if (invoice.iva_r !== 0 || invoice.islr !== 0) {
-        invoice.igtf =
-          (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
-      } else {
-        invoice.igtf = invoice.totalAmount * 0.03;
-      }
+      invoice.igtf =
+        (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
     }
 
     if (invoice.currencyCode === 'BS') {

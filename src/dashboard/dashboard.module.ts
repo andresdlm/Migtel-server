@@ -7,6 +7,7 @@ import { DailyIncomeView } from './entities/dailyIncomeView.entity';
 import { MonthlyAccountIncomeView } from './entities/monthlyAccountIncomeView.entity';
 import { MonthlyIncomeView } from './entities/monthlyIncomeView.entity';
 import { MonthlySalesView } from './entities/monthlySalesView.entity';
+import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MonthlySalesView } from './entities/monthlySalesView.entity';
       MonthlyIncomeView,
       MonthlySalesView,
     ]),
+    CurrencyRateModule,
   ],
   providers: [DashboardService],
   controllers: [DashboardController],

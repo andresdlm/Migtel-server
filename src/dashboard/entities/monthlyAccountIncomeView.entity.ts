@@ -6,12 +6,12 @@ import { ViewEntity, ViewColumn } from 'typeorm';
       payment_methods.id,
       payment_methods.name,
       count(invoices.*)::integer AS count,
-      COALESCE(sum(
+      ROUND(sum(
         CASE
           WHEN invoices.currency_code = 'BS'
-            THEN invoices.subtotal / invoices.exhange_rate
-          ELSE invoices.subtotal
-        END::double precision), 0::double precision) AS y
+            THEN invoices.total_amount / invoices.exhange_rate
+          ELSE invoices.total_amount
+        END), 2)::double precision AS y
     FROM payment_methods
     LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id
     WHERE invoices.type = 'FACT'

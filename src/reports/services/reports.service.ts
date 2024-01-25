@@ -420,7 +420,7 @@ export class ReportsService {
           });
         }),
       )
-      .orderBy('payment_date', 'ASC')
+      .orderBy('invoice_number', 'ASC')
       .getMany();
 
     const summary: SummarySalesBook = await this.invoiceRepo.query(
