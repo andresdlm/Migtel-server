@@ -46,6 +46,20 @@ export class ReportDto {
   readonly until: Date;
 }
 
+export class PortalReportDto {
+  @IsDate()
+  @IsNotEmpty()
+  readonly since: Date;
+
+  @IsDate()
+  @IsNotEmpty()
+  readonly until: Date;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly paymentMethod: number;
+}
+
 export class PaymentReportDto {
   @IsNumber()
   @IsNotEmpty()

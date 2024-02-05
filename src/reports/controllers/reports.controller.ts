@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import {
   PaymentReportDto,
+  PortalReportDto,
   ReferenceDto,
   ReportDto,
   SalesBookReportDto,
@@ -76,5 +77,17 @@ export class ReportsController {
   @Post('conciliationInvoice')
   async getConciliationInvoice(@Body() payload: SalesBookReportDto) {
     return await this.reportsService.getConciliationReport(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Post('portalPaymentReport')
+  async getPortalPaymentReport(@Body() payload: PortalReportDto) {
+    return await this.reportsService.getPortalPaymentReport(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Get('portalPaymentMethods')
+  async getPortalPaymentMethods() {
+    return await this.reportsService.getPortalPaymentMethods();
   }
 }

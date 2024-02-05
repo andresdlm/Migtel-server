@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invoice, PaymentMethod, Payment])],
+  imports: [TypeOrmModule.forFeature([Invoice, PaymentMethod, Payment]), HttpModule],
   controllers: [ReportsController],
   providers: [ReportsService],
 })
