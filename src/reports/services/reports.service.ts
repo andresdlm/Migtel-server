@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Raw, Repository } from 'typeorm';
 
@@ -7,6 +7,7 @@ import {
   PaymentReportDto,
   SalesBookReportDto,
   ReferenceDto,
+  PortalReportDto,
 } from '../dtos/reports.dtos';
 import { Invoice } from 'src/invoices/entities/invoice.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
@@ -21,6 +22,10 @@ import {
   SummaryRetentions,
   SummarySalesBook,
 } from '../models/reports.model';
+import { map } from 'rxjs';
+import config from '../../config'
+import { ConfigType } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class ReportsService {
@@ -31,6 +36,9 @@ export class ReportsService {
     private paymentMethodRepo: Repository<PaymentMethod>,
     @InjectRepository(Payment)
     private paymentRepo: Repository<Payment>,
+    @Inject(config.KEY)
+    private readonly configService: ConfigType<typeof config>,
+    private readonly httpService: HttpService
   ) {}
 
   async getSalesBookReport(params: SalesBookReportDto) {
@@ -438,5 +446,33 @@ export class ReportsService {
       report,
       summary: summary[0],
     };
+  }
+
+  async getPortalPaymentReport(portalReportDto: PortalReportDto) {
+    const url = new URL(
+      `payments/report`,
+      this.configService.portalUrl,
+      );
+    const headers = { 'Auth': this.configService.apiKeyPortal };
+    const axiosConfig = {
+      headers,
+    };
+    return this.httpService
+      .post(url.toString(), portalReportDto, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  async getPortalPaymentMethods() {
+    const url = new URL(
+      `payment-methods`,
+      this.configService.portalUrl,
+    );
+    const headers = { 'Auth': this.configService.apiKeyPortal };
+    const axiosConfig = {
+      headers,
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
   }
 }
