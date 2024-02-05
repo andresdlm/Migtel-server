@@ -13,5 +13,7 @@ export default registerAs('config', () => {
     jwtSecret: process.env.JWT_SECRET,
     crmUrl: process.env.CRM_URL,
     crmApikey: process.env.CRM_API_KEY,
+    portalUrl: process.env.PORTAL_URL,
+    apiKeyPortal: process.env.API_KEY_PORTAL,
   };
 });
