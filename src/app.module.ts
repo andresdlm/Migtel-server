@@ -31,6 +31,8 @@ import config from './config';
         JWT_SECRET: Joi.string().required(),
         CRM_URL: Joi.string().required(),
         CRM_API_KEY: Joi.string().required(),
+        PORTAL_URL: Joi.string().required(),
+        PORTAL_API_KEY: Joi.string().required(),
       }),
     }),
     EmployeesModule,
