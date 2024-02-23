@@ -8,7 +8,10 @@ import { Payment } from 'src/payments/entities/payment.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invoice, PaymentMethod, Payment]), HttpModule],
+  imports: [
+    TypeOrmModule.forFeature([Invoice, PaymentMethod, Payment]),
+    HttpModule,
+  ],
   controllers: [ReportsController],
   providers: [ReportsService],
 })

@@ -12,6 +12,7 @@ import config from 'src/config';
 import { PaymentMethodsService } from 'src/payment-methods/services/payment-methods.service';
 import { Payment } from '../entities/payment.entity';
 import {
+  CreateCRMPaymentDTO,
   CreatePaymentDto,
   FilterPaymentDto,
   UpdatePaymentDTO,
@@ -89,13 +90,16 @@ export class PaymentsService {
     return await this.paymentRepo.save(newPayment);
   }
 
-  createCrmPayment(payload: any): Observable<AxiosResponse<any>> {
+  createCrmPayment(
+    payload: CreateCRMPaymentDTO,
+  ): Observable<AxiosResponse<any>> {
     const url = new URL(`payments`, this.configService.crmUrl);
     const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
     const axiosConfig: AxiosRequestConfig = {
       headers,
       httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     };
+
     return this.httpService
       .post(url.toString(), payload, axiosConfig)
       .pipe(map((res) => res.data));

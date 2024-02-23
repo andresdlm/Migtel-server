@@ -1,14 +1,15 @@
+import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
 import { ViewEntity, ViewColumn } from 'typeorm';
 
 @ViewEntity({
   expression: `
     SELECT
-      COALESCE(SUM(
+      ROUND(COALESCE(SUM(
         CASE
           WHEN invoices.currency_code = 'BS'
             THEN invoices.subtotal / invoices.exhange_rate
           ELSE invoices.subtotal
-        END)::double precision, 0::double precision) AS daily_income
+        END)::numeric, 0::numeric), 2) AS daily_income
     FROM invoices
     WHERE invoices.type = 'FACT'
       AND invoices.canceled = false
@@ -18,6 +19,9 @@ import { ViewEntity, ViewColumn } from 'typeorm';
   name: 'daily_income_view',
 })
 export class DailyIncomeView {
-  @ViewColumn({ name: 'daily_income' })
+  @ViewColumn({
+    name: 'daily_income',
+    transformer: new ColumnNumericTransformer(),
+  })
   dailyIncome: number;
 }

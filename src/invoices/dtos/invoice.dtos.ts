@@ -16,6 +16,7 @@ import { Type } from 'class-transformer';
 import { CreateInvoiceProductRelationDto } from './invoice-product-relation.dtos';
 import { CreateInvoiceServiceRelationDto } from './invoice-service-relation.dtos';
 import { PartialType } from '@nestjs/mapped-types';
+import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
 
 export class CreateInvoiceDto {
   @IsInt()
@@ -89,6 +90,10 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly userId: number;
 
+  @IsOptional()
+  @IsString()
+  readonly phone: string;
+
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceProductRelationDto)
@@ -98,6 +103,11 @@ export class CreateInvoiceDto {
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceServiceRelationDto)
   readonly servicesDtos: CreateInvoiceServiceRelationDto[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => CreateCRMPaymentDTO)
+  readonly paymentCRMDto: CreateCRMPaymentDTO;
 }
 
 export class UpdateInvoiceDto {

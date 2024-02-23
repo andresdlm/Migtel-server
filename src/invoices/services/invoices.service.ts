@@ -16,6 +16,11 @@ import { PaymentMethodsService } from 'src/payment-methods/services/payment-meth
 import { UsersService } from 'src/employees/services/users.service';
 import { InvoiceServiceRelation } from '../entities/invoice-service-relation.entity';
 import { InvoiceProductRelation } from '../entities/invoice-product-relation.entity';
+import { NotifyService } from 'src/notify-api/services/notify.service';
+import { SingleSMSDTO } from 'src/notify-api/dtos/notify.dtos';
+import { PaymentsService } from 'src/payments/services/payments.service';
+import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
+import { switchMap } from 'rxjs';
 
 @Injectable()
 export class InvoicesService {
@@ -31,6 +36,8 @@ export class InvoicesService {
     private clientsService: ClientsService,
     private paymentMethodService: PaymentMethodsService,
     private userService: UsersService,
+    private notifyService: NotifyService,
+    private paymentService: PaymentsService,
   ) {}
 
   async findAll(params?: FilterInvoiceDto) {
@@ -145,14 +152,49 @@ export class InvoicesService {
       .execute();
   }
 
-  async setPaid(id: number) {
+  async setPaid(id: number, paymentCRMDto: CreateCRMPaymentDTO) {
     const invoice = await this.invoiceRepo.findOne({
       where: {
         id: id,
       },
     });
-    invoice.paid = true;
-    await this.invoiceRepo.save(invoice);
+
+    let notifyBody: SingleSMSDTO;
+
+    this.clientsService
+      .getCrmClient(invoice.clientId)
+      .pipe(
+        switchMap((client) => {
+          notifyBody = {
+            to: client.contacts[0].phone,
+            text: `Migtel le informa que su pago por ${
+              invoice.currencyCode
+            } ${invoice.totalAmount.toFixed(
+              2,
+            )} ha sido cargado exitosamente. Numero de factura ${invoice.invoiceNumber.toFixed(
+              0,
+            )}`,
+          };
+          paymentCRMDto.attributes[4].value = invoice.invoiceNumber.toFixed(0);
+          return this.paymentService.createCrmPayment(paymentCRMDto);
+        }),
+        switchMap(() => {
+          return this.notifyService.singleSMS(notifyBody);
+        }),
+      )
+      .subscribe();
+
+    await this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        paid: true,
+      })
+      .where('invoice_number = :invoice_number', {
+        invoice_number: invoice.invoiceNumber,
+      })
+      .execute();
+
     return await this.findOne(id);
   }
 
@@ -194,10 +236,6 @@ export class InvoicesService {
 
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
-    // newInvoice.paymentDate.setUTCMinutes(
-    //   newInvoice.paymentDate.getTimezoneOffset(),
-    // );
-
     newInvoice.invoiceNumber = 0;
     newInvoice = await this.invoiceRepo.save(newInvoice);
     newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
@@ -212,6 +250,10 @@ export class InvoicesService {
       const invoiceService = this.invoiceServiceRelRepo.create(service);
       invoiceService.invoiceId = newInvoice.id;
       await this.invoiceServiceRelRepo.save(invoiceService);
+    }
+
+    if (newInvoice.paid) {
+      await this.setPaid(newInvoice.id, data.paymentCRMDto);
     }
 
     return await this.invoiceRepo.save(newInvoice);

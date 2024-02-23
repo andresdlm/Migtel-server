@@ -12,6 +12,8 @@ import { PaymentMethodsModule } from 'src/payment-methods/payment-methods.module
 import { InvoiceProductRelation } from './entities/invoice-product-relation.entity';
 import { InvoiceServiceRelation } from './entities/invoice-service-relation.entity';
 import { EmployeesModule } from 'src/employees/employees.module';
+import { NotifyApiModule } from 'src/notify-api/notify-api.module';
+import { PaymentsModule } from 'src/payments/payments.module';
 
 @Module({
   imports: [
@@ -23,8 +25,10 @@ import { EmployeesModule } from 'src/employees/employees.module';
     ]),
     ClientsModule,
     ProductsModule,
+    PaymentsModule,
     PaymentMethodsModule,
     EmployeesModule,
+    NotifyApiModule,
   ],
   exports: [InvoicesService],
   controllers: [InvoicesController],

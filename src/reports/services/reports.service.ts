@@ -23,7 +23,7 @@ import {
   SummarySalesBook,
 } from '../models/reports.model';
 import { map } from 'rxjs';
-import config from '../../config'
+import config from '../../config';
 import { ConfigType } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 
@@ -38,7 +38,7 @@ export class ReportsService {
     private paymentRepo: Repository<Payment>,
     @Inject(config.KEY)
     private readonly configService: ConfigType<typeof config>,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
   ) {}
 
   async getSalesBookReport(params: SalesBookReportDto) {
@@ -449,11 +449,8 @@ export class ReportsService {
   }
 
   async getPortalPaymentReport(portalReportDto: PortalReportDto) {
-    const url = new URL(
-      `payments/report`,
-      this.configService.portalUrl,
-      );
-    const headers = { 'Auth': this.configService.apiKeyPortal };
+    const url = new URL(`payments/report`, this.configService.portalUrl);
+    const headers = { Auth: this.configService.apiKeyPortal };
     const axiosConfig = {
       headers,
     };
@@ -463,11 +460,8 @@ export class ReportsService {
   }
 
   async getPortalPaymentMethods() {
-    const url = new URL(
-      `payment-methods`,
-      this.configService.portalUrl,
-    );
-    const headers = { 'Auth': this.configService.apiKeyPortal };
+    const url = new URL(`payment-methods`, this.configService.portalUrl);
+    const headers = { Auth: this.configService.apiKeyPortal };
     const axiosConfig = {
       headers,
     };

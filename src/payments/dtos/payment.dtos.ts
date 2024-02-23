@@ -8,8 +8,10 @@ import {
   IsNumber,
   Matches,
   Max,
+  ValidateNested,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 
 export class CreatePaymentDto {
   @IsInt()
@@ -96,4 +98,44 @@ export class FilterPaymentDto {
   @IsOptional()
   @Min(0)
   offset: number;
+}
+
+export class CreateCRMPaymentDTO {
+  @IsNotEmpty()
+  @IsInt()
+  readonly clientId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  readonly amount: number;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly currencyCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly methodId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly note: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  readonly userId: number;
+
+  @ValidateNested({ each: true })
+  @Type(() => PaymentAttributeCRMDTO)
+  readonly attributes: PaymentAttributeCRMDTO[];
+}
+
+export class PaymentAttributeCRMDTO {
+  @IsNotEmpty()
+  @IsNumber()
+  readonly customAttributeId: number;
+
+  @IsOptional()
+  @IsString()
+  value: string;
 }

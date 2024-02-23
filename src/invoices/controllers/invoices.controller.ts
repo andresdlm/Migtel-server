@@ -24,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('invoices')
@@ -95,8 +96,11 @@ export class InvoicesController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put('setpaid/:invoiceId')
-  setPaid(@Param('invoiceId', ParseIntPipe) invoiceId: number) {
-    return this.invoiceService.setPaid(invoiceId);
+  setPaid(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Body() payload: CreateCRMPaymentDTO,
+  ) {
+    return this.invoiceService.setPaid(invoiceId, payload);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
