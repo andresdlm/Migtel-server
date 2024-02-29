@@ -1,4 +1,11 @@
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class SingleSMSDTO {
   @IsNotEmpty()
@@ -18,4 +25,23 @@ export class MassSMSDTO {
   @IsNotEmpty()
   @IsString()
   readonly text: string;
+}
+
+export class PaymentRecievedSMSDTO {
+  @IsNotEmpty()
+  @IsInt()
+  readonly clientId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  readonly amount: number;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly currency: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  readonly invoiceNumber: number;
 }

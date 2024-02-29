@@ -90,10 +90,6 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   readonly userId: number;
 
-  @IsOptional()
-  @IsString()
-  readonly phone: string;
-
   @IsNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceProductRelationDto)

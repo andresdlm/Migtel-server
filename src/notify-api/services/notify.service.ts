@@ -5,7 +5,11 @@ import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Observable, map } from 'rxjs';
 import * as https from 'https';
 
-import { MassSMSDTO, SingleSMSDTO } from '../dtos/notify.dtos';
+import {
+  MassSMSDTO,
+  PaymentRecievedSMSDTO,
+  SingleSMSDTO,
+} from '../dtos/notify.dtos';
 import config from 'src/config';
 
 @Injectable()
@@ -32,6 +36,26 @@ export class NotifyService {
 
   massSMS(body: MassSMSDTO): Observable<AxiosResponse<any>> {
     const url = new URL(`/tedexis/front/mass`, this.configService.notifyUrl);
+    const headers = {
+      Authorization: `Bearer ${this.configService.notifyApikey}`,
+    };
+    const axiosConfig: AxiosRequestConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    return this.httpService
+      .post(url.toString(), body, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  paymentRecievedSMS(
+    body: PaymentRecievedSMSDTO,
+  ): Observable<AxiosResponse<any>> {
+    const url = new URL(
+      '/tedexis/payment-received',
+      this.configService.notifyUrl,
+    );
     const headers = {
       Authorization: `Bearer ${this.configService.notifyApikey}`,
     };

@@ -107,6 +107,7 @@ export class CreateCRMPaymentDTO {
 
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   readonly amount: number;
 
   @IsNotEmpty()

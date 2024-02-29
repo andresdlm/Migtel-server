@@ -17,7 +17,7 @@ import { UsersService } from 'src/employees/services/users.service';
 import { InvoiceServiceRelation } from '../entities/invoice-service-relation.entity';
 import { InvoiceProductRelation } from '../entities/invoice-product-relation.entity';
 import { NotifyService } from 'src/notify-api/services/notify.service';
-import { SingleSMSDTO } from 'src/notify-api/dtos/notify.dtos';
+import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
 import { switchMap } from 'rxjs';
@@ -158,28 +158,19 @@ export class InvoicesService {
         id: id,
       },
     });
+    paymentCRMDto.attributes[4].value = invoice.invoiceNumber.toFixed(0);
+    const notifyBody: PaymentRecievedSMSDTO = {
+      clientId: invoice.clientId,
+      amount: Number(invoice.totalAmount.toFixed(2)),
+      currency: invoice.currencyCode,
+      invoiceNumber: invoice.invoiceNumber,
+    };
 
-    let notifyBody: SingleSMSDTO;
-
-    this.clientsService
-      .getCrmClient(invoice.clientId)
+    this.paymentService
+      .createCrmPayment(paymentCRMDto)
       .pipe(
-        switchMap((client) => {
-          notifyBody = {
-            to: client.contacts[0].phone,
-            text: `Migtel le informa que su pago por ${
-              invoice.currencyCode
-            } ${invoice.totalAmount.toFixed(
-              2,
-            )} ha sido cargado exitosamente. Numero de factura ${invoice.invoiceNumber.toFixed(
-              0,
-            )}`,
-          };
-          paymentCRMDto.attributes[4].value = invoice.invoiceNumber.toFixed(0);
-          return this.paymentService.createCrmPayment(paymentCRMDto);
-        }),
         switchMap(() => {
-          return this.notifyService.singleSMS(notifyBody);
+          return this.notifyService.paymentRecievedSMS(notifyBody);
         }),
       )
       .subscribe();
