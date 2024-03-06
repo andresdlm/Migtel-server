@@ -3,12 +3,12 @@ import { ViewEntity, ViewColumn } from 'typeorm';
 @ViewEntity({
   expression: `
     SELECT
-      ROUND(SUM(
+      COALESCE(SUM(
         CASE
           WHEN invoices.currency_code = 'BS'
             THEN invoices.subtotal / invoices.exhange_rate
           ELSE invoices.subtotal
-        END), 2)::double precision AS daily_income
+        END)::double precision, 0::double precision) AS daily_income
     FROM invoices
     WHERE invoices.type = 'FACT'
       AND invoices.canceled = false
