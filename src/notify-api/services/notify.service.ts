@@ -6,11 +6,13 @@ import { Observable, map } from 'rxjs';
 import * as https from 'https';
 
 import {
+  MassByTagDTO,
   MassSMSDTO,
   PaymentRecievedSMSDTO,
   SingleSMSDTO,
 } from '../dtos/notify.dtos';
 import config from 'src/config';
+import { FilterByTags } from '../dtos/filter.dtos';
 
 @Injectable()
 export class NotifyService {
@@ -54,6 +56,54 @@ export class NotifyService {
   ): Observable<AxiosResponse<any>> {
     const url = new URL(
       '/tedexis/payment-received',
+      this.configService.notifyUrl,
+    );
+    const headers = {
+      Authorization: `Bearer ${this.configService.notifyApikey}`,
+    };
+    const axiosConfig: AxiosRequestConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    return this.httpService
+      .post(url.toString(), body, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  getClientTags(): Observable<AxiosResponse<any>> {
+    const url = new URL(`client-tags`, this.configService.crmUrl);
+    const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  massByTagSMS(body: MassByTagDTO) {
+    const url = new URL(
+      `/tedexis/front/mass-by-filters`,
+      this.configService.notifyUrl,
+    );
+    const headers = {
+      Authorization: `Bearer ${this.configService.notifyApikey}`,
+    };
+    const axiosConfig: AxiosRequestConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    return this.httpService
+      .post(url.toString(), body, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  getFilteredClients(body: FilterByTags) {
+    const url = new URL(
+      `/tedexis/front/filtered-clients`,
       this.configService.notifyUrl,
     );
     const headers = {

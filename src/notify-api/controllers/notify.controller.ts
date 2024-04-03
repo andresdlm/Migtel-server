@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body } from '@nestjs/common';
+import { Controller, UseGuards, Post, Body, Get } from '@nestjs/common';
 
 import { NotifyService } from '../services/notify.service';
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -7,10 +7,12 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
 import {
+  MassByTagDTO,
   MassSMSDTO,
   PaymentRecievedSMSDTO,
   SingleSMSDTO,
 } from '../dtos/notify.dtos';
+import { FilterByTags } from '../dtos/filter.dtos';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('notify')
@@ -33,5 +35,23 @@ export class NotifyController {
   @Post('paymentRecievedSMS')
   paymentRecievedSMS(@Body() payload: PaymentRecievedSMSDTO) {
     return this.notifyService.paymentRecievedSMS(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Get('getClientTags')
+  getClientTags() {
+    return this.notifyService.getClientTags();
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Post('getFilteredClients')
+  getFilteredClients(@Body() payload: FilterByTags) {
+    return this.notifyService.getFilteredClients(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Post('massByTagSMS')
+  massByTagSMS(@Body() payload: MassByTagDTO) {
+    return this.notifyService.massByTagSMS(payload);
   }
 }

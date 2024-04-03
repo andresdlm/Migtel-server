@@ -158,7 +158,10 @@ export class InvoicesService {
         id: id,
       },
     });
-    paymentCRMDto.attributes[4].value = invoice.invoiceNumber.toFixed(0);
+    const index = paymentCRMDto.attributes
+      .map((e) => e.customAttributeId)
+      .indexOf(22);
+    paymentCRMDto.attributes[index].value = invoice.invoiceNumber.toFixed(0);
     const notifyBody: PaymentRecievedSMSDTO = {
       clientId: invoice.clientId,
       amount: Number(invoice.totalAmount.toFixed(2)),
