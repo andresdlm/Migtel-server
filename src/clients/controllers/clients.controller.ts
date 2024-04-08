@@ -53,7 +53,7 @@ export class ClientsController {
     return this.clientsService.createOrUpdate(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.delete(id);

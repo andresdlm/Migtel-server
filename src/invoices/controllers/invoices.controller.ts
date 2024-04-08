@@ -61,7 +61,7 @@ export class InvoicesController {
     return this.invoiceService.search(searchParam);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('printInvoice/:count')
   printInvoice(@Param('count', ParseIntPipe) count: number) {
     return this.invoiceService.printCount(count);
@@ -103,7 +103,7 @@ export class InvoicesController {
     return this.invoiceService.setPaid(invoiceId, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id')
   updateInvoice(
     @Param('id', ParseIntPipe) id: number,
@@ -112,7 +112,7 @@ export class InvoicesController {
     return this.invoiceService.updateInvoice(id, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id/updateReference')
   updateReference(
     @Param('id', ParseIntPipe) id: number,
@@ -121,7 +121,7 @@ export class InvoicesController {
     return this.invoiceService.updateReference(id, reference);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id/updatePeriod')
   updatePeriod(
     @Param('id', ParseIntPipe) id: number,
@@ -130,7 +130,7 @@ export class InvoicesController {
     return this.invoiceService.updatePeriod(id, period);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceProduct/:productId')
   updateInvoiceProduct(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -144,7 +144,7 @@ export class InvoicesController {
     );
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceService/:serviceId')
   updateInvoiceService(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -158,7 +158,7 @@ export class InvoicesController {
     );
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceComment')
   updateInvoiceComment(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -167,19 +167,19 @@ export class InvoicesController {
     return this.invoiceService.updateInvoiceComment(invoiceId, changes);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id/creditNote')
   createCreditNote(@Param('id', ParseIntPipe) id: number) {
     return this.invoiceService.createCreditNote(id);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.cancelInvoice(invoiceNumber);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':invoiceNumber/unprintInvoice')
   unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.unprint(invoiceNumber);

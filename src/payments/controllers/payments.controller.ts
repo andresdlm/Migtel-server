@@ -66,7 +66,7 @@ export class PaymentsController {
     return this.paymentService.createCrmPayment(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -75,7 +75,7 @@ export class PaymentsController {
     return this.paymentService.update(id, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.delete(id);

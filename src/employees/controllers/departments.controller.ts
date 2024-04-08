@@ -40,7 +40,7 @@ export class DepartmentsController {
     return this.departmentsService.getCount();
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR, Role.READER)
   @Get('search')
   search(@Query('searchParam') searchParam: string) {
     return this.departmentsService.search(searchParam);

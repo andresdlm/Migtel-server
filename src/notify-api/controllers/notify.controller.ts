@@ -19,37 +19,37 @@ import { FilterByTags } from '../dtos/filter.dtos';
 export class NotifyController {
   constructor(private notifyService: NotifyService) {}
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('singleSMS')
   singleSMS(@Body() payload: SingleSMSDTO) {
     return this.notifyService.singleSMS(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('massSMS')
   massSMS(@Body() payload: MassSMSDTO) {
     return this.notifyService.massSMS(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('paymentRecievedSMS')
   paymentRecievedSMS(@Body() payload: PaymentRecievedSMSDTO) {
     return this.notifyService.paymentRecievedSMS(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('getClientTags')
   getClientTags() {
     return this.notifyService.getClientTags();
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('getFilteredClients')
   getFilteredClients(@Body() payload: FilterByTags) {
     return this.notifyService.getFilteredClients(payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('massByTagSMS')
   massByTagSMS(@Body() payload: MassByTagDTO) {
     return this.notifyService.massByTagSMS(payload);
