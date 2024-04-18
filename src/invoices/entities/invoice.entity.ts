@@ -7,6 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Generated,
 } from 'typeorm';
 
 import { PaymentMethod } from 'src/payment-methods/entities/payment-method.entity';
@@ -21,6 +22,7 @@ export class Invoice {
   id: number;
 
   @Column({ name: 'invoice_number', type: 'int' })
+  @Generated('increment')
   invoiceNumber: number;
 
   @Column({ name: 'client_id' })

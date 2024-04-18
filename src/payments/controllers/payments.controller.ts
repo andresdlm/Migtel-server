@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 
 import {
-  CreateCRMPaymentDTO,
   CreatePaymentDto,
   FilterPaymentDto,
   UpdatePaymentDTO,
@@ -58,12 +57,6 @@ export class PaymentsController {
   @Post('')
   create(@Body() payload: CreatePaymentDto) {
     return this.paymentService.create(payload);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @Post('createCrmPayment')
-  createCrmPayment(@Body() payload: CreateCRMPaymentDTO) {
-    return this.paymentService.createCrmPayment(payload);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)

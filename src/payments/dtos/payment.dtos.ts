@@ -13,6 +13,37 @@ import {
 import { PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
 
+export class CreateCRMPaymentDTO {
+  @IsNotEmpty()
+  @IsInt()
+  readonly clientId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  readonly amount: number;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly currencyCode: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly methodId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly note: string;
+
+  @IsNotEmpty()
+  @IsInt()
+  readonly userId: number;
+
+  @ValidateNested({ each: true })
+  @Type(() => PaymentAttributeCRMDTO)
+  readonly attributes: PaymentAttributeCRMDTO[];
+}
+
 export class CreatePaymentDto {
   @IsInt()
   @IsNotEmpty()
@@ -80,6 +111,11 @@ export class CreatePaymentDto {
   @IsNumber()
   @IsNotEmpty()
   readonly userId: number;
+
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateCRMPaymentDTO)
+  readonly paymentCrmDto: CreateCRMPaymentDTO;
 }
 
 export class UpdatePaymentDTO extends PartialType(CreatePaymentDto) {
@@ -98,37 +134,6 @@ export class FilterPaymentDto {
   @IsOptional()
   @Min(0)
   offset: number;
-}
-
-export class CreateCRMPaymentDTO {
-  @IsNotEmpty()
-  @IsInt()
-  readonly clientId: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  readonly amount: number;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly currencyCode: string;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly methodId: string;
-
-  @IsNotEmpty()
-  @IsString()
-  readonly note: string;
-
-  @IsNotEmpty()
-  @IsInt()
-  readonly userId: number;
-
-  @ValidateNested({ each: true })
-  @Type(() => PaymentAttributeCRMDTO)
-  readonly attributes: PaymentAttributeCRMDTO[];
 }
 
 export class PaymentAttributeCRMDTO {

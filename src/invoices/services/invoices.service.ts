@@ -20,12 +20,9 @@ import { NotifyService } from 'src/notify-api/services/notify.service';
 import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
-import { switchMap } from 'rxjs';
 
 @Injectable()
 export class InvoicesService {
-  initialInvoiceNumber = 47487; // NO CAMBIAR;
-
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
@@ -169,14 +166,9 @@ export class InvoicesService {
       invoiceNumber: invoice.invoiceNumber,
     };
 
-    this.paymentService
-      .createCrmPayment(paymentCRMDto)
-      .pipe(
-        switchMap(() => {
-          return this.notifyService.paymentRecievedSMS(notifyBody);
-        }),
-      )
-      .subscribe();
+    await this.paymentService.createCrmPayment(paymentCRMDto).finally(() => {
+      return this.notifyService.paymentRecievedSMS(notifyBody).subscribe();
+    });
 
     await this.invoiceRepo
       .createQueryBuilder()
@@ -230,9 +222,10 @@ export class InvoicesService {
 
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
-    newInvoice.invoiceNumber = 0;
-    newInvoice = await this.invoiceRepo.save(newInvoice);
-    newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
+    if (newInvoice.paid) {
+      await this.setPaid(newInvoice.id, data.paymentCRMDto);
+    }
+
     newInvoice = await this.invoiceRepo.save(newInvoice);
 
     for await (const product of data.productsDtos) {
@@ -246,11 +239,7 @@ export class InvoicesService {
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
-    if (newInvoice.paid) {
-      await this.setPaid(newInvoice.id, data.paymentCRMDto);
-    }
-
-    return await this.invoiceRepo.save(newInvoice);
+    return newInvoice;
   }
 
   async getPreview(data: CreateInvoiceDto) {
@@ -375,8 +364,6 @@ export class InvoicesService {
       creditNote.invoiceNumber = 0;
       creditNote.userId = invoice.userId;
 
-      await this.invoiceRepo.save(creditNote);
-      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
       return await this.invoiceRepo.save(creditNote);
     }
   }

@@ -1,9 +1,14 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Observable, map } from 'rxjs';
+import { AxiosRequestConfig } from 'axios';
+import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigType } from '@nestjs/config';
 import * as https from 'https';
@@ -87,12 +92,13 @@ export class PaymentsService {
     );
     newPayment.paymentMethodId = paymentMethod.id;
     newPayment.paymentMethod = paymentMethod;
+
+    await this.createCrmPayment(data.paymentCrmDto);
+
     return await this.paymentRepo.save(newPayment);
   }
 
-  createCrmPayment(
-    payload: CreateCRMPaymentDTO,
-  ): Observable<AxiosResponse<any>> {
+  async createCrmPayment(payload: CreateCRMPaymentDTO) {
     const url = new URL(`payments`, this.configService.crmUrl);
     const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
     const axiosConfig: AxiosRequestConfig = {
@@ -100,9 +106,13 @@ export class PaymentsService {
       httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     };
 
-    return this.httpService
-      .post(url.toString(), payload, axiosConfig)
-      .pipe(map((res) => res.data));
+    try {
+      return await firstValueFrom(
+        this.httpService.post(url.toString(), payload, axiosConfig),
+      );
+    } catch (error) {
+      throw new ServiceUnavailableException('UISP unavailable');
+    }
   }
 
   async update(id: number, changes: UpdatePaymentDTO) {
