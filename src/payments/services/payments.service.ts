@@ -109,7 +109,9 @@ export class PaymentsService {
     try {
       return await firstValueFrom(
         this.httpService.post(url.toString(), payload, axiosConfig),
-      );
+      ).then((res) => {
+        return res.data;
+      });
     } catch (error) {
       throw new ServiceUnavailableException('UISP unavailable');
     }

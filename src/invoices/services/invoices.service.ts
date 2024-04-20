@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
+import * as https from 'https';
 
 import {
   CreateInvoiceDto,
@@ -20,10 +21,15 @@ import { NotifyService } from 'src/notify-api/services/notify.service';
 import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class InvoicesService {
   constructor(
+    @Inject(config.KEY) private configService: ConfigType<typeof config>,
+    private httpService: HttpService,
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
     @InjectRepository(InvoiceServiceRelation)
@@ -210,6 +216,7 @@ export class InvoicesService {
   }
 
   async create(data: CreateInvoiceDto) {
+    let crmResponse: any = null;
     let newInvoice = this.invoiceRepo.create(data);
 
     const user = await this.userService.findOne(data.userId);
@@ -223,10 +230,53 @@ export class InvoicesService {
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
     if (newInvoice.paid) {
-      await this.setPaid(newInvoice.id, data.paymentCRMDto);
+      crmResponse = await this.paymentService.createCrmPayment(
+        data.paymentCRMDto,
+      );
     }
 
     newInvoice = await this.invoiceRepo.save(newInvoice);
+
+    if (newInvoice.paid) {
+      const notifyBody: PaymentRecievedSMSDTO = {
+        clientId: newInvoice.clientId,
+        amount: Number(newInvoice.totalAmount.toFixed(2)),
+        currency: newInvoice.currencyCode,
+        invoiceNumber: newInvoice.invoiceNumber,
+      };
+
+      this.notifyService.paymentRecievedSMS(notifyBody).subscribe();
+
+      const url = new URL(
+        `payments/${crmResponse.id}`,
+        this.configService.crmUrl,
+      );
+      const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+      const axiosConfig = {
+        headers,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      };
+      const payload = {
+        attributes: [
+          {
+            value: newInvoice.invoiceNumber.toFixed(0),
+            customAttributeId: 22,
+          },
+        ],
+      };
+      this.httpService.patch(url.toString(), payload, axiosConfig).subscribe();
+
+      await this.invoiceRepo
+        .createQueryBuilder()
+        .update(Invoice)
+        .set({
+          paid: true,
+        })
+        .where('invoice_number = :invoice_number', {
+          invoice_number: newInvoice.invoiceNumber,
+        })
+        .execute();
+    }
 
     for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
