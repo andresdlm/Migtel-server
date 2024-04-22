@@ -265,17 +265,6 @@ export class InvoicesService {
         ],
       };
       this.httpService.patch(url.toString(), payload, axiosConfig).subscribe();
-
-      await this.invoiceRepo
-        .createQueryBuilder()
-        .update(Invoice)
-        .set({
-          paid: true,
-        })
-        .where('invoice_number = :invoice_number', {
-          invoice_number: newInvoice.invoiceNumber,
-        })
-        .execute();
     }
 
     for await (const product of data.productsDtos) {
