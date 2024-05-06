@@ -448,14 +448,14 @@ export class ReportsService {
     };
   }
 
-  async getPortalPaymentReport(portalReportDto: PortalReportDto) {
+  async getPortalPaymentReport(params: PortalReportDto) {
     const url = new URL(`payments/report`, this.configService.portalUrl);
     const headers = { Auth: this.configService.apiKeyPortal };
     const axiosConfig = {
       headers,
     };
     return this.httpService
-      .post(url.toString(), portalReportDto, axiosConfig)
+      .post(url.toString(), params, axiosConfig)
       .pipe(map((res) => res.data));
   }
 
