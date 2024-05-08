@@ -27,7 +27,8 @@ import { ViewEntity, ViewColumn } from 'typeorm';
     GROUP BY
       DATE_TRUNC('month', register_date)
     ORDER BY
-      DATE_TRUNC('month', register_date);
+      DATE_TRUNC('month', register_date)
+    OFFSET 1;
   `,
   name: 'monthly_income_view',
 })
