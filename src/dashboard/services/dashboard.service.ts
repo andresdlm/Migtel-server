@@ -25,13 +25,12 @@ export class DashboardService {
     const monthlyAccountIncome = await this.monthlyAccountIncomeViewRepo.find();
     const currencyRate = await this.currencyRateService.getLatestUsdRate();
 
-    const dashboard = {
-      dailyIncome: dailyIncome?.dailyIncome || 0,
+    return {
+      invoiceDailyIncome: dailyIncome.invoiceDailyIncome,
+      paymentDailyIncome: dailyIncome.paymentDailyIncome,
       currencyRate: currencyRate.price,
       monthlyStats: monthlyIncome,
       accountsBalance: monthlyAccountIncome,
     };
-
-    return dashboard;
   }
 }
