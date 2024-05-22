@@ -118,7 +118,7 @@ export class ReportsUtilsService {
     //Create pages
     let pageNumber: number = 1;
     while (report.report.length > 0) {
-      console.log(`page: ${pageNumber}`);
+      // console.log(`page: ${pageNumber}`);
       const invoices: any[] = report.report.splice(0, amount);
       invoiceReportPages.set(pageNumber, invoices);
       pageNumber++;
