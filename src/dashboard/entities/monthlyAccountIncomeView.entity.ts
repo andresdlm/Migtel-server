@@ -10,8 +10,8 @@ import { ViewEntity, ViewColumn } from 'typeorm';
       ROUND(COALESCE(sum(
         CASE
           WHEN invoices.currency_code = 'BS'
-            THEN invoices.subtotal / invoices.exhange_rate
-          ELSE invoices.subtotal
+            THEN invoices.total_amount / invoices.exhange_rate
+          ELSE invoices.total_amount
         END::numeric), 0::numeric), 2) AS y
     FROM payment_methods
     LEFT JOIN invoices ON payment_methods.id = invoices.payment_method_id
@@ -19,7 +19,12 @@ import { ViewEntity, ViewColumn } from 'typeorm';
       AND invoices.canceled = false
       AND date_part('month', invoices.register_date) = date_part('month', CURRENT_DATE)
     GROUP BY payment_methods.id
-    ORDER BY y DESC, payment_methods.id
+    ORDER BY (round(COALESCE(sum(
+      CASE
+        WHEN invoices.currency_code::text = 'BS'::text
+            THEN invoices.total_amount / invoices.exhange_rate
+        ELSE invoices.total_amount
+        END), 0::numeric), 2)) DESC, payment_methods.id;
   `,
   name: 'monthly_account_income_view',
 })
