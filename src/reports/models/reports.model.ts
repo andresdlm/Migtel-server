@@ -1,3 +1,5 @@
+import { PartialType } from "@nestjs/mapped-types";
+
 export interface Account {
   id: number;
   name: string;
@@ -36,6 +38,7 @@ export interface SummarySalesBook {
   total_amount: number;
   total_invoices: number;
   total_invoices_canceled: number;
+  total_neto: number;
 }
 
 export interface SummaryRetentions {
