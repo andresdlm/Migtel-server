@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
 import * as https from 'https';
+import { ConfigType } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { Observer } from 'rxjs';
 
 import {
   CreateInvoiceDto,
@@ -22,8 +25,6 @@ import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
 import config from 'src/config';
-import { ConfigType } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class InvoicesService {
@@ -264,7 +265,16 @@ export class InvoicesService {
           },
         ],
       };
-      this.httpService.patch(url.toString(), payload, axiosConfig).subscribe();
+      const observer: Observer<any> = {
+        next: () => {},
+        error: (error) => {
+          console.error('UISP unavailable', error);
+        },
+        complete: () => {},
+      };
+      this.httpService
+        .patch(url.toString(), payload, axiosConfig)
+        .subscribe(observer);
     }
 
     for await (const product of data.productsDtos) {
