@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# ignore pdf files
+/pdf/*.pdf
+
 # Logs
 logs
 *.log
