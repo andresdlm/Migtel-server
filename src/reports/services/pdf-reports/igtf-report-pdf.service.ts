@@ -8,15 +8,21 @@ import { IgtfBook, IPdfReport } from '../../models/pdf';
 
 @Injectable()
 export class IgtfService implements IPdfReport {
-
   private dateNow = new Date().toLocaleDateString();
   private params: ReportDto | null = null;
   private report: IgtfBook | null = null;
   private pages: Map<number, Igtf[]>;
 
-  constructor(private reportsUtils: ReportsUtilsService, private puppeteerUtils: PuppeteerUtils) {}
+  constructor(
+    private reportsUtils: ReportsUtilsService,
+    private puppeteerUtils: PuppeteerUtils,
+  ) {}
 
-  public async generate(report: IgtfBook, params: ReportDto, fileName?: string) {
+  public async generate(
+    report: IgtfBook,
+    params: ReportDto,
+    fileName?: string,
+  ) {
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Igtf[]>();
@@ -33,17 +39,17 @@ export class IgtfService implements IPdfReport {
     let html: HTML = '';
     let iterations: number = this.pages.size;
 
-    if(this.report) {
+    if (this.report) {
       html += `
       <div>
         <!-- Start Report -->
         <div id="print-sales-book-report" class="mt-4 report fontSize-header">
         `;
 
-        for(const [key, report] of this.pages) {
-          iterations--;
+      for (const [key, report] of this.pages) {
+        iterations--;
 
-          html += `
+        html += `
           <div class="page">
             <div class="d-flex flex-column fontSize-header">
               <div class="d-flex justify-content-between">
@@ -51,24 +57,24 @@ export class IgtfService implements IPdfReport {
                   <p>COMUNICACIONES MIGTEL C. A.</p>
                   `;
 
-                  if(this.params) {
-                    html += `
+        if (this.params) {
+          html += `
                     <p *ngIf="igtfBookDto">
                       <strong>Emisión:</strong> Desde
-                      ${ this.reportsUtils.formatDate(this.params.since) } hasta
-                      ${ this.reportsUtils.formatDate(this.params.until) }
+                      ${this.reportsUtils.formatDate(this.params.since)} hasta
+                      ${this.reportsUtils.formatDate(this.params.until)}
                     </p>
                     `;
-                  }
+        }
 
-                  html += `
+        html += `
                 </div>
                 <div>
                   <p>
                     <strong>Fecha emisión:</strong>
-                    ${ this.reportsUtils.formatDate(this.dateNow) }
+                    ${this.reportsUtils.formatDate(this.dateNow)}
                   </p>
-                  <p>Página ${ key }/${ this.pages.size }</p>
+                  <p>Página ${key}/${this.pages.size}</p>
                 </div>
               </div>
             </div>
@@ -92,50 +98,55 @@ export class IgtfService implements IPdfReport {
               <tbody>
               `;
 
-                for(const invoice of report) {
-                  html += `
+        for (const invoice of report) {
+          html += `
                   <tr class="reduceFontWeight">
-                    <th>${ invoice.invoice_number }</th>
+                    <th>${invoice.invoice_number}</th>
                     <th class="text-truncate" style="max-width: 280px">
-                      ${ this.reportsUtils.getName(invoice) }
+                      ${this.reportsUtils.getName(invoice)}
                     </th>
-                    <th>${ this.reportsUtils.formatDate(invoice.register_date) }</th>
-                    <th>${ invoice.payment_method_name }</th>
+                    <th>${this.reportsUtils.formatDate(
+                      invoice.register_date,
+                    )}</th>
+                    <th>${invoice.payment_method_name}</th>
                     <th style="text-align: right">
-                      Bs ${ this.reportsUtils.formatAmount(invoice.imponible) }
+                      Bs ${this.reportsUtils.formatAmount(invoice.imponible)}
                     </th>
                     <th style="text-align: right">
-                      Bs ${ this.reportsUtils.formatAmount(invoice.igtf) }
+                      Bs ${this.reportsUtils.formatAmount(invoice.igtf)}
                     </th>
                   </tr>
                   `;
-
-                }
-                if(iterations === 0) {
-                  html += `
+        }
+        if (iterations === 0) {
+          html += `
                   <tr *ngIf="lastPage">
-                    <th>TOTAL FACT: ${ this.report.summary.total_invoices }</th>
+                    <th>TOTAL FACT: ${this.report.summary.total_invoices}</th>
                     <th></th>
                     <th></th>
                     <th></th>
                     <th style="text-align: right">
-                      Bs ${ this.reportsUtils.formatAmount(this.report.summary.total_imponible) }
+                      Bs ${this.reportsUtils.formatAmount(
+                        this.report.summary.total_imponible,
+                      )}
                     </th>
                     <th style="text-align: right">
-                      Bs ${ this.reportsUtils.formatAmount(this.report.summary.total_igtf) }
+                      Bs ${this.reportsUtils.formatAmount(
+                        this.report.summary.total_igtf,
+                      )}
                     </th>
                   </tr>
                   `;
-                }
+        }
 
-                html += `
+        html += `
               </tbody>
             </table>
           </div>
           `;
-        }
+      }
 
-        html += `
+      html += `
         </div>
         <!--End Report-->
       </div>

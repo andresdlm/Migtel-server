@@ -5,11 +5,14 @@ import { HTML } from 'src/reports/types/report.type';
 import { PuppeteerUtils } from 'src/reports/utils/puppeteer.utils';
 import { ReportsUtilsService } from 'src/reports/utils/reports.utils';
 import { ReportsService } from '../reports.service';
-import { IPdfReport, PortalPayment, PortalPaymentReport } from '../../models/pdf';
+import {
+  IPdfReport,
+  PortalPayment,
+  PortalPaymentReport,
+} from '../../models/pdf';
 
 @Injectable()
 export class PortalPaymentService implements IPdfReport {
-
   private dateNow = new Date().toLocaleDateString();
   private portalPaymentDto: PortalReportDto | null = null;
   private portalPaymentReport: PortalPaymentReport | null = null;
@@ -20,9 +23,13 @@ export class PortalPaymentService implements IPdfReport {
     private reportsUtils: ReportsUtilsService,
     private puppeteerUtils: PuppeteerUtils,
     private reportsService: ReportsService,
-    ) {}
+  ) {}
 
-  public async generate(report: PortalPaymentReport, params: PortalReportDto, fileName?: string) {
+  public async generate(
+    report: PortalPaymentReport,
+    params: PortalReportDto,
+    fileName?: string,
+  ) {
     this.portalPaymentDto = params;
     this.portalPaymentReport = report;
     this.portalPaymentReportPages = new Map<number, PortalPayment[]>();
@@ -55,17 +62,17 @@ export class PortalPaymentService implements IPdfReport {
     let html: HTML = '';
     let iterations: number = this.portalPaymentReportPages.size;
 
-    if(this.portalPaymentReport) {
+    if (this.portalPaymentReport) {
       html += `
       <div>
         <!-- Start Report -->
         <div id="print-sales-book-report" class="mt-4 report fontSize-header">
           `;
 
-          for(const [key, report] of this.portalPaymentReportPages) {
-            iterations--;
+      for (const [key, report] of this.portalPaymentReportPages) {
+        iterations--;
 
-            html += `
+        html += `
             <div class="page">
               <div class="d-flex flex-column fontSize-header">
                 <div class="d-flex justify-content-between">
@@ -73,32 +80,38 @@ export class PortalPaymentService implements IPdfReport {
                     <p>COMUNICACIONES MIGTEL C. A.</p>
                     `;
 
-                    if(this.portalPaymentDto) {
-                      html += `
+        if (this.portalPaymentDto) {
+          html += `
                       <p>
                         <strong>Emisión:</strong> Desde
-                        ${ this.reportsUtils.formatDate(this.portalPaymentDto.since) } hasta
-                        ${ this.reportsUtils.formatDate(this.portalPaymentDto.until) }
+                        ${this.reportsUtils.formatDate(
+                          this.portalPaymentDto.since,
+                        )} hasta
+                        ${this.reportsUtils.formatDate(
+                          this.portalPaymentDto.until,
+                        )}
                       </p>
                       `;
-                    }
+        }
 
-                    html += `
+        html += `
                   </div>
                   <div>
                     <p>
                       <strong>Fecha emisión:</strong>
-                      ${ this.reportsUtils.formatDate(this.dateNow) }
+                      ${this.reportsUtils.formatDate(this.dateNow)}
                     </p>
                     <p>
-                      Página ${ key }/${ this.portalPaymentReportPages.size }
+                      Página ${key}/${this.portalPaymentReportPages.size}
                     </p>
                   </div>
                 </div>
               </div>
               <hr />
               <p class="text-center border-dark border-3 fontSize-header">
-                <strong>REPORTE DE PAGOS ONLINE ${ this.paymentMethodName }</strong>
+                <strong>REPORTE DE PAGOS ONLINE ${
+                  this.paymentMethodName
+                }</strong>
               </p>
               <hr />
               <table class="mt-2 fontSize-table" style="width: 100%">
@@ -121,38 +134,46 @@ export class PortalPaymentService implements IPdfReport {
                 <tbody>
                 `;
 
-                  for(const payment of report) {
-                    html += `
+        for (const payment of report) {
+          html += `
                     <tr class="reduceFontWeight">
-                      <th>${ payment.clientId }</th>
-                      <th>${ this.reportsUtils.getName(payment) }</th>
-                      <th>${ this.reportsUtils.formatDate(payment.registerDate) }</th>
-                      <th>${ payment.reference }</th>
-                      <th>${ payment.currency }</th>
-                      <th>${ payment.paymentMethod.name }</th>
+                      <th>${payment.clientId}</th>
+                      <th>${this.reportsUtils.getName(payment)}</th>
+                      <th>${this.reportsUtils.formatDate(
+                        payment.registerDate,
+                      )}</th>
+                      <th>${payment.reference}</th>
+                      <th>${payment.currency}</th>
+                      <th>${payment.paymentMethod.name}</th>
                       `;
 
-                      if(payment.invoiceNumber) {
-                        html += `<th>${ payment.invoiceNumber }</th>`;
-                      } else {
-                        html += `<th></th>`;
-                      }
+          if (payment.invoiceNumber) {
+            html += `<th>${payment.invoiceNumber}</th>`;
+          } else {
+            html += `<th></th>`;
+          }
 
-                      html += `
-                      <th>${ this.reportsUtils.formatAmount(payment.exchangeRate) }</th>
-                      <th>${ this.reportsUtils.formatAmount(payment.subtotal) }</th>
-                      <th>${ this.reportsUtils.formatAmount(payment.igtf) }</th>
-                      <th>${ this.reportsUtils.formatAmount(payment.totalAmount) }</th>
+          html += `
+                      <th>${this.reportsUtils.formatAmount(
+                        payment.exchangeRate,
+                      )}</th>
+                      <th>${this.reportsUtils.formatAmount(
+                        payment.subtotal,
+                      )}</th>
+                      <th>${this.reportsUtils.formatAmount(payment.igtf)}</th>
+                      <th>${this.reportsUtils.formatAmount(
+                        payment.totalAmount,
+                      )}</th>
                     </tr>
                     `;
-                  }
+        }
 
-                  if(iterations === 0) {
-                    html += `
+        if (iterations === 0) {
+          html += `
                     <tr style="border-top: 1px solid rgb(199, 199, 199)">
                       <th>
                         CANTIDAD DE PAGOS:
-                        ${ this.portalPaymentReport.summary.total_payments }
+                        ${this.portalPaymentReport.summary.total_payments}
                       </th>
                       <th></th>
                       <th></th>
@@ -164,20 +185,22 @@ export class PortalPaymentService implements IPdfReport {
                       <th></th>
                       <th>MONTO TOTAL:</th>
                       <th>
-                        ${ this.reportsUtils.formatAmount(this.portalPaymentReport.summary.total_amount) }
+                        ${this.reportsUtils.formatAmount(
+                          this.portalPaymentReport.summary.total_amount,
+                        )}
                       </th>
                     </tr>
                     `;
-                  }
+        }
 
-                  html += `
+        html += `
                 </tbody>
               </table>
             </div>
             `;
-          }
+      }
 
-          html += `
+      html += `
         </div>
         <!--End Report-->
       </div>

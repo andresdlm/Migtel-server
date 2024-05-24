@@ -8,15 +8,21 @@ import { AccountReport, IPdfReport } from '../../models/pdf';
 
 @Injectable()
 export class AccountPaymentService implements IPdfReport {
-
   private dateNow = new Date().toLocaleDateString();
   private report: AccountReport | null = null;
   private params: ReportDto | null = null;
   private pages: Map<number, Account[]>;
 
-  constructor(private reportsUtils: ReportsUtilsService, private puppeteerUtils: PuppeteerUtils) {}
+  constructor(
+    private reportsUtils: ReportsUtilsService,
+    private puppeteerUtils: PuppeteerUtils,
+  ) {}
 
-  public async generate(report: AccountReport, params: ReportDto, fileName?: string) {
+  public async generate(
+    report: AccountReport,
+    params: ReportDto,
+    fileName?: string,
+  ) {
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Account[]>();
@@ -32,14 +38,14 @@ export class AccountPaymentService implements IPdfReport {
   private getHtml(): HTML {
     let html: HTML = '';
 
-    if(this.report) {
+    if (this.report) {
       html += `
       <div>
         <!-- Start Report -->
         <div id="print-account-report" class="report mt-4 test2 fontSize-header">
       `;
 
-      for(const [key, accountReportPage] of this.pages) {
+      for (const [key, accountReportPage] of this.pages) {
         html += `
           <div class="page">
             <div class="d-flex flex-column fontSize-header">
@@ -47,24 +53,24 @@ export class AccountPaymentService implements IPdfReport {
                 <div>
                   <p>COMUNICACIONES MIGTEL C. A.</p>
                   `;
-                  if(this.params) {
-                    html += `
+        if (this.params) {
+          html += `
                     <p>
                       <strong>Emisión:</strong> Desde
-                      ${ this.reportsUtils.formatDate(this.params.since) } hasta
-                      ${ this.reportsUtils.formatDate(this.params.until) }
+                      ${this.reportsUtils.formatDate(this.params.since)} hasta
+                      ${this.reportsUtils.formatDate(this.params.until)}
                     </p>
                     `;
-                  }
+        }
 
-                html += `
+        html += `
                 </div>
                 <div>
                   <p>
                     <strong>Fecha emisión:</strong>
-                    ${ this.reportsUtils.formatDate(this.dateNow) }
+                    ${this.reportsUtils.formatDate(this.dateNow)}
                   </p>
-                  <p>Página ${ key }/${ this.pages.size }</p>
+                  <p>Página ${key}/${this.pages.size}</p>
                 </div>
               </div>
             </div>
@@ -87,50 +93,56 @@ export class AccountPaymentService implements IPdfReport {
               <tbody>
               `;
 
-              for(const account of accountReportPage.values()) {
-                html += `
+        for (const account of accountReportPage.values()) {
+          html += `
                   <tr class="reduceWeight">
-                    <th>${ account.id }</th>
-                    <th>${ account.name }</th>
+                    <th>${account.id}</th>
+                    <th>${account.name}</th>
                     <th>
                       <div>
-                        ${ account.payments }
+                        ${account.payments}
                       </div>
                     </th>
                     <th class="text-end">
                       <div>
-                        ${ this.reportsUtils.formatAmount(account.usd_balance) }
+                        ${this.reportsUtils.formatAmount(account.usd_balance)}
                       </div>
                     </th>
                     <th class="text-end">
-                      <div>${ this.reportsUtils.formatAmount(account.bs_balance) }</div>
+                      <div>${this.reportsUtils.formatAmount(
+                        account.bs_balance,
+                      )}</div>
                     </th>
                   </tr>
                 `;
-              }
+        }
 
-              html += `
+        html += `
               </tbody>
             </table>
 
             <div>
               <p class="my-1">
-                CANTIDAD DE PAGOS RECIBIDOS: ${ this.report.summary.payments }
+                CANTIDAD DE PAGOS RECIBIDOS: ${this.report.summary.payments}
               </p>
               <p class="my-1">
                 BALANCE TOTAL en USD:
-                ${ this.reportsUtils.formatAmount(this.report.summary.total_usd_balance) }
+                ${this.reportsUtils.formatAmount(
+                  this.report.summary.total_usd_balance,
+                )}
               </p>
               <p class="my-1">
                 BALANCE TOTAL en BS:
-                ${ this.reportsUtils.formatAmount(this.report.summary.total_bs_balance) }
+                ${this.reportsUtils.formatAmount(
+                  this.report.summary.total_bs_balance,
+                )}
               </p>
             </div>
           </div>
           `;
       }
 
-        html += `
+      html += `
         </div>
         <!--End Report-->
       </div>

@@ -5,7 +5,6 @@ import { Payment } from '../models/pdf';
 
 @Injectable()
 export class ReportsUtilsService {
-
   constructor(private paymentMethodsService: PaymentMethodsService) {}
 
   public getName(invoice: any) {
@@ -17,20 +16,20 @@ export class ReportsUtilsService {
 
     if (invoice.clientFirstname) {
       return invoice.clientFirstname + ' ' + invoice.clientLastname;
-    } else if(invoice.clientCompanyName) {
+    } else if (invoice.clientCompanyName) {
       return invoice.clientCompanyName;
     }
 
     if (invoice.clientName) {
       return invoice.clientName;
-    } else if(invoice.companyName) {
+    } else if (invoice.companyName) {
       return invoice.companyName;
     }
   }
 
   public formatAmount(value: number) {
     //Split value in miles and decimals
-    if(!value.toString().includes('.')) {
+    if (!value.toString().includes('.')) {
       value = Number(value.toString().concat('.00'));
     }
 
@@ -86,8 +85,11 @@ export class ReportsUtilsService {
   }
 
   public async getPaymentMethodName(salesBookDto?: any) {
-
-    const paymentMethods = await this.paymentMethodsService.findAll({ limit: 1000, offset: 0, getArchive: false })
+    const paymentMethods = await this.paymentMethodsService.findAll({
+      limit: 1000,
+      offset: 0,
+      getArchive: false,
+    });
 
     const paymentMethod = paymentMethods.find((paymentMethod) => {
       return paymentMethod.id === Number(salesBookDto?.paymentMethod);
@@ -128,7 +130,7 @@ export class ReportsUtilsService {
   }
 
   public getStyles(): HTML {
-    let css: HTML = `
+    const css: HTML = `
     <style>
       * {
         box-sizing: border-box;

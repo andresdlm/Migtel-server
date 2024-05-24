@@ -1,12 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
-import { HTML } from "../types/report.type";
+import { HTML } from '../types/report.type';
 
 @Injectable()
 export class PuppeteerUtils {
-
-  public async createPdf(html: HTML, fileName: string = 'invoice.pdf'): Promise<Buffer> {
-    const browser = await puppeteer.launch();
+  public async createPdf(
+    html: HTML,
+    fileName: string = 'invoice.pdf',
+  ): Promise<Buffer> {
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
     // await page.emulateMediaType('print');

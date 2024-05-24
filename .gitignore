@@ -3,7 +3,8 @@
 /node_modules
 /build
 
-# ignore pdf files
+# Ignore pdf files
+pdf
 /pdf/*.pdf
 
 # Logs
@@ -33,6 +34,7 @@ lerna-debug.log*
 
 # IDE - VSCode
 .vscode/*
+.vscode
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
