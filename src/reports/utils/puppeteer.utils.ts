@@ -10,14 +10,14 @@ export class PuppeteerUtils {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
     // await page.emulateMediaType('print');
-    // console.log('Creating PDF...');
+    console.log('Creating PDF...');
     const pdf = await page.pdf({
       path: `pdf/${fileName}`,
       format: 'A4',
       landscape: true,
       // timeout: 0, // Puppeteer has a limit timeout, with this param that limit is off
     });
-    // console.log('PDF created');
+    console.log('PDF created');
     await browser.close();
 
     return pdf;
