@@ -6,18 +6,26 @@ import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/auth/models/roles.model';
-import { PaymentReportDto, PortalReportDto, ReferenceDto, ReportDto, SalesBookReportDto } from '../dtos/reports.dtos';
+import {
+  PaymentReportDto,
+  PortalReportDto,
+  ReferenceDto,
+  ReportDto,
+  SalesBookReportDto,
+} from '../dtos/reports.dtos';
 import { PdfReportsService } from '../services/pdf-reports.service';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('pdf-reports')
 export class PdfReportsController {
-
   constructor(private pdfReportsService: PdfReportsService) {}
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('salesBook')
-  async getSalesBookReport(@Body() payload: SalesBookReportDto, @Res() res: Response) {
+  async getSalesBookReport(
+    @Body() payload: SalesBookReportDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'salesBook.pdf';
     await this.pdfReportsService.getSalesBookReport(payload, fileName);
 
@@ -45,7 +53,10 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('accountPaymentReport')
-  async getAccountPaymentReport(@Body() payload: ReportDto, @Res() res: Response) {
+  async getAccountPaymentReport(
+    @Body() payload: ReportDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'accountPaymentReport.pdf';
     await this.pdfReportsService.getAccountPaymentReport(payload, fileName);
 
@@ -59,7 +70,10 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('paymentReport')
-  async getPaymentReport(@Body() payload: PaymentReportDto, @Res() res: Response) {
+  async getPaymentReport(
+    @Body() payload: PaymentReportDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'paymentReport.pdf';
     await this.pdfReportsService.getPaymentReport(payload, fileName);
 
@@ -87,7 +101,10 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('referenceInvoiceReport')
-  async getReferenceInvoiceReport(@Body() payload: ReferenceDto, @Res() res: Response) {
+  async getReferenceInvoiceReport(
+    @Body() payload: ReferenceDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'referenceInvoiceReport.pdf';
     await this.pdfReportsService.getReferenceInvoiceReport(payload, fileName);
 
@@ -101,7 +118,10 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('referencePaymentReport')
-  async getReferencePaymentReport(@Body() payload: ReferenceDto, @Res() res: Response) {
+  async getReferencePaymentReport(
+    @Body() payload: ReferenceDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'referencePaymentReport.pdf';
     await this.pdfReportsService.getReferencePaymentReport(payload, fileName);
 
@@ -143,9 +163,15 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('conciliationInvoice')
-  async getConciliationReport(@Body() payload: SalesBookReportDto, @Res() res: Response) {
+  async getConciliationReport(
+    @Body() payload: SalesBookReportDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'conciliationInvoice.pdf';
-    await this.pdfReportsService.getConciliationInvoiceReport(payload, fileName);
+    await this.pdfReportsService.getConciliationInvoiceReport(
+      payload,
+      fileName,
+    );
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment');
@@ -157,7 +183,10 @@ export class PdfReportsController {
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('portalPaymentReport')
-  async getPortalPaymentReport(@Body() payload: PortalReportDto, @Res() res: Response) {
+  async getPortalPaymentReport(
+    @Body() payload: PortalReportDto,
+    @Res() res: Response,
+  ) {
     const fileName = 'portalPaymentReport.pdf';
     await this.pdfReportsService.getPortalPaymentReport(payload, fileName);
 
