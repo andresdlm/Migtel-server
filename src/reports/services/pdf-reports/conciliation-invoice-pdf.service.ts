@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class ConciliationInvoiceService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private params: SalesBookReportDto | null = null;
   private report: SalesBookReport | null = null;
   private pages: Map<number, Invoice[]>;
@@ -27,6 +27,7 @@ export class ConciliationInvoiceService implements IPdfReport {
     params: SalesBookReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Invoice[]>();

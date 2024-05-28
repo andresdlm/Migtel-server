@@ -10,7 +10,7 @@ import {
 
 @Injectable()
 export class NotPaidInvoiceService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private report: PaidInvoice | null = null;
   private pages: Map<number, Invoice[]>;
 
@@ -20,6 +20,7 @@ export class NotPaidInvoiceService implements IPdfReport {
   ) {}
 
   public async generate(report: PaidInvoice, params: any, fileName?: string) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.report = report;
     this.pages = new Map<number, Invoice[]>();
 

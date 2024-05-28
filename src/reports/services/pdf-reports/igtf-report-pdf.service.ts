@@ -8,7 +8,7 @@ import { IgtfBook, IPdfReport } from '../../models/pdf';
 
 @Injectable()
 export class IgtfService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private params: ReportDto | null = null;
   private report: IgtfBook | null = null;
   private pages: Map<number, Igtf[]>;
@@ -23,6 +23,7 @@ export class IgtfService implements IPdfReport {
     params: ReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Igtf[]>();

@@ -13,7 +13,7 @@ import {
 
 @Injectable()
 export class PortalPaymentService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private portalPaymentDto: PortalReportDto | null = null;
   private portalPaymentReport: PortalPaymentReport | null = null;
   private portalPaymentReportPages: Map<number, PortalPayment[]>;
@@ -30,6 +30,7 @@ export class PortalPaymentService implements IPdfReport {
     params: PortalReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.portalPaymentDto = params;
     this.portalPaymentReport = report;
     this.portalPaymentReportPages = new Map<number, PortalPayment[]>();

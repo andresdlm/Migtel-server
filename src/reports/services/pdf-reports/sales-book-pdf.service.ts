@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class SalesBookService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private report: SalesBookReport | null = null;
   private params: SalesBookReportDto = {
     organizationId: 0,
@@ -34,6 +34,7 @@ export class SalesBookService implements IPdfReport {
     params: SalesBookReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     // Reset
     this.params = params;
     this.report = report;
