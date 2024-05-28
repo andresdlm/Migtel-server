@@ -3,19 +3,29 @@ import { ReportDto } from 'src/reports/dtos/reports.dtos';
 import { HTML } from 'src/reports/types/report.type';
 import { PuppeteerUtils } from 'src/reports/utils/puppeteer.utils';
 import { ReportsUtilsService } from 'src/reports/utils/reports.utils';
-import { IPdfReport, RetentionsReport, InvoiceLikeEntity as Invoice } from '../../models/pdf';
+import {
+  IPdfReport,
+  RetentionsReport,
+  InvoiceLikeEntity as Invoice,
+} from '../../models/pdf';
 
 @Injectable()
 export class RetentionsService implements IPdfReport {
-
   private dateNow = new Date().toLocaleDateString();
   private dates: ReportDto | null = null;
   private retentionsReport: RetentionsReport | null = null;
   private pages: Map<number, Invoice[]>;
 
-  constructor(private reportsUtils: ReportsUtilsService, private puppeteerUtils: PuppeteerUtils) {}
+  constructor(
+    private reportsUtils: ReportsUtilsService,
+    private puppeteerUtils: PuppeteerUtils,
+  ) {}
 
-  public async generate(report: RetentionsReport, params: ReportDto, fileName?: string) {
+  public async generate(
+    report: RetentionsReport,
+    params: ReportDto,
+    fileName?: string,
+  ) {
     this.dates = params;
     this.retentionsReport = report;
     this.pages = new Map<number, Invoice[]>();
@@ -32,17 +42,17 @@ export class RetentionsService implements IPdfReport {
     let html: HTML = '';
     let iterations: number = this.pages.size;
 
-    if(this.retentionsReport) {
+    if (this.retentionsReport) {
       html += `
       <div>
         <!-- Start Report -->
         <div id="print-sales-book-report" class="mt-4 report fontSize-header">
           `;
 
-          for(const [key, report] of this.pages) {
-            iterations--;
+      for (const [key, report] of this.pages) {
+        iterations--;
 
-            html += `
+        html += `
             <div class="page">
               <div class="d-flex flex-column fontSize-header">
                 <div class="d-flex justify-content-between">
@@ -50,24 +60,24 @@ export class RetentionsService implements IPdfReport {
                     <p>COMUNICACIONES MIGTEL C. A.</p>
                     `;
 
-                    if(this.dates) {
-                      html += `
+        if (this.dates) {
+          html += `
                       <p>
                         <strong>Emisión:</strong> Desde
-                        ${ this.reportsUtils.formatDate(this.dates.since) } hasta
-                        ${ this.reportsUtils.formatDate(this.dates.until) }
+                        ${this.reportsUtils.formatDate(this.dates.since)} hasta
+                        ${this.reportsUtils.formatDate(this.dates.until)}
                       </p>
                       `;
-                    }
+        }
 
-                    html += `
+        html += `
                   </div>
                   <div>
                     <p>
                       <strong>Fecha emisión:</strong>
-                      ${ this.reportsUtils.formatDate(this.dateNow) }
+                      ${this.reportsUtils.formatDate(this.dateNow)}
                     </p>
-                    <p>Página ${ key }/${ this.pages.size }</p>
+                    <p>Página ${key}/${this.pages.size}</p>
                   </div>
                 </div>
               </div>
@@ -99,116 +109,133 @@ export class RetentionsService implements IPdfReport {
                 <tbody>
                   `;
 
-                  for(const invoice of report) {
-
-                    html += `
+        for (const invoice of report) {
+          html += `
                     <tr class="reduceFontWeight">
-                      <th>${ this.reportsUtils.formatDate(invoice.registerDate) }</th>
-                      <th>${ invoice.type }</th>
-                      <th>${ invoice.invoiceNumber }</th>
+                      <th>${this.reportsUtils.formatDate(
+                        invoice.registerDate,
+                      )}</th>
+                      <th>${invoice.type}</th>
+                      <th>${invoice.invoiceNumber}</th>
                       `;
 
-                      if(invoice.type === 'N/C') {
-                        html += `<th>${ invoice.comment }</th>`;
-                      }
+          if (invoice.type === 'N/C') {
+            html += `<th>${invoice.comment}</th>`;
+          }
 
-                      if(invoice.type !== 'N/C') {
-                        html += `<th></th>`;
-                      }
+          if (invoice.type !== 'N/C') {
+            html += `<th></th>`;
+          }
 
-                      html += `
+          html += `
                       <th class="text-truncate" style="max-width: 250px">
-                        ${ this.reportsUtils.getName(invoice) }
+                        ${this.reportsUtils.getName(invoice)}
                       </th>
-                      <th>${ invoice.clientDocument }</th>
+                      <th>${invoice.clientDocument}</th>
                       `;
 
-                      if(invoice.currencyCode === 'USD') {
-                        html += `
+          if (invoice.currencyCode === 'USD') {
+            html += `
                         <div>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.subtotal * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.subtotal * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.iva * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.totalAmount * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.totalAmount * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva_r * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.iva_r * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva_p * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.iva_p * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.igtf * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.igtf * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.islr * invoice.exhangeRate) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.islr * invoice.exhangeRate,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${
-                              this.reportsUtils.formatAmount((invoice.totalAmount - invoice.iva_r - invoice.islr) *
-                                invoice.exhangeRate)
-                            }
+                            ${this.reportsUtils.formatAmount(
+                              (invoice.totalAmount -
+                                invoice.iva_r -
+                                invoice.islr) *
+                                invoice.exhangeRate,
+                            )}
                           </th>
                         </div>
                         `;
-
-                      } else {
-                        html += `
+          } else {
+            html += `
                         <div>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.subtotal) }
+                            ${this.reportsUtils.formatAmount(invoice.subtotal)}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva) }
+                            ${this.reportsUtils.formatAmount(invoice.iva)}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.totalAmount) }
+                            ${this.reportsUtils.formatAmount(
+                              invoice.totalAmount,
+                            )}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva_r) }
+                            ${this.reportsUtils.formatAmount(invoice.iva_r)}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.iva_p) }
+                            ${this.reportsUtils.formatAmount(invoice.iva_p)}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.igtf) }
+                            ${this.reportsUtils.formatAmount(invoice.igtf)}
                           </th>
                           <th style="text-align: right">
-                            ${ this.reportsUtils.formatAmount(invoice.islr) }
+                            ${this.reportsUtils.formatAmount(invoice.islr)}
                           </th>
                           <th style="text-align: right">
-                            ${
-                              (invoice.totalAmount - invoice.iva_r - invoice.islr).toFixed(
-                                2
-                              )
-                            }
+                            ${(
+                              invoice.totalAmount -
+                              invoice.iva_r -
+                              invoice.islr
+                            ).toFixed(2)}
                           </th>
                         </div>
                         `;
-                      }
+          }
 
-
-                      html += `
+          html += `
                     </tr>
                     `;
-                  }
+        }
 
-                  if(iterations === 0) {
-                    html += `
+        if (iterations === 0) {
+          html += `
                     <tr>
                       <th>
                         Cant. fact:
-                        ${ this.retentionsReport.summary.total_invoices }
+                        ${this.retentionsReport.summary.total_invoices}
                       </th>
                       <th>
                         Válidas:
                         ${
                           this.retentionsReport.summary.total_invoices -
-                            this.retentionsReport.summary.total_invoices_canceled
+                          this.retentionsReport.summary.total_invoices_canceled
                         }
                       </th>
                       <th></th>
@@ -216,47 +243,62 @@ export class RetentionsService implements IPdfReport {
                       <th></th>
                       <th>TOTALES:</th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_subtotal) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_subtotal,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_iva) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_iva,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_amount) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_amount,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_iva_r) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_iva_r,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_iva_p) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_iva_p,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_igtf) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_igtf,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_islr) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_islr,
+                        )}
                       </th>
                       <th style="text-align: right">
-                        ${ this.reportsUtils.formatAmount(this.retentionsReport.summary.total_neto) }
+                        ${this.reportsUtils.formatAmount(
+                          this.retentionsReport.summary.total_neto,
+                        )}
                       </th>
                       <th></th>
                     </tr>
                     `;
-                  }
+        }
 
-                  html += `
+        html += `
                 </tbody>
               </table>
             </div>
             `;
-          }
+      }
 
-          html += `
+      html += `
         </div>
         <!--End Report-->
       </div>
       `;
-
     }
 
     return html;

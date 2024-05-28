@@ -7,23 +7,31 @@ import { IPdfReport, PaymentReport, Payment } from '../../models/pdf';
 
 @Injectable()
 export class PaymentService implements IPdfReport {
-
   private dateNow = new Date().toLocaleDateString();
   private report: PaymentReport;
   private params: PaymentReportDto;
   private pages: Map<number, Payment[]>;
   private paymentMethodName: string = '';
 
-  constructor(private reportsUtils: ReportsUtilsService, private puppeteerUtils: PuppeteerUtils) {}
+  constructor(
+    private reportsUtils: ReportsUtilsService,
+    private puppeteerUtils: PuppeteerUtils,
+  ) {}
 
-  public async generate(report: PaymentReport, params: PaymentReportDto, fileName?: string) {
+  public async generate(
+    report: PaymentReport,
+    params: PaymentReportDto,
+    fileName?: string,
+  ) {
     // Reset
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Payment[]>();
 
     // Get payment method name here because await doesn't work when generating the HTML
-    this.paymentMethodName = await this.reportsUtils.getPaymentMethodName(this.params);
+    this.paymentMethodName = await this.reportsUtils.getPaymentMethodName(
+      this.params,
+    );
 
     this.pages = this.reportsUtils.splice(report, 40);
 
@@ -37,17 +45,17 @@ export class PaymentService implements IPdfReport {
     let html: HTML = '';
     let iterations: number = this.pages.size;
 
-    if(this.pages.size > 0) {
+    if (this.pages.size > 0) {
       html += `
       <div>
         <!-- Start Report -->
         <div id="print-sales-book-report" class="report fontSize-header">
         `;
 
-        for(const [key, report] of this.pages) {
-          iterations--;
+      for (const [key, report] of this.pages) {
+        iterations--;
 
-          html += `
+        html += `
           <div class="page">
             <div class="d-flex flex-column fontSize-header">
               <div class="d-flex justify-content-between">
@@ -55,24 +63,24 @@ export class PaymentService implements IPdfReport {
                   <p>COMUNICACIONES MIGTEL C. A.</p>
                   `;
 
-                  if(this.params) {
-                    html += `
+        if (this.params) {
+          html += `
                     <p>
                       <strong>Emisión:</strong> Desde
-                      ${ this.reportsUtils.formatDate(this.params.since) } hasta
-                      ${ this.reportsUtils.formatDate(this.params.until) }
+                      ${this.reportsUtils.formatDate(this.params.since)} hasta
+                      ${this.reportsUtils.formatDate(this.params.until)}
                     </p>
                     `;
-                  }
+        }
 
-                  html += `
+        html += `
                 </div>
                 <div>
                   <p>
                     <strong>Fecha emisión:</strong>
-                    ${ this.reportsUtils.formatDate(this.dateNow) }
+                    ${this.reportsUtils.formatDate(this.dateNow)}
                   </p>
-                  <p>Página ${ key }/${ this.pages.size }</p>
+                  <p>Página ${key}/${this.pages.size}</p>
                 </div>
               </div>
             </div>
@@ -81,21 +89,26 @@ export class PaymentService implements IPdfReport {
               <strong>REPORTES DE PAGOS
               `;
 
-                if(this.params.organizationId) {
-                  html += `<span> ${ this.reportsUtils.getOrganization(this.params) } </span>`;
-                }
+        if (this.params.organizationId) {
+          html += `<span> ${this.reportsUtils.getOrganization(
+            this.params,
+          )} </span>`;
+        }
 
-                if(this.params.paymentMethod) {
-                  html += `<span> ${ this.paymentMethodName } </span> `;
-                }
+        if (this.params.paymentMethod) {
+          html += `<span> ${this.paymentMethodName} </span> `;
+        }
 
-                if(this.params.currencyCode === 'USD' || this.params.currencyCode === 'BS') {
-                  html += `
-                  <span> - ${ this.params.currencyCode } </span>
+        if (
+          this.params.currencyCode === 'USD' ||
+          this.params.currencyCode === 'BS'
+        ) {
+          html += `
+                  <span> - ${this.params.currencyCode} </span>
                   `;
-                }
+        }
 
-                html += `
+        html += `
               </strong>
             </p>
             <hr />
@@ -116,54 +129,62 @@ export class PaymentService implements IPdfReport {
               <tbody>
               `;
 
-              for(const payment of report) {
-                html += `
+        for (const payment of report) {
+          html += `
                 <tr class="reduce-font-weight">
-                  <th>${ payment.clientId }</th>
-                  <th>${ this.reportsUtils.getName(payment) }</th>
-                  <th>${ payment.clientDocument }</th>
-                  <th>${ this.reportsUtils.formatDate(payment.registerDate) }</th>
-                  <th>${ payment.paymentMethod.name }</th>
+                  <th>${payment.clientId}</th>
+                  <th>${this.reportsUtils.getName(payment)}</th>
+                  <th>${payment.clientDocument}</th>
+                  <th>${this.reportsUtils.formatDate(payment.registerDate)}</th>
+                  <th>${payment.paymentMethod.name}</th>
                   <th style="text-align: right">
-                    Bs. ${ this.reportsUtils.formatAmount(this.reportsUtils.returnBs(payment)) }
+                    Bs. ${this.reportsUtils.formatAmount(
+                      this.reportsUtils.returnBs(payment),
+                    )}
                   </th>
                   <th style="text-align: right">
-                    $ ${ this.reportsUtils.formatAmount(this.reportsUtils.returnUSD(payment)) }
+                    $ ${this.reportsUtils.formatAmount(
+                      this.reportsUtils.returnUSD(payment),
+                    )}
                   </th>
                   <th style="text-align: right">
-                    ${ this.reportsUtils.formatAmount(payment.exhangeRate) }
+                    ${this.reportsUtils.formatAmount(payment.exhangeRate)}
                   </th>
                 </tr>
                 `;
-              }
+        }
 
-              if(iterations === 0) {
-                html += `
+        if (iterations === 0) {
+          html += `
                 <tr>
-                  <th>CANTIDAD: ${ this.report.summary.count_payments }</th>
+                  <th>CANTIDAD: ${this.report.summary.count_payments}</th>
                   <th></th>
                   <th></th>
                   <th></th>
                   <th>TOTAL:</th>
                   <th style="text-align: right">
-                    Bs ${ this.reportsUtils.formatAmount(this.report.summary.total_bs) }
+                    Bs ${this.reportsUtils.formatAmount(
+                      this.report.summary.total_bs,
+                    )}
                   </th>
                   <th style="text-align: right">
-                    $ ${ this.reportsUtils.formatAmount(this.report.summary.total_usd) }
+                    $ ${this.reportsUtils.formatAmount(
+                      this.report.summary.total_usd,
+                    )}
                   </th>
                   <th></th>
                 </tr>
                 `;
-              }
+        }
 
-              html += `
+        html += `
               </tbody>
             </table>
           </div>
           `;
-        }
+      }
 
-          html += `
+      html += `
         </div>
         <!--End Report-->
       </div>
