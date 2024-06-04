@@ -137,6 +137,7 @@ export class NotifyService {
   }
 
   massEmail(body: MassEmailDTO) {
+
     const url = new URL(
       `/smtp/mass`,
       this.configService.notifyUrl,
