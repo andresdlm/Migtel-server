@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class ReferenceInvoiceService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private params: ReferenceDto | null = null;
   private report: ReferenceInvoice | null = null;
   private pages: Map<number, Invoice[]>;
@@ -26,6 +26,7 @@ export class ReferenceInvoiceService implements IPdfReport {
     params: ReferenceDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Invoice[]>();

@@ -57,6 +57,13 @@ export class ReportsUtilsService {
     return stringMiles?.concat(',', stringDecimals);
   }
 
+  public getCurrentDate() {
+    const date = new Date().toLocaleDateString();
+    const threeDays = 3 * 24 * 60 * 60 * 1000;
+    const dateNow = new Date(new Date(date).getTime() + threeDays).toLocaleDateString();
+    return dateNow;
+  }
+
   public formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString('es-VE', {
       year: 'numeric',

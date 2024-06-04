@@ -39,6 +39,6 @@ export class FilterByTags {
   readonly suspended: boolean;
 
   @IsOptional()
-  @IsBoolean()
+  @IsString()
   readonly text: string;
 }

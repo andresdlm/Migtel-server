@@ -1,9 +1,11 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsDefined,
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsPositive,
   IsString,
@@ -67,4 +69,42 @@ export class MassByTagDTO {
   @ValidateNested({ each: true })
   @Type(() => FilterByTags)
   readonly filters: FilterByTags;
+}
+
+export class SingleEmailDTO {
+  @IsNotEmpty()
+  @IsString()
+  text: string;
+
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
+  @IsString()
+  @IsOptional()
+  subject: string;
+}
+
+export class MassEmailDTO {
+  @IsString()
+  @IsNotEmpty()
+  readonly text: string;
+
+  @IsString()
+  @IsOptional()
+  readonly subject: string;
+
+  @IsDefined()
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => FilterByTags)
+  readonly filters: FilterByTags;
+
+  @IsOptional()
+  readonly callback?: MassEmailCallback;
+}
+
+export interface MassEmailCallback {
+  buttonText: string;
+  link: string;
 }

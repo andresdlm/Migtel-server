@@ -8,8 +8,10 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
 import {
   MassByTagDTO,
+  MassEmailDTO,
   MassSMSDTO,
   PaymentRecievedSMSDTO,
+  SingleEmailDTO,
   SingleSMSDTO,
 } from '../dtos/notify.dtos';
 import { FilterByTags } from '../dtos/filter.dtos';
@@ -18,6 +20,22 @@ import { FilterByTags } from '../dtos/filter.dtos';
 @Controller('notify')
 export class NotifyController {
   constructor(private notifyService: NotifyService) {}
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
+  @Get('getClientTags')
+  getClientTags() {
+    return this.notifyService.getClientTags();
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
+  @Post('getFilteredClients')
+  getFilteredClients(@Body() payload: FilterByTags) {
+    return this.notifyService.getFilteredClients(payload);
+  }
+
+  /*******
+  * SMS *
+  ******/
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('singleSMS')
@@ -38,20 +56,24 @@ export class NotifyController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
-  @Get('getClientTags')
-  getClientTags() {
-    return this.notifyService.getClientTags();
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
-  @Post('getFilteredClients')
-  getFilteredClients(@Body() payload: FilterByTags) {
-    return this.notifyService.getFilteredClients(payload);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('massByTagSMS')
   massByTagSMS(@Body() payload: MassByTagDTO) {
     return this.notifyService.massByTagSMS(payload);
+  }
+
+  /*********
+  * Email *
+  ********/
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
+  @Post('singleEmail')
+  singleEmail(@Body() payload: SingleEmailDTO) {
+    return this.notifyService.singleEmail(payload);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
+  @Post('massEmail')
+  massEmail(@Body() payload: MassEmailDTO) {
+    return this.notifyService.massEmail(payload);
   }
 }

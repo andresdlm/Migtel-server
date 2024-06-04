@@ -7,7 +7,7 @@ import { IPdfReport, Payment, ReferencePayment } from '../../models/pdf';
 
 @Injectable()
 export class ReferencePaymentService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private params: ReferenceDto | null = null;
   private report: ReferencePayment | null = null;
   private pages: Map<number, Payment[]>;
@@ -22,6 +22,7 @@ export class ReferencePaymentService implements IPdfReport {
     params: ReferenceDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Payment[]>();

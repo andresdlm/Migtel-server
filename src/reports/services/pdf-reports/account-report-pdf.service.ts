@@ -8,7 +8,7 @@ import { AccountReport, IPdfReport } from '../../models/pdf';
 
 @Injectable()
 export class AccountService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private report: AccountReport | null = null;
   private params: ReportDto | null = null;
   private pages: Map<number, Account[]>;
@@ -23,6 +23,7 @@ export class AccountService implements IPdfReport {
     params: ReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.params = params;
     this.report = report;
     this.pages = new Map<number, Account[]>();

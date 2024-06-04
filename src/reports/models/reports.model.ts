@@ -1,3 +1,5 @@
+import { PartialType } from "@nestjs/mapped-types";
+
 export interface Account {
   id: number;
   name: string;

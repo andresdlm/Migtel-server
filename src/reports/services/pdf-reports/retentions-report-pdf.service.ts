@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class RetentionsService implements IPdfReport {
-  private dateNow = new Date().toLocaleDateString();
+  private dateNow = '';
   private dates: ReportDto | null = null;
   private retentionsReport: RetentionsReport | null = null;
   private pages: Map<number, Invoice[]>;
@@ -26,6 +26,7 @@ export class RetentionsService implements IPdfReport {
     params: ReportDto,
     fileName?: string,
   ) {
+    this.dateNow = this.reportsUtils.getCurrentDate();
     this.dates = params;
     this.retentionsReport = report;
     this.pages = new Map<number, Invoice[]>();

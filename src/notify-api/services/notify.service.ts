@@ -7,8 +7,10 @@ import * as https from 'https';
 
 import {
   MassByTagDTO,
+  MassEmailDTO,
   MassSMSDTO,
   PaymentRecievedSMSDTO,
+  SingleEmailDTO,
   SingleSMSDTO,
 } from '../dtos/notify.dtos';
 import config from 'src/config';
@@ -104,6 +106,40 @@ export class NotifyService {
   getFilteredClients(body: FilterByTags) {
     const url = new URL(
       `/tedexis/front/filtered-clients`,
+      this.configService.notifyUrl,
+    );
+    const headers = {
+      Authorization: `Bearer ${this.configService.notifyApikey}`,
+    };
+    const axiosConfig: AxiosRequestConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    return this.httpService
+      .post(url.toString(), body, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  singleEmail(body: SingleEmailDTO): Observable<AxiosResponse<any>> {
+    const url = new URL(`/smtp/single`, this.configService.notifyUrl);
+    const headers = {
+      Authorization: `Bearer ${this.configService.notifyApikey}`,
+    };
+    const axiosConfig: AxiosRequestConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    return this.httpService
+      .post(url.toString(), body, axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
+  massEmail(body: MassEmailDTO) {
+
+    const url = new URL(
+      `/smtp/mass`,
       this.configService.notifyUrl,
     );
     const headers = {
