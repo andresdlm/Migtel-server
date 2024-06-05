@@ -125,10 +125,10 @@ export class PortalPaymentService implements IPdfReport {
                     <th>MONEDA</th>
                     <th>METODO</th>
                     <th>N FACTURA</th>
-                    <th style="text-align: right">TASA</th>
-                    <th style="text-align: right">SUBTOTAL</th>
-                    <th style="text-align: right">IGTF</th>
-                    <th style="text-align: right">TOTAL</th>
+                    <th>TASA</th>
+                    <th>SUBTOTAL</th>
+                    <th>IGTF</th>
+                    <th>TOTAL</th>
                   </tr>
                 </thead>
 
@@ -165,6 +165,8 @@ export class PortalPaymentService implements IPdfReport {
                       <th style="text-align: right">${this.reportsUtils.formatAmount(
                         payment.totalAmount,
                       )}</th>
+                      <th style="text-align: right">${ this.reportsUtils.formatAmount(payment.neto ?? 0) }</th>
+                      <th style="text-align: right">${ this.reportsUtils.formatAmount(payment.amountFromBank ?? 0) }</th>
                     </tr>
                     `;
         }

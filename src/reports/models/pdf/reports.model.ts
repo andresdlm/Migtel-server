@@ -174,6 +174,8 @@ export interface PortalPayment {
   email: string;
   invoiceNumber: number;
   paymentMethod: PaymentMethod;
+  neto: number;
+  amountFromBank: number;
 }
 
 export interface PortalPaymentReport {
