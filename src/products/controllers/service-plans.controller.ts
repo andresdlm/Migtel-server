@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import {
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('service-plans')
@@ -71,12 +73,14 @@ export class ServicePlansController {
     return this.servicePlansService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('')
   create(@Body() payload: CreateServicePlanDto) {
     return this.servicePlansService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
@@ -86,12 +90,14 @@ export class ServicePlansController {
     return this.servicePlansService.update(id, payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete('archive/:id')
   archive(@Param('id', ParseIntPipe) id: number) {
     return this.servicePlansService.archive(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {

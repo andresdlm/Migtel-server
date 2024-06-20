@@ -14,6 +14,7 @@ import { ProductsModule } from './products/products.module';
 import { PaymentsModule } from './payments/payments.module';
 import { CurrencyRateModule } from './currency-rate/currency-rate.module';
 import { NotifyApiModule } from './notify-api/notify-api.module';
+import { LoggerModule } from './logger/logger.module';
 import config from './config';
 
 @Module({
@@ -50,6 +51,7 @@ import config from './config';
     PaymentsModule,
     CurrencyRateModule,
     NotifyApiModule,
+    LoggerModule,
   ],
   controllers: [],
   providers: [],

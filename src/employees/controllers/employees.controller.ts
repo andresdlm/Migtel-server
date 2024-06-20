@@ -10,6 +10,7 @@ import {
   UseGuards,
   Query,
   ParseBoolPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { EmployeesService } from '../services/employees.service';
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('employees')
@@ -67,12 +69,14 @@ export class EmployeesController {
     return this.employeesService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN)
   @Post()
   create(@Body() payload: CreateEmployeeDto) {
     return this.employeesService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
@@ -82,6 +86,7 @@ export class EmployeesController {
     return this.employeesService.update(id, payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete(':id')
   deactivate(@Param('id', ParseIntPipe) id: number) {

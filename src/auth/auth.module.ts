@@ -19,6 +19,7 @@ import { AppKeyService } from './services/app-key.service';
 import { AppKeyController } from './controllers/app-key.controller';
 import { AppKeyServicesController } from './controllers/app-key-services.controller';
 import config from 'src/config';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import config from 'src/config';
     ClientsModule,
     CurrencyRateModule,
     PassportModule,
+    LoggerModule,
     JwtModule.registerAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {

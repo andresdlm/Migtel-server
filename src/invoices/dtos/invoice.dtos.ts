@@ -138,8 +138,19 @@ export class FilterInvoiceDto {
 
 export class UpdateInvoiceProductRelationDto extends PartialType(
   CreateInvoiceProductRelationDto,
-) {}
+) {
+  @IsOptional()
+  @IsNumber()
+  invoiceId: number;
+
+  @IsOptional()
+  product: any;
+}
 
 export class UpdateInvoiceServiceRelationDto extends PartialType(
   CreateInvoiceServiceRelationDto,
-) {}
+) {
+  @IsOptional()
+  @IsNumber()
+  invoiceId: number;
+}

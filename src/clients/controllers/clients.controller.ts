@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateClientDto, FilterClientDto } from '../dtos/client.dtos';
 import { ClientsService } from './../services/clients.service';
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('clients')
@@ -47,12 +49,14 @@ export class ClientsController {
     return this.clientsService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreateClientDto) {
     return this.clientsService.createOrUpdate(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
