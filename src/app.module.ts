@@ -16,6 +16,7 @@ import { CurrencyRateModule } from './currency-rate/currency-rate.module';
 import { NotifyApiModule } from './notify-api/notify-api.module';
 import { LoggerModule } from './logger/logger.module';
 import config from './config';
+import { PortalModule } from './portal/portal.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import config from './config';
     CurrencyRateModule,
     NotifyApiModule,
     LoggerModule,
+    PortalModule
   ],
   controllers: [],
   providers: [],
