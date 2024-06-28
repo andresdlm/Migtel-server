@@ -35,7 +35,7 @@ import { PortalModule } from './portal/portal.module';
         CRM_URL: Joi.string().required(),
         CRM_API_KEY: Joi.string().required(),
         PORTAL_URL: Joi.string().required(),
-        API_KEY_PORTAL: Joi.string().required(),
+        PORTAL_API_KEY: Joi.string().required(),
         NOTIFY_URL: Joi.string().required(),
         NOTIFY_API_KEY: Joi.string().required(),
       }),
