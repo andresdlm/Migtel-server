@@ -14,7 +14,7 @@ export default registerAs('config', () => {
     crmUrl: process.env.CRM_URL,
     crmApikey: process.env.CRM_API_KEY,
     portalUrl: process.env.PORTAL_URL,
-    apiKeyPortal: process.env.PORTAL_API_KEY,
+    apiKeyPortal: process.env.API_KEY_PORTAL,
     notifyUrl: process.env.NOTIFY_URL,
     notifyApikey: process.env.NOTIFY_API_KEY,
   };

@@ -102,41 +102,57 @@ export class NotifyController {
   * Blacklist *
   ************/
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Get('blacklist')
   private getAll(): Observable<Blacklist[]> {
     return this.blacklistService.getAll();
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Get('blacklist/deleted')
   private getAllDeleted(): Observable<Blacklist[]> {
     return this.blacklistService.getAllDeleted();
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Get('blacklist/:id')
   private getOne(@Param('id') id: number): Observable<Blacklist> {
     return this.blacklistService.getOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('blacklist')
   private add(@Body() payload: CreateBlacklistDto): Observable<Blacklist> {
     return this.blacklistService.add(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Patch('blacklist/:id')
   private update(@Param('id') id: number, @Body() payload: UpdateBlacklistDto): Observable<Blacklist> {
     return this.blacklistService.update(id, payload);
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Delete('blacklist/:id')
   private softRemove(@Param('id') id: number): Observable<Blacklist> {
     return this.blacklistService.softRemove(id);
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Delete('blacklist/remove/:id')
   private remove(@Param('id') id: number): Observable<Blacklist> {
     return this.blacklistService.remove(id);
   }
 
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('blacklist/restore/:id')
   private restore(@Param('id') id: number): Observable<Blacklist> {
     return this.blacklistService.restore(id);
