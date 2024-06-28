@@ -16,6 +16,7 @@ import { CurrencyRateModule } from './currency-rate/currency-rate.module';
 import { NotifyApiModule } from './notify-api/notify-api.module';
 import { LoggerModule } from './logger/logger.module';
 import config from './config';
+import { PortalModule } from './portal/portal.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import config from './config';
         CRM_URL: Joi.string().required(),
         CRM_API_KEY: Joi.string().required(),
         PORTAL_URL: Joi.string().required(),
-        PORTAL_API_KEY: Joi.string().required(),
+        API_KEY_PORTAL: Joi.string().required(),
         NOTIFY_URL: Joi.string().required(),
         NOTIFY_API_KEY: Joi.string().required(),
       }),
@@ -52,6 +53,7 @@ import config from './config';
     CurrencyRateModule,
     NotifyApiModule,
     LoggerModule,
+    PortalModule
   ],
   controllers: [],
   providers: [],
