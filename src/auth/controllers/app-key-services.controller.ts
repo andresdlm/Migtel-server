@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ClientsService } from 'src/clients/services/clients.service';
 import { CurrencyRateService } from 'src/currency-rate/services/currency-rate.service';
@@ -16,6 +17,7 @@ import { AppKeyGuard } from '../guards/app-key.guard';
 import { CreateInvoiceDto } from 'src/invoices/dtos/invoice.dtos';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, AppKeyGuard)
 @Controller('app-key-services')
@@ -36,11 +38,13 @@ export class AppKeyServicesController {
     return this.currencyRateService.getLatestUsdRate();
   }
 
+  @UseInterceptors(LogInterceptor)
   @Post('invoices/createInvoice')
   create(@Body() payload: CreateInvoiceDto) {
     return this.invoicesService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('invoices/previewInvoice')
   getPreview(@Body() payload: CreateInvoiceDto) {

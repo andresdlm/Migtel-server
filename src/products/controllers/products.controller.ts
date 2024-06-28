@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { ProductsService } from '../services/products.service';
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('products')
@@ -61,12 +63,14 @@ export class ProductsController {
     return this.productsService.findOne(product);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('')
   create(@Body() payload: CreateProductDto) {
     return this.productsService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
@@ -76,6 +80,7 @@ export class ProductsController {
     return this.productsService.update(id, payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete('archive/:id')
   archive(@Param('id', ParseIntPipe) id: number) {

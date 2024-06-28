@@ -15,7 +15,6 @@ import { InvoiceProductRelation } from './invoice-product-relation.entity';
 import { User } from 'src/employees/entities/user.entity';
 import { InvoiceServiceRelation } from './invoice-service-relation.entity';
 import { ColumnNumericTransformer } from 'src/common/colum-numeric-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -150,5 +149,5 @@ export class Invoice {
   })
   updateAt: Date;
 
-  neto: number
+  neto?: number;
 }

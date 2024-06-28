@@ -1,4 +1,11 @@
-import { Controller, UseGuards, Post, Body, Get } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Body,
+  Get,
+  UseInterceptors,
+} from '@nestjs/common';
 
 import { NotifyService } from '../services/notify.service';
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
@@ -15,6 +22,7 @@ import {
   SingleSMSDTO,
 } from '../dtos/notify.dtos';
 import { FilterByTags } from '../dtos/filter.dtos';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('notify')
@@ -34,27 +42,31 @@ export class NotifyController {
   }
 
   /*******
-  * SMS *
-  ******/
+   * SMS *
+   ******/
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('singleSMS')
   singleSMS(@Body() payload: SingleSMSDTO) {
     return this.notifyService.singleSMS(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('massSMS')
   massSMS(@Body() payload: MassSMSDTO) {
     return this.notifyService.massSMS(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('paymentRecievedSMS')
   paymentRecievedSMS(@Body() payload: PaymentRecievedSMSDTO) {
     return this.notifyService.paymentRecievedSMS(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('massByTagSMS')
   massByTagSMS(@Body() payload: MassByTagDTO) {
@@ -62,15 +74,17 @@ export class NotifyController {
   }
 
   /*********
-  * Email *
-  ********/
+   * Email *
+   ********/
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('singleEmail')
   singleEmail(@Body() payload: SingleEmailDTO) {
     return this.notifyService.singleEmail(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMMUNICATOR)
   @Post('massEmail')
   massEmail(@Body() payload: MassEmailDTO) {

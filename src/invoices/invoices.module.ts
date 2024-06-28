@@ -14,6 +14,7 @@ import { InvoiceServiceRelation } from './entities/invoice-service-relation.enti
 import { EmployeesModule } from 'src/employees/employees.module';
 import { NotifyApiModule } from 'src/notify-api/notify-api.module';
 import { PaymentsModule } from 'src/payments/payments.module';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PaymentsModule } from 'src/payments/payments.module';
     PaymentMethodsModule,
     EmployeesModule,
     NotifyApiModule,
+    LoggerModule,
   ],
   exports: [InvoicesService],
   controllers: [InvoicesController],
