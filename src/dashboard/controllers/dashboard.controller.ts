@@ -13,4 +13,9 @@ export class DashboardController {
   getDashboard() {
     return this.dashboardService.generateDashboard();
   }
+
+  @Get('organizations')
+  getOrganizationDashboard() {
+    return this.dashboardService.organizationDashboard();
+  }
 }
