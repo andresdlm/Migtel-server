@@ -10,6 +10,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   CreatePaymentMethodDto,
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('payment-methods')
@@ -60,12 +62,14 @@ export class PaymentMethodsController {
     return this.paymentMethodService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post('')
   create(@Body() payload: CreatePaymentMethodDto) {
     return this.paymentMethodService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
@@ -75,6 +79,7 @@ export class PaymentMethodsController {
     return this.paymentMethodService.update(id, payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Delete('archive/:id')
   archive(@Param('id', ParseIntPipe) id: number) {

@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   CreateInvoiceDto,
@@ -24,6 +25,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('invoices')
@@ -60,7 +63,7 @@ export class InvoicesController {
     return this.invoiceService.search(searchParam);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get('printInvoice/:count')
   printInvoice(@Param('count', ParseIntPipe) count: number) {
     return this.invoiceService.printCount(count);
@@ -81,6 +84,7 @@ export class InvoicesController {
     return this.invoiceService.findByClientId(clientId, params);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreateInvoiceDto) {
@@ -93,13 +97,18 @@ export class InvoicesController {
     return this.invoiceService.getPreview(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put('setpaid/:invoiceId')
-  setPaid(@Param('invoiceId', ParseIntPipe) invoiceId: number) {
-    return this.invoiceService.setPaid(invoiceId);
+  setPaid(
+    @Param('invoiceId', ParseIntPipe) invoiceId: number,
+    @Body() payload: CreateCRMPaymentDTO,
+  ) {
+    return this.invoiceService.setPaid(invoiceId, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id')
   updateInvoice(
     @Param('id', ParseIntPipe) id: number,
@@ -108,7 +117,8 @@ export class InvoicesController {
     return this.invoiceService.updateInvoice(id, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id/updateReference')
   updateReference(
     @Param('id', ParseIntPipe) id: number,
@@ -117,7 +127,8 @@ export class InvoicesController {
     return this.invoiceService.updateReference(id, reference);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':id/updatePeriod')
   updatePeriod(
     @Param('id', ParseIntPipe) id: number,
@@ -126,7 +137,8 @@ export class InvoicesController {
     return this.invoiceService.updatePeriod(id, period);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceProduct/:productId')
   updateInvoiceProduct(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -140,7 +152,8 @@ export class InvoicesController {
     );
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceService/:serviceId')
   updateInvoiceService(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -154,7 +167,8 @@ export class InvoicesController {
     );
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Put(':invoiceId/updateInvoiceComment')
   updateInvoiceComment(
     @Param('invoiceId', ParseIntPipe) invoiceId: number,
@@ -163,19 +177,22 @@ export class InvoicesController {
     return this.invoiceService.updateInvoiceComment(invoiceId, changes);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id/creditNote')
   createCreditNote(@Param('id', ParseIntPipe) id: number) {
     return this.invoiceService.createCreditNote(id);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':invoiceNumber/cancelInvoice')
   cancelInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.cancelInvoice(invoiceNumber);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':invoiceNumber/unprintInvoice')
   unprintInvoice(@Param('invoiceNumber', ParseIntPipe) invoiceNumber: number) {
     return this.invoiceService.unprint(invoiceNumber);

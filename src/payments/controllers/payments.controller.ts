@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import {
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('payments')
@@ -53,19 +55,15 @@ export class PaymentsController {
     return this.paymentService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('')
   create(@Body() payload: CreatePaymentDto) {
     return this.paymentService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @Post('createCrmPayment')
-  createCrmPayment(@Body() payload: any) {
-    return this.paymentService.createCrmPayment(payload);
-  }
-
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -74,7 +72,8 @@ export class PaymentsController {
     return this.paymentService.update(id, payload);
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @UseInterceptors(LogInterceptor)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.delete(id);

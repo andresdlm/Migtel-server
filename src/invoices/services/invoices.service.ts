@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
+import * as https from 'https';
+import { ConfigType } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { Observer } from 'rxjs';
 
 import {
   CreateInvoiceDto,
@@ -16,12 +20,17 @@ import { PaymentMethodsService } from 'src/payment-methods/services/payment-meth
 import { UsersService } from 'src/employees/services/users.service';
 import { InvoiceServiceRelation } from '../entities/invoice-service-relation.entity';
 import { InvoiceProductRelation } from '../entities/invoice-product-relation.entity';
+import { NotifyService } from 'src/notify-api/services/notify.service';
+import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
+import { PaymentsService } from 'src/payments/services/payments.service';
+import { CreateCRMPaymentDTO } from 'src/payments/dtos/payment.dtos';
+import config from 'src/config';
 
 @Injectable()
 export class InvoicesService {
-  initialInvoiceNumber = 47487; // NO CAMBIAR;
-
   constructor(
+    @Inject(config.KEY) private configService: ConfigType<typeof config>,
+    private httpService: HttpService,
     @InjectRepository(Invoice)
     private invoiceRepo: Repository<Invoice>,
     @InjectRepository(InvoiceServiceRelation)
@@ -31,6 +40,8 @@ export class InvoicesService {
     private clientsService: ClientsService,
     private paymentMethodService: PaymentMethodsService,
     private userService: UsersService,
+    private notifyService: NotifyService,
+    private paymentService: PaymentsService,
   ) {}
 
   async findAll(params?: FilterInvoiceDto) {
@@ -145,14 +156,38 @@ export class InvoicesService {
       .execute();
   }
 
-  async setPaid(id: number) {
+  async setPaid(id: number, paymentCRMDto: CreateCRMPaymentDTO) {
     const invoice = await this.invoiceRepo.findOne({
       where: {
         id: id,
       },
     });
-    invoice.paid = true;
-    await this.invoiceRepo.save(invoice);
+    const index = paymentCRMDto.attributes
+      .map((e) => e.customAttributeId)
+      .indexOf(22);
+    paymentCRMDto.attributes[index].value = invoice.invoiceNumber.toFixed(0);
+    const notifyBody: PaymentRecievedSMSDTO = {
+      clientId: invoice.clientId,
+      amount: Number(invoice.totalAmount.toFixed(2)),
+      currency: invoice.currencyCode,
+      invoiceNumber: invoice.invoiceNumber,
+    };
+
+    await this.paymentService.createCrmPayment(paymentCRMDto).finally(() => {
+      return this.notifyService.paymentRecievedSMS(notifyBody).subscribe();
+    });
+
+    await this.invoiceRepo
+      .createQueryBuilder()
+      .update(Invoice)
+      .set({
+        paid: true,
+      })
+      .where('invoice_number = :invoice_number', {
+        invoice_number: invoice.invoiceNumber,
+      })
+      .execute();
+
     return await this.findOne(id);
   }
 
@@ -182,6 +217,7 @@ export class InvoicesService {
   }
 
   async create(data: CreateInvoiceDto) {
+    let crmResponse: any = null;
     let newInvoice = this.invoiceRepo.create(data);
 
     const user = await this.userService.findOne(data.userId);
@@ -194,14 +230,52 @@ export class InvoicesService {
 
     newInvoice = await this.calculateInvoiceAmount(newInvoice, data);
 
-    // newInvoice.paymentDate.setUTCMinutes(
-    //   newInvoice.paymentDate.getTimezoneOffset(),
-    // );
+    if (newInvoice.paid) {
+      crmResponse = await this.paymentService.createCrmPayment(
+        data.paymentCRMDto,
+      );
+    }
 
-    newInvoice.invoiceNumber = 0;
     newInvoice = await this.invoiceRepo.save(newInvoice);
-    newInvoice.invoiceNumber = newInvoice.id + this.initialInvoiceNumber;
-    newInvoice = await this.invoiceRepo.save(newInvoice);
+
+    if (newInvoice.paid) {
+      const notifyBody: PaymentRecievedSMSDTO = {
+        clientId: newInvoice.clientId,
+        amount: Number(newInvoice.totalAmount.toFixed(2)),
+        currency: newInvoice.currencyCode,
+        invoiceNumber: newInvoice.invoiceNumber,
+      };
+
+      this.notifyService.paymentRecievedSMS(notifyBody).subscribe();
+
+      const url = new URL(
+        `payments/${crmResponse.id}`,
+        this.configService.crmUrl,
+      );
+      const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+      const axiosConfig = {
+        headers,
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      };
+      const payload = {
+        attributes: [
+          {
+            value: newInvoice.invoiceNumber.toFixed(0),
+            customAttributeId: 22,
+          },
+        ],
+      };
+      const observer: Observer<any> = {
+        next: () => {},
+        error: (error) => {
+          console.error('UISP unavailable', error);
+        },
+        complete: () => {},
+      };
+      this.httpService
+        .patch(url.toString(), payload, axiosConfig)
+        .subscribe(observer);
+    }
 
     for await (const product of data.productsDtos) {
       const invoiceProduct = this.invoiceProductRelRepo.create(product);
@@ -214,7 +288,7 @@ export class InvoicesService {
       await this.invoiceServiceRelRepo.save(invoiceService);
     }
 
-    return await this.invoiceRepo.save(newInvoice);
+    return newInvoice;
   }
 
   async getPreview(data: CreateInvoiceDto) {
@@ -339,8 +413,6 @@ export class InvoicesService {
       creditNote.invoiceNumber = 0;
       creditNote.userId = invoice.userId;
 
-      await this.invoiceRepo.save(creditNote);
-      creditNote.invoiceNumber = creditNote.id + this.initialInvoiceNumber;
       return await this.invoiceRepo.save(creditNote);
     }
   }

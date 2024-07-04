@@ -8,10 +8,12 @@ import { ServicePlansController } from './controllers/service-plans.controller';
 import { ServicePlansService } from './services/service-plans.service';
 import { ServicePlan } from './entities/service-plan.entity';
 import { InvoiceProductRelation } from 'src/invoices/entities/invoice-product-relation.entity';
+import { LoggerModule } from 'src/logger/logger.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, ServicePlan, InvoiceProductRelation]),
+    LoggerModule,
   ],
   controllers: [ProductsController, ServicePlansController],
   providers: [ServicePlansService, ProductsService],

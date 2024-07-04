@@ -6,8 +6,8 @@ import { DashboardController } from './controllers/dashboard.controller';
 import { DailyIncomeView } from './entities/dailyIncomeView.entity';
 import { MonthlyAccountIncomeView } from './entities/monthlyAccountIncomeView.entity';
 import { MonthlyIncomeView } from './entities/monthlyIncomeView.entity';
-import { MonthlySalesView } from './entities/monthlySalesView.entity';
 import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
+import { OrganizationMonthlyView } from './entities/organizationMonthlyView.entity';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
       DailyIncomeView,
       MonthlyAccountIncomeView,
       MonthlyIncomeView,
-      MonthlySalesView,
+      OrganizationMonthlyView,
     ]),
     CurrencyRateModule,
   ],

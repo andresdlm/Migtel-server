@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { DepartmentsService } from '../services/departments.service';
@@ -22,6 +23,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/roles.model';
+import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('departments')
@@ -40,7 +42,7 @@ export class DepartmentsController {
     return this.departmentsService.getCount();
   }
 
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR, Role.READER)
   @Get('search')
   search(@Query('searchParam') searchParam: string) {
     return this.departmentsService.search(searchParam);
@@ -52,12 +54,14 @@ export class DepartmentsController {
     return this.departmentsService.findOne(id);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Post()
   create(@Body() payload: CreateDepartmentDto) {
     return this.departmentsService.create(payload);
   }
 
+  @UseInterceptors(LogInterceptor)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Put(':id')
   update(
