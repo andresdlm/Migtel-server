@@ -7,6 +7,7 @@ import { DailyIncomeView } from './entities/dailyIncomeView.entity';
 import { MonthlyAccountIncomeView } from './entities/monthlyAccountIncomeView.entity';
 import { MonthlyIncomeView } from './entities/monthlyIncomeView.entity';
 import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
+import { OrganizationMonthlyView } from './entities/organizationMonthlyView.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CurrencyRateModule } from 'src/currency-rate/currency-rate.module';
       DailyIncomeView,
       MonthlyAccountIncomeView,
       MonthlyIncomeView,
+      OrganizationMonthlyView,
     ]),
     CurrencyRateModule,
   ],

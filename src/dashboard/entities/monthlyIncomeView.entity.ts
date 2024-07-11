@@ -27,7 +27,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
           ELSE payments.amount
           END), 0::numeric), 2) AS total_amount
       FROM payments
-      WHERE payments.register_date >= (CURRENT_DATE - '1 year'::interval)
+      WHERE invoices.register_date >= ((date_trunc('month', CURRENT_DATE) + interval '1 month')::date - '1 year'::interval)
       GROUP BY (date_trunc('month'::text, payments.register_date))
       ORDER BY (date_trunc('month'::text, payments.register_date))
       OFFSET 1) monthly_payments
@@ -50,7 +50,7 @@ import { ViewEntity, ViewColumn } from 'typeorm';
       END), 0::numeric),
     2) AS monthly_taxes
     FROM invoices
-    WHERE invoices.register_date >= (CURRENT_DATE - '1 year'::interval)
+    WHERE invoices.register_date >= ((date_trunc('month', CURRENT_DATE) + interval '1 month')::date - '1 year'::interval)
       AND invoices.type::text = 'FACT'::text
     GROUP BY (date_trunc('month'::text, invoices.register_date))
     ORDER BY (date_trunc('month'::text, invoices.register_date))

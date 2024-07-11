@@ -48,3 +48,21 @@ export class CreateLogDto {
     }
   }
 }
+
+export class FilterLogsDto {
+  @IsOptional()
+  @IsString()
+  readonly endpoint: string;
+
+  @IsOptional()
+  @IsString()
+  readonly httpMethod: string;
+
+  @IsOptional()
+  @IsString()
+  readonly severity: string;
+
+  @IsOptional()
+  @IsString()
+  readonly searchParam: string;
+}
