@@ -44,6 +44,12 @@ export class ClientsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Get('crm/:clientId')
+  getCrmClient(@Param('clientId') clientId: number) {
+    return this.clientsService.getCrmClient(clientId);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.findOne(id);

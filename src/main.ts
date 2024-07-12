@@ -9,6 +9,8 @@ async function bootstrap() {
   const corsOptions = {
     origin: '*',
     optionsSuccessStatus: 200,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   };
   app.use(cors(corsOptions));
 
