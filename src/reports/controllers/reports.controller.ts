@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import {
   PaymentReportDto,
@@ -89,5 +89,11 @@ export class ReportsController {
   @Get('portalPaymentMethods')
   async getPortalPaymentMethods() {
     return await this.reportsService.getPortalPaymentMethods();
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Get('bdvPaymentDetails/:id')
+  async getBdvPaymentDetails(@Param('id') id: string) {
+    return await this.reportsService.getBdvPaymentDetails(id);
   }
 }
