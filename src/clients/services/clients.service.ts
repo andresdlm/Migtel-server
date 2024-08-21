@@ -87,6 +87,18 @@ export class ClientsService {
       .pipe(map((res) => res.data));
   }
 
+  getCrmClientByEmail(email: string): Observable<any> {
+    const url = new URL(`clients?email=${email}`, this.configService.crmUrl);
+    const headers = { 'X-Auth-App-Key': this.configService.crmApikey };
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
+  }
+
   async createOrUpdate(data: CreateClientDto) {
     const client = await this.clientRepo.findOne({
       where: {

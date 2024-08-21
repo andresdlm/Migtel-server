@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -31,6 +32,16 @@ export class AppKeyServicesController {
   @Get('clients/:id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.clientsService.findOne(id);
+  }
+
+  @Get('crm/clients')
+  getOneCrmClientByEmail(@Query('email') email: string) {
+    return this.clientsService.getCrmClientByEmail(email);
+  }
+
+  @Get('crm/clients/:id')
+  getOneCrmClientById(@Param('id', ParseIntPipe) id: number) {
+    return this.clientsService.getCrmClient(id);
   }
 
   @Get('currency-rate/usd')
