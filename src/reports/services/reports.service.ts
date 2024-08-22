@@ -469,4 +469,15 @@ export class ReportsService {
       .get(url.toString(), axiosConfig)
       .pipe(map((res) => res.data));
   }
+
+  async getBdvPaymentDetails(id: string) {
+    const url = new URL(`bdv?id=${id}`, this.configService.portalUrl);
+    const headers = { Auth: this.configService.apiKeyPortal };
+    const axiosConfig = {
+      headers,
+    };
+    return this.httpService
+      .get(url.toString(), axiosConfig)
+      .pipe(map((res) => res.data));
+  }
 }
