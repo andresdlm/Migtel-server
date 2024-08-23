@@ -14,7 +14,6 @@ import {
   SalesBookReportDto,
 } from '../dtos/reports.dtos';
 import { PdfReportsService } from '../services/pdf-reports.service';
-import { ThrottlerGuard } from '@nestjs/throttler';
 
 @UseGuards(ApiKeyGuard, JwtAuthGuard, RolesGuard)
 @Controller('pdf-reports')
@@ -22,7 +21,6 @@ export class PdfReportsController {
   constructor(private pdfReportsService: PdfReportsService) {}
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('salesBook')
   async getSalesBookReport(
     @Body() payload: SalesBookReportDto,
@@ -40,7 +38,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('accountReport')
   async getAccountReport(@Body() payload: ReportDto, @Res() res: Response) {
     const fileName = 'accountReport.pdf';
@@ -55,7 +52,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('accountPaymentReport')
   async getAccountPaymentReport(
     @Body() payload: ReportDto,
@@ -73,7 +69,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('paymentReport')
   async getPaymentReport(
     @Body() payload: PaymentReportDto,
@@ -91,7 +86,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('retentionReport')
   async getRetentionReport(@Body() payload: ReportDto, @Res() res: Response) {
     const fileName = 'retentionReport.pdf';
@@ -106,7 +100,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('referenceInvoiceReport')
   async getReferenceInvoiceReport(
     @Body() payload: ReferenceDto,
@@ -124,7 +117,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('referencePaymentReport')
   async getReferencePaymentReport(
     @Body() payload: ReferenceDto,
@@ -142,7 +134,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('igtfBook')
   async getIgtfBookReport(@Body() payload: ReportDto, @Res() res: Response) {
     const fileName = 'igtfBook.pdf';
@@ -157,7 +148,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('paidInvoiceReport')
   async getPaidInvoiceReport(@Res() res: Response) {
     const fileName = 'paidInvoiceReport.pdf';
@@ -172,7 +162,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('conciliationInvoice')
   async getConciliationReport(
     @Body() payload: SalesBookReportDto,
@@ -193,7 +182,6 @@ export class PdfReportsController {
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
-  @UseGuards(ThrottlerGuard)
   @Post('portalPaymentReport')
   async getPortalPaymentReport(
     @Body() payload: PortalReportDto,
