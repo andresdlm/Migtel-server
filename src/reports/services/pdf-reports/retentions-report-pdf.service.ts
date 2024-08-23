@@ -91,7 +91,7 @@ export class RetentionsService implements IPdfReport {
                 <thead>
                   <tr>
                     <th>FECHA</th>
-                    <th>TIPO</th>
+                    <th>ID CLIENTE</th>
                     <th>NÚMERO</th>
                     <th>FACT AFEC</th>
                     <th>NOMBRE O RAZON SOCIAL</th>
@@ -116,7 +116,7 @@ export class RetentionsService implements IPdfReport {
                       <th>${this.reportsUtils.formatDate(
                         invoice.registerDate,
                       )}</th>
-                      <th>${invoice.type}</th>
+                      <th>${invoice.clientId}</th>
                       <th>${invoice.invoiceNumber}</th>
                       `;
 

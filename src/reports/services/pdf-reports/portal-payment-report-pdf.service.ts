@@ -118,8 +118,8 @@ export class PortalPaymentService implements IPdfReport {
               <table class="mt-2 fontSize-table" style="width: 100%">
                 <thead>
                   <tr>
-                    <th>CLIENT ID</th>
-                    <th>NAME</th>
+                    <th>ID CLIENTE</th>
+                    <th>NOMBRE</th>
                     <th>FECHA</th>
                     <th>REFERENCIA</th>
                     <th>MONEDA</th>
