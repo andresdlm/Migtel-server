@@ -15,11 +15,18 @@ import { PdfReportsService } from './services/pdf-reports.service';
 import { ReportsService } from './services/reports.service';
 import { PuppeteerUtils } from './utils/puppeteer.utils';
 import { ReportsUtilsService } from './utils/reports.utils';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Invoice, PaymentMethod, Payment]),
     HttpModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 3000,
+        limit: 2,
+      },
+    ]),
   ],
   controllers: [ReportsController, CsvReportsController, PdfReportsController],
   providers: [

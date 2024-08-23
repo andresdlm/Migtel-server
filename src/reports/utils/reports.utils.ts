@@ -59,8 +59,9 @@ export class ReportsUtilsService {
 
   public getCurrentDate() {
     const date = new Date().toLocaleDateString();
-    const threeDays = 3 * 24 * 60 * 60 * 1000;
-    const dateNow = new Date(new Date(date).getTime() + threeDays).toLocaleDateString();
+    // const threeDays = 3 * 24 * 60 * 60 * 1000;
+    // const dateNow = new Date(new Date(date).getTime() + threeDays).toLocaleDateString();
+    const dateNow = new Date(new Date(date).getTime()).toLocaleDateString();
     return dateNow;
   }
 
