@@ -122,6 +122,12 @@ export class UpdateInvoiceDto {
   @Min(0)
   @Max(100)
   readonly islr: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  readonly otherTaxes: number;
 }
 
 export class FilterInvoiceDto {

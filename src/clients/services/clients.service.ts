@@ -41,7 +41,12 @@ export class ClientsService {
       },
     });
     if (!client) {
-      return this.clientRepo.create({ id: id, retention: 0, amountIslr: 0 });
+      return this.clientRepo.create({
+        id: id,
+        retention: 0,
+        amountIslr: 0,
+        otherRetentions: 0,
+      });
     }
     return client;
   }
@@ -72,6 +77,7 @@ export class ClientsService {
         const client = await this.findOne(clientCrm.id);
         clientCrm.retention = client.retention;
         clientCrm.amountIslr = client.amountIslr;
+        clientCrm.otherRetentions = client.otherRetentions;
       }),
     );
 
@@ -124,6 +130,7 @@ export class ClientsService {
     const client = await this.findOne(clientCrm.id);
     clientCrm.retention = client.retention;
     clientCrm.amountIslr = client.amountIslr;
+    clientCrm.otherRetentions = client.otherRetentions;
     return clientCrm;
   }
 

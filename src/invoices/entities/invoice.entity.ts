@@ -86,6 +86,14 @@ export class Invoice {
   igtf: number;
 
   @Column({
+    type: 'numeric',
+    name: 'other_taxes',
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
+  otherTaxes: number;
+
+  @Column({
     name: 'total_amount',
     type: 'numeric',
     transformer: new ColumnNumericTransformer(),

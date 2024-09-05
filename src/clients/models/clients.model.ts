@@ -40,4 +40,5 @@ export interface ClientCrm {
   usesProforma: boolean;
   retention: number;
   amountIslr: number;
+  otherRetentions: number;
 }
