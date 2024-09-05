@@ -31,8 +31,11 @@ export class User {
   @Column({ type: 'int', name: 'crm_id', default: 1255 })
   crmId: number;
 
-  @Column({ type: 'boolean', default: true })
-  active: boolean;
+  @Column({ name: 'failed_login_attempts', type: 'int', default: 0 })
+  failedLoginAttempts: number;
+
+  @Column({ name: 'is_locked', type: 'boolean', default: false })
+  isLocked: boolean;
 
   @Exclude()
   @OneToMany(() => Invoice, (invoice) => invoice.user)

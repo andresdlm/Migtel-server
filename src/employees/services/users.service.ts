@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { isNumber } from 'class-validator';
@@ -17,12 +21,12 @@ export class UsersService {
 
   async findAll(params?: FilterUsersDto) {
     if (params) {
-      const { limit, offset, getActive } = params;
+      const { limit, offset, getLocked } = params;
       return await this.userRepo.find({
         order: { id: 'DESC' },
         take: limit,
         skip: offset,
-        where: { active: getActive },
+        where: { isLocked: getLocked },
       });
     }
     return await this.userRepo.find({
@@ -49,9 +53,9 @@ export class UsersService {
     return await this.userRepo.findOneBy({ username: username });
   }
 
-  async getCount(getActive: boolean) {
+  async getCount(isLocked: boolean) {
     return await this.userRepo.count({
-      where: { active: getActive },
+      where: { isLocked: isLocked },
     });
   }
 
@@ -94,16 +98,43 @@ export class UsersService {
     return this.userRepo.save(user);
   }
 
-  async activate(id: number) {
+  async switchLock(id: number) {
     const user = await this.userRepo.findOneBy({ id: id });
     if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
-    user.active = !user.active;
+    if (user.failedLoginAttempts >= 3) {
+      throw new ForbiddenException(
+        'User account is locked due to multiple failed login attempts. Please reset the password to unlock the account.',
+      );
+    }
+    user.isLocked = !user.isLocked;
     return await this.userRepo.save(user);
   }
 
   async remove(id: number) {
     return await this.userRepo.delete(id);
+  }
+
+  async incrementFailedAttempts(userId: number): Promise<void> {
+    await this.userRepo.increment({ id: userId }, 'failedLoginAttempts', 1);
+  }
+
+  async resetFailedAttempts(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      failedLoginAttempts: 0,
+      isLocked: false,
+    });
+  }
+
+  async lockUser(userId: number): Promise<void> {
+    await this.userRepo.update(userId, { isLocked: true });
+  }
+
+  async unlockUser(userId: number): Promise<void> {
+    await this.userRepo.update(userId, {
+      failedLoginAttempts: 0,
+      isLocked: false,
+    });
   }
 }
