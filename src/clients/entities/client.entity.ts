@@ -10,4 +10,7 @@ export class Client {
 
   @Column({ name: 'amount_islr', type: 'int', default: 0 })
   amountIslr: number;
+
+  @Column({ name: 'other_retentions', type: 'int', default: 0 })
+  otherRetentions: number;
 }

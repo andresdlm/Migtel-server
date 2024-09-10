@@ -9,7 +9,14 @@ export class PuppeteerUtils {
     fileName: string = 'invoice.pdf',
   ): Promise<Buffer> {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true,
+      executablePath: `/usr/bin/google-chrome`,
+      args: [
+        `--no-sandbox`,
+        `--headless`,
+        `--disable-gpu`,
+        `--disable-dev-shm-usage`,
+      ],
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });

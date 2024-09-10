@@ -36,16 +36,16 @@ export class UsersController {
   @Get()
   findAll(
     @Query() params: FilterUsersDto,
-    @Query('getActive', ParseBoolPipe) getActive: boolean,
+    @Query('getLocked', ParseBoolPipe) getLocked: boolean,
   ) {
-    params.getActive = getActive;
+    params.getLocked = getLocked;
     return this.usersService.findAll(params);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @Get('count')
-  getCount(@Query('getActive', ParseBoolPipe) getActive: boolean) {
-    return this.usersService.getCount(getActive);
+  getCount(@Query('getLocked', ParseBoolPipe) getLocked: boolean) {
+    return this.usersService.getCount(getLocked);
   }
 
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
@@ -75,13 +75,6 @@ export class UsersController {
     @Body() payload: UpdateUserDto,
   ) {
     return this.usersService.update(id, payload);
-  }
-
-  @UseInterceptors(LogInterceptor)
-  @Roles(Role.SUPER_ADMIN)
-  @Delete('activate/:id')
-  activate(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.activate(id);
   }
 
   @UseInterceptors(LogInterceptor)

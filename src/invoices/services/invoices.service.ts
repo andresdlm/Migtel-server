@@ -323,6 +323,10 @@ export class InvoicesService {
     if (changes.islr !== undefined && invoice.igtf === 0) {
       invoice.islr = invoice.subtotal * changes.islr * 0.01;
     }
+
+    if (changes.otherTaxes !== undefined) {
+      invoice.otherTaxes = invoice.subtotal * changes.otherTaxes * 0.01;
+    }
     await this.invoiceRepo.save(invoice);
     return await this.findOne(invoice.id);
   }
@@ -489,13 +493,14 @@ export class InvoicesService {
     invoice.iva_r = invoice.iva * client.retention * 0.01;
     invoice.iva_p = invoice.iva - invoice.iva_r;
     invoice.islr = invoice.subtotal * client.amountIslr * 0.01;
-    invoice.igtf = 0;
-
+    invoice.otherTaxes = invoice.subtotal * client.otherRetentions * 0.01;
     invoice.totalAmount = invoice.subtotal + invoice.iva;
 
     if (invoice.paymentMethod.hasIgtf && invoice.currencyCode !== 'BS') {
       invoice.igtf =
         (invoice.totalAmount - invoice.iva_r - invoice.islr) * 0.03;
+    } else {
+      invoice.igtf = 0;
     }
 
     if (invoice.currencyCode === 'BS') {
