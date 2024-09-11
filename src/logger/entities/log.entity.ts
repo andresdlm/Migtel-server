@@ -31,6 +31,9 @@ export class Log {
   @Column({ type: 'json', nullable: true })
   jwt: string;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  stack: string;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
