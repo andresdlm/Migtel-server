@@ -46,5 +46,5 @@ export class FilterUsersDto {
 
   @IsBoolean()
   @IsOptional()
-  getActive: boolean;
+  getLocked: boolean;
 }

@@ -7,7 +7,6 @@ import {
   Max,
   IsNumber,
 } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateClientDto {
   @IsNumber()
@@ -26,9 +25,13 @@ export class CreateClientDto {
   @Min(0)
   @Max(100)
   readonly amountIslr: number;
-}
 
-export class UpdateClientDto extends PartialType(CreateClientDto) {}
+  @IsInt()
+  @IsNotEmpty()
+  @Min(0)
+  @Max(100)
+  readonly otherRetentions: number;
+}
 
 export class FilterClientDto {
   @IsInt()
