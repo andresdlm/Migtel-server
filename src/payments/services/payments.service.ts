@@ -80,6 +80,7 @@ export class PaymentsService {
         relations: {
           paymentMethod: true,
         },
+        order: { id: 'DESC' },
       });
     }
   }
