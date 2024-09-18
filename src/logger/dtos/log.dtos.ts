@@ -30,17 +30,23 @@ export class CreateLogDto {
   @IsOptional()
   readonly jwt?: any;
 
+  @IsString()
+  @IsOptional()
+  readonly stack?: string;
+
   constructor(
     endpoint: string,
     httpMethod: string,
     requestBody?: any,
     responseBody?: any,
     jwt?: string,
+    stack?: string,
   ) {
     this.endpoint = endpoint;
     this.httpMethod = httpMethod;
     this.requestBody = requestBody;
     this.responseBody = responseBody;
+    this.stack = stack;
     if (jwt && isJWT(jwt)) {
       const jwtBody = jwt.split('.')[1];
       const decodedJwtBody = Buffer.from(jwtBody, 'base64').toString('utf8');

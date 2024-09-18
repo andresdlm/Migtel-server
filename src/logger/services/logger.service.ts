@@ -16,6 +16,7 @@ export class LoggerService extends ConsoleLogger {
       const log = this.logRepo.create(logDto);
       log.message = message;
       log.severity = 'LOG';
+      log.stack = stack;
       this.logRepo.save(log);
     } else {
       super.log(message, stack || context);
@@ -28,6 +29,7 @@ export class LoggerService extends ConsoleLogger {
       const log = this.logRepo.create(logDto);
       log.message = message;
       log.severity = 'FATAL';
+      log.stack = stack;
       this.logRepo.save(log);
     } else {
       super.fatal(message, stack || context);
@@ -40,6 +42,7 @@ export class LoggerService extends ConsoleLogger {
       const log = this.logRepo.create(logDto);
       log.message = message;
       log.severity = 'ERROR';
+      log.stack = stack;
       this.logRepo.save(log);
     } else {
       super.error(message, stack || context);
@@ -52,6 +55,7 @@ export class LoggerService extends ConsoleLogger {
       const log = this.logRepo.create(logDto);
       log.message = message;
       log.severity = 'WARN';
+      log.stack = stack;
       this.logRepo.save(log);
     } else {
       super.warn(message, stack || context);
