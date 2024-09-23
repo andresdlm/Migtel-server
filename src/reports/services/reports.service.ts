@@ -121,6 +121,9 @@ export class ReportsService {
           canceled: true,
         },
       ],
+      relations: {
+        paymentMethod: true,
+      },
       order: {
         id: 'DESC',
       },
@@ -510,21 +513,21 @@ export class ReportsService {
   }
 
   async getOrganization(organizationId: number) {
-      const url = `${this.configService.crmUrl}/organizations/${organizationId}`;
+    const url = `${this.configService.crmUrl}/organizations/${organizationId}`;
 
-      const headers = {
-        'X-Auth-App-Key': `${this.configService.crmApikey}`,
-      };
-  
-      const axiosConfig = {
-        headers,
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-      };
-  
-      const response = await firstValueFrom(
-        this.httpService.get(url, axiosConfig),
-      );
-  
-      return response.data;
+    const headers = {
+      'X-Auth-App-Key': `${this.configService.crmApikey}`,
+    };
+
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    const response = await firstValueFrom(
+      this.httpService.get(url, axiosConfig),
+    );
+
+    return response.data;
   }
 }
