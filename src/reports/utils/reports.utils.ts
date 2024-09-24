@@ -81,6 +81,7 @@ export class ReportsUtilsService {
       'HIGUEROTE',
       'GUARENAS',
       'CAUCAGUA',
+      'BARLOVENTO',
     ];
 
     return organizations[salesBookDto.organizationId];

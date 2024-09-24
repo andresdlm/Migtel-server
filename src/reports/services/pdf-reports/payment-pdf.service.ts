@@ -4,6 +4,7 @@ import { HTML } from 'src/reports/types/report.type';
 import { PuppeteerUtils } from 'src/reports/utils/puppeteer.utils';
 import { ReportsUtilsService } from 'src/reports/utils/reports.utils';
 import { IPdfReport, PaymentReport, Payment } from '../../models/pdf';
+import { ReportsService } from '../reports.service';
 
 @Injectable()
 export class PaymentService implements IPdfReport {
@@ -12,10 +13,12 @@ export class PaymentService implements IPdfReport {
   private params: PaymentReportDto;
   private pages: Map<number, Payment[]>;
   private paymentMethodName: string = '';
+  private organizationName: string = '';
 
   constructor(
     private reportsUtils: ReportsUtilsService,
     private puppeteerUtils: PuppeteerUtils,
+    private reportsService: ReportsService,
   ) {}
 
   public async generate(
@@ -32,6 +35,13 @@ export class PaymentService implements IPdfReport {
     // Get payment method name here because await doesn't work when generating the HTML
     this.paymentMethodName = await this.reportsUtils.getPaymentMethodName(
       this.params,
+    );
+
+    this.organizationName = await this.reportsService.getOrganization(this.params.organizationId).then(
+      (organization) => {
+        let organizationSplitted = organization.name.split(' ');
+        return organizationSplitted[3].toLocaleUpperCase();
+      }
     );
 
     this.pages = this.reportsUtils.splice(report, 40);
@@ -91,9 +101,10 @@ export class PaymentService implements IPdfReport {
               `;
 
         if (this.params.organizationId) {
-          html += `<span> ${this.reportsUtils.getOrganization(
-            this.params,
-          )} </span>`;
+          html += `
+            <span>
+              ${this.organizationName}
+            </span>`;
         }
 
         if (this.params.paymentMethod) {
