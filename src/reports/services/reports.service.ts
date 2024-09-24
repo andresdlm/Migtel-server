@@ -22,10 +22,11 @@ import {
   SummaryRetentions,
   SummarySalesBook,
 } from '../models/reports.model';
-import { map } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import config from '../../config';
 import { ConfigType } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
+import * as https from 'https';
 
 @Injectable()
 export class ReportsService {
@@ -99,6 +100,36 @@ export class ReportsService {
       report: report,
       summary: summary[0],
     };
+  }
+
+  async getCanceledInvoiceReport(params: ReportDto) {
+    params.since.setUTCMinutes(params.since.getTimezoneOffset());
+    params.until.setUTCMinutes(params.until.getTimezoneOffset());
+    params.until.setDate(params.until.getDate() + 1);
+
+    const report: Invoice[] = await this.invoiceRepo.find({
+      where: [
+        {
+          registerDate: Raw(
+            (registerDate) =>
+              `${registerDate} >= :since AND ${registerDate} <= :until`,
+            {
+              since: `${params.since.toLocaleDateString('en-US')}`,
+              until: `${params.until.toLocaleDateString('en-US')}`,
+            },
+          ),
+          canceled: true,
+        },
+      ],
+      relations: {
+        paymentMethod: true,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+
+    return report;
   }
 
   async getAccountPaymentReport(params: ReportDto) {
@@ -479,5 +510,24 @@ export class ReportsService {
     return this.httpService
       .get(url.toString(), axiosConfig)
       .pipe(map((res) => res.data));
+  }
+
+  async getOrganization(organizationId: number) {
+    const url = `${this.configService.crmUrl}/organizations/${organizationId}`;
+
+    const headers = {
+      'X-Auth-App-Key': `${this.configService.crmApikey}`,
+    };
+
+    const axiosConfig = {
+      headers,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+    };
+
+    const response = await firstValueFrom(
+      this.httpService.get(url, axiosConfig),
+    );
+
+    return response.data;
   }
 }

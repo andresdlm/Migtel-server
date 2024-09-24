@@ -37,6 +37,12 @@ export class ReportsController {
     return await this.reportsService.getAccountPaymentReport(payload);
   }
 
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.READER, Role.OPERATOR)
+  @Post('canceled')
+  getCanceledInvoiceReport(@Body() payload: ReportDto) {
+    return this.reportsService.getCanceledInvoiceReport(payload);
+  }
+
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
   @Post('paymentReport')
   async getPaymentReport(@Body() payload: PaymentReportDto) {
@@ -95,5 +101,11 @@ export class ReportsController {
   @Get('bdvPaymentDetails/:id')
   async getBdvPaymentDetails(@Param('id') id: string) {
     return await this.reportsService.getBdvPaymentDetails(id);
+  }
+
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+  @Get('organization/:id')
+  async getOrganization(@Param('id', ParseIntPipe) organizationId: number) {
+    return await this.reportsService.getOrganization(organizationId);
   }
 }
