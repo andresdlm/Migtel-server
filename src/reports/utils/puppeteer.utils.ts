@@ -10,7 +10,7 @@ export class PuppeteerUtils {
   ): Promise<Buffer> {
     const browser = await puppeteer.launch({
       headless: true,
-      // executablePath: `/usr/bin/google-chrome`,
+      executablePath: `/usr/bin/google-chrome`,
       args: [
         `--no-sandbox`,
         `--headless`,
