@@ -8,6 +8,7 @@ import {
   SalesBookReport,
   InvoiceLikeEntity as Invoice,
 } from '../../models/pdf';
+import { ReportsService } from '../reports.service';
 
 @Injectable()
 export class ConciliationInvoiceService implements IPdfReport {
@@ -16,10 +17,12 @@ export class ConciliationInvoiceService implements IPdfReport {
   private report: SalesBookReport | null = null;
   private pages: Map<number, Invoice[]>;
   private paymentMethodName: string = '';
+  private organizationName: string = '';
 
   constructor(
     private reportsUtils: ReportsUtilsService,
     private puppeteerUtils: PuppeteerUtils,
+    private reportsService: ReportsService,
   ) {}
 
   public async generate(
@@ -36,6 +39,13 @@ export class ConciliationInvoiceService implements IPdfReport {
 
     this.paymentMethodName = await this.reportsUtils.getPaymentMethodName(
       this.params,
+    );
+
+    this.organizationName = await this.reportsService.getOrganization(this.params.organizationId).then(
+      (organization) => {
+        let organizationSplitted = organization.name.split(' ');
+        return organizationSplitted[3].toLocaleUpperCase();
+      }
     );
 
     const html: HTML = this.getHtml() + this.reportsUtils.getStyles();
@@ -95,7 +105,7 @@ export class ConciliationInvoiceService implements IPdfReport {
         if (this.params?.organizationId) {
           html += `
                     <span>
-                      ${this.reportsUtils.getOrganization(this.params)}
+                      ${this.organizationName}
                     </span>
                     `;
         }

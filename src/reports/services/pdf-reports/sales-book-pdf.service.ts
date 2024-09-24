@@ -8,6 +8,7 @@ import {
   SalesBookInvoice,
   SalesBookReport,
 } from '../../models/pdf';
+import { ReportsService } from '../reports.service';
 
 @Injectable()
 export class SalesBookService implements IPdfReport {
@@ -23,10 +24,12 @@ export class SalesBookService implements IPdfReport {
   };
   private pages: Map<number, SalesBookInvoice[]>;
   private paymentMethodName: string = '';
+  private organizationName: string = '';
 
   constructor(
     private reportsUtils: ReportsUtilsService,
     private puppeteerUtils: PuppeteerUtils,
+    private reportsService: ReportsService,
   ) {}
 
   public async generate(
@@ -45,6 +48,13 @@ export class SalesBookService implements IPdfReport {
     // Get payment method name here because await doesn't work when generating the HTML
     this.paymentMethodName = await this.reportsUtils.getPaymentMethodName(
       this.params,
+    );
+
+    this.organizationName = await this.reportsService.getOrganization(this.params.organizationId).then(
+      (organization) => {
+        let organizationSplitted = organization.name.split(' ');
+        return organizationSplitted[3].toLocaleUpperCase();
+      }
     );
 
     const html: HTML = this.getHtml() + this.reportsUtils.getStyles();
@@ -101,7 +111,7 @@ export class SalesBookService implements IPdfReport {
         if (this.params.organizationId) {
           html += `
                   <span>
-                    ${this.reportsUtils.getOrganization(this.params)}
+                    ${this.organizationName}
                   </span>
                   `;
         }
