@@ -112,6 +112,7 @@ export class InvoicesService {
           { invoiceNumber: Number(searchInput) },
           { clientId: Number(searchInput) },
         ],
+        order: { id: 'DESC' },
         take: 20,
       });
     }
