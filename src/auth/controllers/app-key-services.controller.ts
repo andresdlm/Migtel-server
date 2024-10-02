@@ -19,6 +19,8 @@ import { CreateInvoiceDto } from 'src/invoices/dtos/invoice.dtos';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../models/roles.model';
 import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
+import { CreatePaymentDto } from 'src/payments/dtos/payment.dtos';
+import { PaymentsService } from 'src/payments/services/payments.service';
 
 @UseGuards(ApiKeyGuard, AppKeyGuard)
 @Controller('app-key-services')
@@ -27,6 +29,7 @@ export class AppKeyServicesController {
     private readonly invoicesService: InvoicesService,
     private readonly clientsService: ClientsService,
     private readonly currencyRateService: CurrencyRateService,
+    private readonly paymentsService: PaymentsService
   ) {}
 
   @Get('clients/:id')
@@ -51,8 +54,14 @@ export class AppKeyServicesController {
 
   @UseInterceptors(LogInterceptor)
   @Post('invoices/createInvoice')
-  create(@Body() payload: CreateInvoiceDto) {
+  createInvoice(@Body() payload: CreateInvoiceDto) {
     return this.invoicesService.create(payload);
+  }
+
+  @UseInterceptors(LogInterceptor)
+  @Post('payments/createPayment')
+  createPayment(@Body() payload: CreatePaymentDto) {
+    return this.paymentsService.create(payload);
   }
 
   @UseInterceptors(LogInterceptor)
