@@ -114,6 +114,7 @@ export class PaymentsService {
         return res.data;
       });
     } catch (error) {
+      console.log(error);
       throw new ServiceUnavailableException('UISP unavailable');
     }
   }
