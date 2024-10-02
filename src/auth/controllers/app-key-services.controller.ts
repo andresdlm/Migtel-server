@@ -21,6 +21,8 @@ import { Role } from '../models/roles.model';
 import { LogInterceptor } from 'src/logger/interceptors/log.interceptor';
 import { CreatePaymentDto } from 'src/payments/dtos/payment.dtos';
 import { PaymentsService } from 'src/payments/services/payments.service';
+import { NotifyService } from 'src/notify-api/services/notify.service';
+import { PaymentRecievedSMSDTO } from 'src/notify-api/dtos/notify.dtos';
 
 @UseGuards(ApiKeyGuard, AppKeyGuard)
 @Controller('app-key-services')
@@ -29,7 +31,8 @@ export class AppKeyServicesController {
     private readonly invoicesService: InvoicesService,
     private readonly clientsService: ClientsService,
     private readonly currencyRateService: CurrencyRateService,
-    private readonly paymentsService: PaymentsService
+    private readonly paymentsService: PaymentsService,
+    private readonly notifyService: NotifyService
   ) {}
 
   @Get('clients/:id')
@@ -61,7 +64,18 @@ export class AppKeyServicesController {
   @UseInterceptors(LogInterceptor)
   @Post('payments/createPayment')
   createPayment(@Body() payload: CreatePaymentDto) {
-    return this.paymentsService.create(payload);
+    const response = this.paymentsService.create(payload).then((res) => {
+      const notifyBody: PaymentRecievedSMSDTO = {
+        clientId: res.clientId,
+        amount: Number(res.amount.toFixed(2)),
+        currency: res.currencyCode,
+      };
+      
+      this.notifyService.paymentRecievedSMS(notifyBody).subscribe();
+      return res;
+    });
+
+    return response;
   }
 
   @UseInterceptors(LogInterceptor)

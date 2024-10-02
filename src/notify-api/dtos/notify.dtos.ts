@@ -53,9 +53,9 @@ export class PaymentRecievedSMSDTO {
   @IsString()
   readonly currency: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  readonly invoiceNumber: number;
+  readonly invoiceNumber?: number;
 }
 
 export class MassByTagDTO {

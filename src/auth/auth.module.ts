@@ -21,6 +21,7 @@ import { AppKeyServicesController } from './controllers/app-key-services.control
 import config from 'src/config';
 import { LoggerModule } from 'src/logger/logger.module';
 import { PaymentsModule } from 'src/payments/payments.module';
+import { NotifyApiModule } from 'src/notify-api/notify-api.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PaymentsModule } from 'src/payments/payments.module';
     PassportModule,
     PaymentsModule,
     LoggerModule,
+    NotifyApiModule,
     JwtModule.registerAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
